@@ -1,0 +1,320 @@
+"use client";
+
+import { Button } from "@/components/Button";
+import { Header } from "@/components/Header";
+import { Heading } from "@/components/Heading";
+import { Modal } from "@/components/Modal";
+import { NavLink } from "@/components/NavLink";
+import { Section } from "@/components/Section";
+import { SectionContainer } from "@/components/SectionContainer";
+import { Table } from "@/components/Table";
+import { Contract, ContractAbi } from "@/types/contracts";
+import { formatEther } from "@/utils/formatter";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import axios from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { keccak256, parseEther, toHex } from "viem";
+import { useAccount, useSendTransaction, useWaitForTransaction } from "wagmi";
+import { startCase } from "lodash";
+
+export default function Contracts() {
+  const { openConnectModal } = useConnectModal();
+  const { address, isDisconnected } = useAccount();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createContractType, setCreateContractType] =
+    useState("AllowanceToken");
+  const [constructorArgs, setConstructorArgs] = useState<{
+    [key: string]: any;
+  }>({});
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [contractAbis, setContractAbis] = useState<{
+    [key: string]: ContractAbi;
+  }>({});
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tab = searchParams.get("tab") ?? "tokens";
+  const contractTypeChoices = (contractAbis && Object.keys(contractAbis)) || [];
+
+  useEffect(() => {
+    (async () => {
+      const contractsRes = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts`
+      );
+      setContracts(contractsRes.data.result);
+    })();
+
+    (async () => {
+      const contractsRes = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/all-abis`
+      );
+      setContractAbis(contractsRes.data);
+    })();
+  }, []);
+
+  const creationConstructorArgs =
+    (contractAbis &&
+      contractAbis[createContractType] &&
+      Object.keys(contractAbis[createContractType]["constructor"]["args"])) ||
+    [];
+
+  const createContractSalt = keccak256(Buffer.from(`${Date.now()}`));
+  const createContractData = {
+    protocol: createContractType,
+    constructorArgs: constructorArgs,
+    salt: createContractSalt,
+  };
+  const createContractTx = useSendTransaction({
+    to: "0x0000000000000000000000000000000000000000",
+    data: toHex(
+      `data:application/vnd.esc.contract.deploy+json,${JSON.stringify(
+        createContractData
+      )}`
+    ),
+  });
+  const createContractWait = useWaitForTransaction({
+    hash: createContractTx.data?.hash,
+    confirmations: 1,
+    onSuccess() {
+      setShowCreateModal(false);
+      setConstructorArgs({});
+    },
+  });
+
+  const createLoading =
+    createContractTx.isLoading ||
+    createContractWait.isFetching ||
+    createContractWait.isLoading;
+
+  const createContract = async () => {
+    try {
+      if (address && !isDisconnected) {
+        createContractTx.sendTransaction();
+      } else if (openConnectModal) {
+        openConnectModal();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const renderTableHeaders = () =>
+    tab === "lps"
+      ? ["Pair", "Reserves", "Created"]
+      : [
+          "Name",
+          "Symbol",
+          "Max Supply",
+          "Total Supply",
+          "Per Mint Limit",
+          "Unique Holders",
+        ];
+
+  const renderTokenItem = (contract: Contract) => {
+    return [
+      <div
+        key={contract.contract_id}
+        className="flex flex-row items-center gap-6"
+      >
+        <div className="font-bold max-w-[100px] sm:max-w-none truncate overflow-hidden">
+          {contract.current_state.name}
+        </div>
+      </div>,
+      <div key={contract.contract_id} className="font-medium">
+        {contract.current_state.symbol}
+      </div>,
+      <div key={contract.contract_id} className="font-medium flex flex-col">
+        {formatEther(contract.current_state.max_supply)}{" "}
+        {contract.current_state.symbol}
+      </div>,
+      <div key={contract.contract_id} className="font-medium flex flex-col">
+        {formatEther(contract.current_state.total_supply)}{" "}
+        {contract.current_state.symbol}
+      </div>,
+      <div key={contract.contract_id} className="font-medium">
+        {formatEther(contract.current_state.per_mint_limit)}{" "}
+        {contract.current_state.symbol}
+      </div>,
+      <div key={contract.contract_id} className="font-medium">
+        {Object.keys(
+          contract.current_state.balances || {}
+        ).length.toLocaleString()}
+      </div>,
+    ];
+  };
+
+  const renderLiquidityPoolItem = (contract: Contract) => {
+    return [
+      <div key={contract.contract_id} className="font-medium">
+        {`${
+          contracts.find((c) => c.contract_id == contract.current_state.token0)
+            ?.current_state?.symbol
+        }/${
+          contracts.find((c) => c.contract_id == contract.current_state.token1)
+            ?.current_state?.symbol
+        }`}
+      </div>,
+      <div key={contract.contract_id} className="font-medium">
+        --
+      </div>,
+      <div key={contract.contract_id} className="font-medium">
+        --
+      </div>,
+    ];
+  };
+
+  const filteredContracts = contracts.filter((contract) => {
+    switch (tab) {
+      case "lps":
+        return contract.current_state.contract_type === "DexLiquidityPool";
+      case "bridges":
+        return contract.current_state.contract_type === "BridgeableToken";
+      default:
+        return (
+          contract.current_state.contract_type === "AllowanceToken" ||
+          contract.current_state.contract_type === "SimpleToken"
+        );
+    }
+  });
+
+  return (
+    <div className="min-h-[100vh] flex flex-col">
+      <Header />
+      <SectionContainer>
+        <Section>
+          <div className="flex flex-col p-0 md:p-8 gap-4 md:gap-8">
+            <Heading>Dumb Contracts</Heading>
+            <div className="text-xl">
+              Dumb Contracts execute tasks off-chain, offering enhanced
+              scalability and flexibility while reducing the constraints of
+              on-chain gas fees and processing limitations.
+            </div>
+            <Button onClick={() => setShowCreateModal(true)}>
+              Create Contract
+            </Button>
+          </div>
+        </Section>
+      </SectionContainer>
+      <SectionContainer>
+        <Section className="py-0">
+          <div className="px-0 md:px-8 flex gap-8 items-center h-min-full">
+            <div className="flex gap-8 h-min-full">
+              <NavLink href="?tab=tokens" isActive={tab === "tokens"}>
+                Tokens
+              </NavLink>
+              <NavLink href="?tab=lps" isActive={tab === "lps"}>
+                Liquidity Pools
+              </NavLink>
+              <NavLink href="?tab=bridges" isActive={tab === "bridges"}>
+                Bridges
+              </NavLink>
+            </div>
+          </div>
+        </Section>
+      </SectionContainer>
+      <SectionContainer className="flex-1">
+        <Section className="flex-1">
+          <div className="px-0 md:px-8">
+            <Table
+              headers={renderTableHeaders()}
+              rows={filteredContracts.map((contract) => {
+                switch (contract.current_state.contract_type) {
+                  case "SimpleToken":
+                  case "AllowanceToken":
+                  case "BridgeableToken":
+                    return renderTokenItem(contract);
+                  default:
+                    return renderLiquidityPoolItem(contract);
+                }
+              })}
+              onRowClick={(rowIndex) =>
+                router.push(
+                  `/contracts/${filteredContracts[rowIndex].contract_id}`
+                )
+              }
+            />
+          </div>
+        </Section>
+      </SectionContainer>
+      <SectionContainer className="border-none">
+        <Section className="flex-1 items-center">
+          &copy; {new Date().getFullYear()} Ethscriptions Inc.
+        </Section>
+      </SectionContainer>
+      <Modal
+        show={contractTypeChoices.length > 0 && showCreateModal}
+        confirmText="Deploy Contract"
+        title="Create New Contract"
+        onClose={() => {
+          setShowCreateModal(false);
+        }}
+        onConfirm={() => {
+          createContract();
+        }}
+        loading={createLoading}
+      >
+        <label
+          htmlFor="contract_type"
+          className="block text-sm font-medium leading-6 mb-2"
+        >
+          Contract Type
+        </label>
+        <div className="mb-4">
+          <select
+            name="contract_type"
+            id="contract_type"
+            className="mt-2 block w-full rounded-none h-10 pl-3 pr-10 outline-none
+                border-[1px] border-[rgba(255,255,255,0.2)] bg-black focus:border-e-2 focus:border-primary sm:text-sm sm:leading-6"
+            onChange={(e) => setCreateContractType(e.target.value)}
+            value={createContractType}
+          >
+            {contractTypeChoices.map((choice) => (
+              <option key={choice} value={choice}>
+                {choice}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="border-t-[1px] border-[rgba(255,255,255,0.2)] w-full my-6" />
+        <div className="block text-sm font-medium leading-6 mb-2">
+          Constructor Arguments
+        </div>
+        <div className="flex flex-col gap-4">
+          {creationConstructorArgs.map((arg) => (
+            <div key={arg}>
+              <label
+                className="block text-xs font-medium leading-6"
+                htmlFor={arg}
+              >
+                {startCase(arg)}
+              </label>
+              <input
+                id={arg}
+                type="text"
+                className="block w-full outline-none bg-black border-0 p-2 ring-1 ring-inset ring-[rgba(255,255,255,0.2)] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                placeholder={startCase(arg)}
+                name={arg}
+                onChange={(e) => {
+                  setConstructorArgs({
+                    ...constructorArgs,
+                    [arg]:
+                      (arg === "_maxSupply" || arg === "_perMintLimit") &&
+                      e.target.value
+                        ? parseEther(e.target.value, "wei").toString()
+                        : e.target.value,
+                  });
+                }}
+                value={
+                  (arg === "_maxSupply" || arg === "_perMintLimit") &&
+                  constructorArgs[arg]
+                    ? formatEther(constructorArgs[arg], false)
+                    : constructorArgs[arg] || ""
+                }
+              />
+            </div>
+          ))}
+        </div>
+      </Modal>
+    </div>
+  );
+}

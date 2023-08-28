@@ -1,0 +1,82 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      },
+    },
+    colors: (colors) => ({
+      ...colors.colors,
+      primary: "#c3ff00",
+      secondary: "#ffca9a",
+      dark: "#131800",
+      lime: {
+        DEFAULT: "#C3FF00",
+        50: "#EEFFB8",
+        100: "#E9FFA3",
+        200: "#E0FF7A",
+        300: "#D6FF52",
+        400: "#CDFF29",
+        500: "#C3FF00",
+        600: "#98C700",
+        700: "#6D8F00",
+        800: "#425700",
+        900: "#171F00",
+        950: "#020300",
+      },
+      avocado: {
+        DEFAULT: "#8A9661",
+        50: "#DCE0CF",
+        100: "#D3D8C2",
+        200: "#C1C8AA",
+        300: "#AFB891",
+        400: "#9DA878",
+        500: "#8A9661",
+        600: "#6B744B",
+        700: "#4B5235",
+        800: "#2C301F",
+        900: "#0D0E09",
+        950: "#000000",
+      },
+      peach: {
+        DEFAULT: "#FFCA9A",
+        50: "#FFFFFF",
+        100: "#FFFFFF",
+        200: "#FFFFFF",
+        300: "#FFF5EC",
+        400: "#FFDFC3",
+        500: "#FFCA9A",
+        600: "#FFAD62",
+        700: "#FF8F2A",
+        800: "#F17200",
+        900: "#B95800",
+        950: "#9D4A00",
+      },
+      tangerine: {
+        DEFAULT: "#F29366",
+        50: "#FFFFFF",
+        100: "#FFFDFC",
+        200: "#FCE3D7",
+        300: "#F8C8B1",
+        400: "#F5AE8C",
+        500: "#F29366",
+        600: "#EE6F32",
+        700: "#D65112",
+        800: "#A23D0E",
+        900: "#6E2A09",
+        950: "#542007",
+      },
+    }),
+  },
+  plugins: [],
+};
+export default config;
