@@ -171,8 +171,8 @@ export default function Contracts() {
         return contract.current_state.contract_type === "BridgeableToken";
       default:
         return (
-          contract.current_state.contract_type === "AllowanceToken" ||
-          contract.current_state.contract_type === "SimpleToken"
+          contract.current_state.contract_type !== "BridgeableToken" &&
+          contract.current_state.contract_type !== "DexLiquidityPool"
         );
     }
   });
@@ -219,12 +219,10 @@ export default function Contracts() {
               headers={renderTableHeaders()}
               rows={filteredContracts.map((contract) => {
                 switch (contract.current_state.contract_type) {
-                  case "SimpleToken":
-                  case "AllowanceToken":
-                  case "BridgeableToken":
-                    return renderTokenItem(contract);
-                  default:
+                  case "DexLiquidityPool":
                     return renderLiquidityPoolItem(contract);
+                  default:
+                    return renderTokenItem(contract);
                 }
               })}
               onRowClick={(rowIndex) =>

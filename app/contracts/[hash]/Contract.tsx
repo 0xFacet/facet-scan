@@ -82,7 +82,7 @@ export default function Contract({ hash }: { hash: string }) {
         })
         .map((name) => ({
           name,
-          arguments: contractAbi[name]["args"],
+          args: contractAbi[name]["args"],
         })),
     [contractAbi]
   );
@@ -271,7 +271,7 @@ export default function Contract({ hash }: { hash: string }) {
             className="flex flex-col gap-3 border-b border-[rgba(255,255,255,0.2)] pb-6"
           >
             <Heading size="h5">{startCase(method.name)}</Heading>
-            {Object.keys(method.arguments).map((argument) => (
+            {Object.keys(method.args ?? {}).map((argument) => (
               <div key={argument} className="flex flex-col gap-1">
                 <label
                   className="block text-sm font-medium leading-6"
@@ -282,7 +282,7 @@ export default function Contract({ hash }: { hash: string }) {
                 <input
                   id={argument}
                   type="text"
-                  className="bg-black w-full block border-0 py-2 px-4 text-gray-900 outline-none ring-1 ring-inset ring-[rgba(255,255,255,0.2)] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary"
+                  className="bg-black w-full block border-0 py-2 px-4 outline-none ring-1 ring-inset ring-[rgba(255,255,255,0.2)] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary"
                   placeholder={startCase(argument)}
                   onChange={(e) => {
                     setMethodValues((values) => ({
@@ -321,7 +321,7 @@ export default function Contract({ hash }: { hash: string }) {
               {staticCallResults[method.name] !== null &&
                 staticCallResults[method.name] !== undefined && (
                   <div>
-                    <div className="text-sm font-medium leading-6 text-gray-900">
+                    <div className="text-sm font-medium leading-6">
                       Result
                     </div>
                     <div className="text-sm">
