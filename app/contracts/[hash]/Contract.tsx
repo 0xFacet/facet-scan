@@ -248,18 +248,12 @@ export default function Contract({ hash }: { hash: string }) {
               isAddress(currentState[key])
                 ? [
                     startCase(key),
-                    <Link
+                    <Address
                       key={key}
-                      href={`/${currentState[key]}`}
-                      className="text-secondary hover:text-primary transition-colors"
-                    >
-                      <Address
-                        address={currentState[key]}
-                        disableAddressLink
-                        noAvatar
-                        noCopy
-                      />
-                    </Link>,
+                      address={currentState[key]}
+                      noAvatar
+                      noCopy
+                    />,
                   ]
                 : [
                     startCase(key),
@@ -520,18 +514,12 @@ export default function Contract({ hash }: { hash: string }) {
               isAddress(selectedState[key])
                 ? [
                     `${key}`,
-                    <Link
+                    <Address
                       key={key}
-                      href={`/${selectedState[key]}`}
-                      className="text-secondary hover:text-primary transition-colors"
-                    >
-                      <Address
-                        address={selectedState[key]}
-                        disableAddressLink
-                        noAvatar
-                        noCopy
-                      />
-                    </Link>,
+                      address={selectedState[key]}
+                      noAvatar
+                      noCopy
+                    />,
                   ]
                 : [
                     `${key}`,

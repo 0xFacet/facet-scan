@@ -104,10 +104,10 @@ export const Address = ({
         )}
       </div>
       {disableAddressLink ? (
-        <span className="text-lg">{displayAddress}</span>
+        <span>{displayAddress}</span>
       ) : (
         <a
-          className="text-lg font-normal"
+          className="text-secondary hover:text-primary transition-colors"
           target="_blank"
           href={blockExplorerAddressLink}
           rel="noopener noreferrer"
