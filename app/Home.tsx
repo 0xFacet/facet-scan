@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/Button";
+import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
@@ -38,11 +39,7 @@ export default function Home() {
           </div>
         </Section>
       </SectionContainer>
-      <SectionContainer className="border-none">
-        <Section className="flex-1 items-center">
-          &copy; {new Date().getFullYear()} Ethscriptions Inc.
-        </Section>
-      </SectionContainer>
+      <Footer />
     </div>
   );
 }

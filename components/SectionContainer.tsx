@@ -4,7 +4,7 @@ export const SectionContainer = ({
   children,
   className,
 }: {
-  children: any | any[];
+  children: React.ReactNode;
   className?: string;
 }) => {
   return (

@@ -5,8 +5,8 @@ export const Table = ({
   rows,
   onRowClick,
 }: {
-  headers?: (JSX.Element | string)[] | (JSX.Element | string)[][];
-  rows: (JSX.Element | string)[][] | (JSX.Element | string)[][];
+  headers?: React.ReactNode[];
+  rows: React.ReactNode[][];
   onRowClick?: (index: number) => void;
 }) => {
   return (

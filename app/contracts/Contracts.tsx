@@ -22,6 +22,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { kebabCase, startCase } from "lodash";
+import { Footer } from "@/components/Footer";
 
 export default function Contracts() {
   const { data: latestBlockNumber } = useBlockNumber({ watch: true });
@@ -222,11 +223,7 @@ export default function Contracts() {
           </div>
         </Section>
       </SectionContainer>
-      <SectionContainer className="border-none">
-        <Section className="flex-1 items-center">
-          &copy; {new Date().getFullYear()} Ethscriptions Inc.
-        </Section>
-      </SectionContainer>
+      <Footer />
       <Modal
         show={contractTypes.length > 0 && showCreateModal}
         confirmText="Deploy Contract"
@@ -260,36 +257,40 @@ export default function Contracts() {
             ))}
           </select>
         </div>
-        <div className="border-t-[1px] border-line w-full my-6" />
-        <div className="block text-sm font-medium leading-6 mb-2">
-          Constructor Arguments
-        </div>
-        <div className="flex flex-col gap-4">
-          {creationConstructorArgs.map((arg) => (
-            <div key={arg}>
-              <label
-                className="block text-xs font-medium leading-6"
-                htmlFor={arg}
-              >
-                {startCase(arg)}
-              </label>
-              <input
-                id={arg}
-                type="text"
-                className="block w-full outline-none bg-black border-0 p-2 ring-1 ring-inset ring-line placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                placeholder={startCase(arg)}
-                name={arg}
-                onChange={(e) => {
-                  setConstructorArgs({
-                    ...constructorArgs,
-                    [arg]: e.target.value,
-                  });
-                }}
-                value={constructorArgs[arg]}
-              />
+        {!!createContractType.length && (
+          <>
+            <div className="border-t-[1px] border-line w-full my-6" />
+            <div className="block text-sm font-medium leading-6 mb-2">
+              Constructor Arguments
             </div>
-          ))}
-        </div>
+            <div className="flex flex-col gap-4">
+              {creationConstructorArgs.map((arg) => (
+                <div key={arg}>
+                  <label
+                    className="block text-xs font-medium leading-6"
+                    htmlFor={arg}
+                  >
+                    {startCase(arg)}
+                  </label>
+                  <input
+                    id={arg}
+                    type="text"
+                    className="block w-full outline-none bg-black border-0 p-2 ring-1 ring-inset ring-line placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    placeholder={startCase(arg)}
+                    name={arg}
+                    onChange={(e) => {
+                      setConstructorArgs({
+                        ...constructorArgs,
+                        [arg]: e.target.value,
+                      });
+                    }}
+                    value={constructorArgs[arg]}
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </Modal>
     </div>
   );

@@ -30,41 +30,9 @@ export const CustomConnectButton = () => {
 
               if (chain.unsupported || chain.id !== targetNetwork.id) {
                 return (
-                  <div className="dropdown dropdown-end">
-                    <Button
-                      tabIndex={0}
-                      className="btn-error btn-sm dropdown-toggle"
-                    >
-                      <span>Wrong network</span>
-                    </Button>
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content menu p-2 mt-1 shadow-lg bg-base-100 rounded-lg"
-                    >
-                      <li>
-                        <button
-                          className="menu-item"
-                          type="button"
-                          onClick={() => switchNetwork?.(targetNetwork.id)}
-                        >
-                          <HiArrowsRightLeft className="h-6 w-4 ml-2 sm:ml-0" />
-                          <span className="whitespace-nowrap">
-                            Switch to {targetNetwork.name}
-                          </span>
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          className="menu-item text-error"
-                          type="button"
-                          onClick={() => disconnect()}
-                        >
-                          <HiArrowLeftOnRectangle className="h-6 w-4 ml-2 sm:ml-0" />{" "}
-                          <span>Disconnect</span>
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+                  <Button onClick={() => switchNetwork?.(targetNetwork.id)}>
+                    <span>Switch to {targetNetwork.name}</span>
+                  </Button>
                 );
               }
 

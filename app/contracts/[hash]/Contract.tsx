@@ -29,7 +29,6 @@ import { formatUnits, isAddress, keccak256, toHex } from "viem";
 import { useAccount, useBlockNumber } from "wagmi";
 import { kebabCase, startCase } from "lodash";
 import { sendTransaction } from "@wagmi/core";
-import { waitForTransaction } from "wagmi/actions";
 import Link from "next/link";
 import { Address } from "@/components/Address";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -42,6 +41,7 @@ import { targetNetwork } from "@/app/providers";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { stackoverflowDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Footer } from "@/components/Footer";
 
 export default function Contract({ hash }: { hash: string }) {
   const { data: latestBlockNumber } = useBlockNumber({ watch: true });
@@ -50,7 +50,7 @@ export default function Contract({ hash }: { hash: string }) {
   const [currentState, setCurrentState] = useState<CurrentState | null>(null);
   const [contractAbi, setContractAbi] = useState<ContractAbi>({});
   const [callReceipts, setCallReceipts] = useState<CallReceipt[]>([]);
-  const [sourceCode, setSourceCode] = useState<SourceCode | null>(null);
+  const [sourceCode, setSourceCode] = useState<SourceCode[]>([]);
   const [methodValues, setMethodValues] = useState<{
     [key: string]: { [key: string]: string };
   }>({});
@@ -69,6 +69,7 @@ export default function Contract({ hash }: { hash: string }) {
   const [addressCopied, setAddressCopied] = useState(false);
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") ?? "transactions";
+  const subtab = searchParams.get("subtab") ?? "details";
 
   const writeMethods = useMemo(
     () =>
@@ -113,7 +114,7 @@ export default function Contract({ hash }: { hash: string }) {
           const {
             current_state = {},
             abi = {},
-            source_code = null,
+            source_code = [],
           } = contractRes.data.result ?? {};
           setCurrentState(current_state);
           setContractAbi(abi);
@@ -233,7 +234,7 @@ export default function Contract({ hash }: { hash: string }) {
     }
   };
 
-  const renderState = () => {
+  const renderStateDetails = () => {
     return (
       <Table
         rows={[
@@ -462,21 +463,22 @@ export default function Contract({ hash }: { hash: string }) {
   };
 
   const renderCode = () => {
-    if (!sourceCode) return null;
+    if (!sourceCode.length) return null;
     return (
-      <SyntaxHighlighter
-        language={sourceCode.language}
-        style={stackoverflowDark}
-      >
-        {sourceCode?.code}
-      </SyntaxHighlighter>
+      <div className="flex flex-col gap-8">
+        {sourceCode.map((sc) => (
+          <SyntaxHighlighter language={sc.language} style={stackoverflowDark}>
+            {sc?.code}
+          </SyntaxHighlighter>
+        ))}
+      </div>
     );
   };
 
-  const renderOther = () => {
+  const renderOtherState = () => {
     const currentStateKeys = Object.keys(currentState);
     const selectedStateKey = currentStateKeys.find(
-      (key) => kebabCase(key) === tab
+      (key) => kebabCase(key) === subtab
     );
     const selectedState = selectedStateKey && currentState[selectedStateKey];
     if (!selectedState) return null;
@@ -540,12 +542,52 @@ export default function Contract({ hash }: { hash: string }) {
     );
   };
 
+  const renderStateSubTabs = () => {
+    switch (subtab) {
+      case "details":
+        return renderStateDetails();
+      default:
+        return renderOtherState();
+    }
+  };
+
+  const renderStateParent = () => {
+    return (
+      <div className="flex flex-col gap-8">
+        <div className="flex gap-8 items-center h-min-full border-b border-line">
+          <div className="flex gap-8 h-min-full">
+            <NavLink
+              href="?tab=state&subtab=details"
+              isActive={subtab === "details"}
+              className="whitespace-nowrap"
+            >
+              Details
+            </NavLink>
+            {Object.keys(currentState)
+              .filter((key) => typeof currentState[key] === "object")
+              .map((key) => (
+                <NavLink
+                  key={key}
+                  href={`?tab=state&subtab=${kebabCase(key)}`}
+                  isActive={subtab === kebabCase(key)}
+                  className="whitespace-nowrap"
+                >
+                  {startCase(key)}
+                </NavLink>
+              ))}
+          </div>
+        </div>
+        {renderStateSubTabs()}
+      </div>
+    );
+  };
+
   const renderTab = () => {
     switch (tab) {
       case "transactions":
         return renderTransactions();
       case "state":
-        return renderState();
+        return renderStateParent();
       case "write":
         return renderMethods(writeMethods);
       case "read":
@@ -553,7 +595,7 @@ export default function Contract({ hash }: { hash: string }) {
       case "code":
         return renderCode();
       default:
-        return renderOther();
+        return null;
     }
   };
 
@@ -639,18 +681,6 @@ export default function Contract({ hash }: { hash: string }) {
               >
                 Code
               </NavLink>
-              {Object.keys(currentState)
-                .filter((key) => typeof currentState[key] === "object")
-                .map((key) => (
-                  <NavLink
-                    key={key}
-                    href={`?tab=${kebabCase(key)}`}
-                    isActive={tab === kebabCase(key)}
-                    className="whitespace-nowrap"
-                  >
-                    {startCase(key)}
-                  </NavLink>
-                ))}
             </div>
           </div>
         </Section>
@@ -660,11 +690,7 @@ export default function Contract({ hash }: { hash: string }) {
           <div className="px-0 md:px-8">{renderTab()}</div>
         </Section>
       </SectionContainer>
-      <SectionContainer className="border-none">
-        <Section className="flex-1 items-center">
-          &copy; {new Date().getFullYear()} Ethscriptions Inc.
-        </Section>
-      </SectionContainer>
+      <Footer />
       <Modal
         title="Call Receipt"
         show={!!callReceipt}

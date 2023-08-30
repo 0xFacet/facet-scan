@@ -12,8 +12,8 @@ export const Modal = ({
   loading,
 }: {
   show: boolean;
-  title: string | string[];
-  children: (string | JSX.Element) | (string | JSX.Element)[];
+  title: React.ReactNode;
+  children: React.ReactNode;
   confirmText?: string;
   onConfirm?: () => void;
   onClose: () => void;

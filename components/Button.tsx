@@ -11,7 +11,7 @@ export const Button = ({
   ...otherProps
 }:
   | {
-      children: (JSX.Element | string) | (JSX.Element | string)[];
+      children: React.ReactNode;
       onClick?: MouseEventHandler<HTMLButtonElement>;
       className?: string;
       disabled?: boolean;

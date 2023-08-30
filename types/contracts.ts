@@ -85,5 +85,5 @@ export interface Contract {
   call_receipts: CallReceipt[];
   contract_id: string;
   current_state: CurrentState;
-  source_code: SourceCode;
+  source_code: SourceCode[];
 }
