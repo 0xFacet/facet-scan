@@ -28,8 +28,7 @@ export default function Contracts() {
   const { openConnectModal } = useConnectModal();
   const { address, isDisconnected } = useAccount();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createContractType, setCreateContractType] =
-    useState("AllowanceToken");
+  const [createContractType, setCreateContractType] = useState("");
   const [constructorArgs, setConstructorArgs] = useState<{
     [key: string]: any;
   }>({});
@@ -116,7 +115,7 @@ export default function Contracts() {
 
   const createContract = async () => {
     try {
-      if (address && !isDisconnected) {
+      if (createContractType.length && address && !isDisconnected) {
         createContractTx.sendTransaction();
       } else if (openConnectModal) {
         openConnectModal();
@@ -235,9 +234,7 @@ export default function Contracts() {
         onClose={() => {
           setShowCreateModal(false);
         }}
-        onConfirm={() => {
-          createContract();
-        }}
+        onConfirm={createContractType.length ? createContract : undefined}
         loading={createLoading}
       >
         <label
@@ -255,6 +252,7 @@ export default function Contracts() {
             onChange={(e) => setCreateContractType(e.target.value)}
             value={createContractType}
           >
+            <option value="">Select a Contract Type</option>
             {contractTypes.map((type) => (
               <option key={type} value={type}>
                 {startCase(type)}

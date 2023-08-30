@@ -140,6 +140,7 @@ export default function Contract({ hash }: { hash: string }) {
             setPendingCallTxnHash(null);
             setCallReceipt(receipt);
             setCallReceipts((receipts) => [receipt, ...receipts]);
+            setMethodLoading({});
           }
         };
 
@@ -223,7 +224,6 @@ export default function Contract({ hash }: { hash: string }) {
             )}`
           ),
         });
-        await waitForTransaction({ confirmations: 2, hash: txn.hash });
         setPendingCallTxnHash(txn.hash);
       } else if (openConnectModal) {
         openConnectModal();
@@ -231,7 +231,6 @@ export default function Contract({ hash }: { hash: string }) {
     } catch (e) {
       console.log(e);
     }
-    setMethodLoading((loading) => ({ ...loading, [name]: false }));
   };
 
   const renderState = () => {
@@ -370,37 +369,65 @@ export default function Contract({ hash }: { hash: string }) {
           <Table
             headers={["Event", "Amount", "From", "To", "Date"]}
             rows={[
-              ...callReceipts
-                .map((callReceipt) => [
-                  <div
-                    key={callReceipt.ethscription_id}
-                    onClick={() => setCallReceipt(callReceipt)}
-                    className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
-                  >
-                    {callReceipt.status === "success" ? (
-                      <IoCheckmarkCircleOutline className="text-xl text-primary" />
-                    ) : (
-                      <IoCloseCircleOutline className="text-xl text-red-500" />
+              ...callReceipts.map((callReceipt) => [
+                <div
+                  key={callReceipt.ethscription_id}
+                  onClick={() => setCallReceipt(callReceipt)}
+                  className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
+                >
+                  {callReceipt.status === "success" ? (
+                    <IoCheckmarkCircleOutline className="text-xl text-primary" />
+                  ) : (
+                    <IoCloseCircleOutline className="text-xl text-red-500" />
+                  )}
+                  {startCase(callReceipt.function_name)}
+                </div>,
+                <div
+                  key={callReceipt.ethscription_id}
+                  className="flex flex-row gap-1"
+                >
+                  <div className="overflow-hidden text-ellipsis max-w-[200px]">
+                    {formatUnits(
+                      callReceipt.function_args.amount ||
+                        callReceipt.function_args.token_a_amount ||
+                        callReceipt.function_args.token_b_amount ||
+                        callReceipt.function_args.input_amount ||
+                        callReceipt.function_args.output_amount ||
+                        callReceipt.function_args.value ||
+                        0,
+                      currentState.decimals ?? 0
                     )}
-                    {startCase(callReceipt.function_name)}
-                  </div>,
-                  <div
+                  </div>
+                  {currentState.symbol}
+                </div>,
+                <Link
+                  key={callReceipt.ethscription_id}
+                  href={`https://ethscriptions.com/${callReceipt.caller}`}
+                  className="text-secondary hover:text-primary transition-colors"
+                  target="_blank"
+                >
+                  <Address
+                    disableAddressLink={true}
+                    noAvatar={true}
+                    noCopy={true}
+                    address={callReceipt.caller}
+                  />
+                </Link>,
+                !!callReceipt.function_args.to ? (
+                  <Link
                     key={callReceipt.ethscription_id}
-                    className="flex flex-row gap-1"
+                    href={`https://ethscriptions.com/${callReceipt.function_args.to}`}
+                    className="text-secondary hover:text-primary transition-colors"
+                    target="_blank"
                   >
-                    <div className="overflow-hidden text-ellipsis max-w-[200px]">
-                      {formatUnits(
-                        callReceipt.function_args.amount ||
-                          callReceipt.function_args.token_a_amount ||
-                          callReceipt.function_args.token_b_amount ||
-                          callReceipt.function_args.input_amount ||
-                          callReceipt.function_args.output_amount ||
-                          callReceipt.function_args.value || 0,
-                        currentState.decimals ?? 0
-                      )}
-                    </div>
-                    {currentState.symbol}
-                  </div>,
+                    <Address
+                      disableAddressLink={true}
+                      noAvatar={true}
+                      noCopy={true}
+                      address={callReceipt.function_args.to}
+                    />
+                  </Link>
+                ) : (
                   <Link
                     key={callReceipt.ethscription_id}
                     href={`https://ethscriptions.com/${callReceipt.caller}`}
@@ -413,48 +440,20 @@ export default function Contract({ hash }: { hash: string }) {
                       noCopy={true}
                       address={callReceipt.caller}
                     />
-                  </Link>,
-                  !!callReceipt.function_args.to ? (
-                    <Link
-                      key={callReceipt.ethscription_id}
-                      href={`https://ethscriptions.com/${callReceipt.function_args.to}`}
-                      className="text-secondary hover:text-primary transition-colors"
-                      target="_blank"
-                    >
-                      <Address
-                        disableAddressLink={true}
-                        noAvatar={true}
-                        noCopy={true}
-                        address={callReceipt.function_args.to}
-                      />
-                    </Link>
-                  ) : (
-                    <Link
-                      key={callReceipt.ethscription_id}
-                      href={`https://ethscriptions.com/${callReceipt.caller}`}
-                      className="text-secondary hover:text-primary transition-colors"
-                      target="_blank"
-                    >
-                      <Address
-                        disableAddressLink={true}
-                        noAvatar={true}
-                        noCopy={true}
-                        address={callReceipt.caller}
-                      />
-                    </Link>
-                  ),
-                  formatTimestamp(callReceipt.timestamp) ? (
-                    <div
-                      key={callReceipt.ethscription_id}
-                      onClick={() => setCallReceipt(callReceipt)}
-                      className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
-                    >
-                      {formatTimestamp(callReceipt.timestamp)}
-                    </div>
-                  ) : (
-                    "--"
-                  ),
-                ]),
+                  </Link>
+                ),
+                formatTimestamp(callReceipt.timestamp) ? (
+                  <div
+                    key={callReceipt.ethscription_id}
+                    onClick={() => setCallReceipt(callReceipt)}
+                    className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
+                  >
+                    {formatTimestamp(callReceipt.timestamp)}
+                  </div>
+                ) : (
+                  "--"
+                ),
+              ]),
             ]}
           />
         </div>
