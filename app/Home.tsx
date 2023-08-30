@@ -23,7 +23,7 @@ export default function Home() {
                 is here
               </Heading>
               <div className="text-xl">
-                Revolutionizing off-chain computation with Dumb Contracts
+                Revolutionizing computation with Dumb Contracts
               </div>
               <div className="flex flex-row gap-4">
                 <Link href="/contracts">

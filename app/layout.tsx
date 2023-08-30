@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Ethscriptions VM",
   description:
-    "The future of decentralized processing is here. Revolutionizing off-chain computation with Dumb Contracts.",
+    "The future of decentralized processing is here. Revolutionizing computation with Dumb Contracts.",
 };
 
 function RootLayout({ children }: { children: React.ReactNode }) {
