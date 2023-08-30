@@ -37,8 +37,11 @@ export const Header = () => {
               <NavLink href="/contracts" isActive={path === "/contracts"}>
                 Contracts
               </NavLink>
-              <NavLink href="https://docs.ethscriptions.com" target="_blank">
-                Docs
+              <NavLink
+                href="https://github.com/ethscriptions-protocol"
+                target="_blank"
+              >
+                GitHub
               </NavLink>
             </div>
             <CustomConnectButton />

@@ -7,6 +7,7 @@ import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -24,7 +25,17 @@ export default function Home() {
               <div className="text-xl">
                 Revolutionizing off-chain computation with Dumb Contracts
               </div>
-              <Button>Learn More</Button>
+              <div className="flex flex-row gap-4">
+                <Link href="/contracts">
+                  <Button>Create Now</Button>
+                </Link>
+                <Link
+                  href="https://docs.ethscriptions.com/v/ethscriptions-vm"
+                  target="_blank"
+                >
+                  <Button primary={false}>Learn More</Button>
+                </Link>
+              </div>
             </div>
             <div className="flex flex-1">
               <div className="w-[50vw] md:w-auto">

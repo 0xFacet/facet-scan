@@ -26,8 +26,8 @@ export const Button = ({
       className,
       disabled ? "opacity-50" : "",
       primary
-        ? "text-black bg-primary hover:bg-secondary"
-        : "border-[1px] text-secondary border-secondary hover:text-primary hover:border-primary"
+        ? "text-black border bg-primary border-primary hover:bg-secondary hover:border-secondary"
+        : "border text-primary border-primary hover:text-secondary hover:border-secondary"
     )}
     onClick={onClick}
     disabled={disabled || loading}
