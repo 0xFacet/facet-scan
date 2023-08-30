@@ -338,7 +338,7 @@ export default function Contract({ hash }: { hash: string }) {
               staticCallResults[method.name] !== undefined && (
                 <div className="flex flex-col gap-1">
                   <div className="text-sm font-medium leading-6">Result:</div>
-                  <div className="text-sm">
+                  <div className="text-sm break-all">
                     {typeof staticCallResults[method.name] == "object"
                       ? JSON.stringify(staticCallResults[method.name])
                       : formatTokenValue(
