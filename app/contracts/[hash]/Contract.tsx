@@ -249,6 +249,7 @@ export default function Contract({ hash }: { hash: string }) {
                 ? [
                     startCase(key),
                     <Link
+                      key={key}
                       href={`/${currentState[key]}`}
                       className="text-secondary hover:text-primary transition-colors"
                     >
@@ -262,7 +263,10 @@ export default function Contract({ hash }: { hash: string }) {
                   ]
                 : [
                     startCase(key),
-                    <div className="max-w-full text-ellipsis overflow-hidden">
+                    <div
+                      key={key}
+                      className="max-w-full text-ellipsis overflow-hidden"
+                    >
                       {formatTokenValue(
                         currentState[key],
                         currentState["decimals"] ?? 0,
@@ -467,8 +471,12 @@ export default function Contract({ hash }: { hash: string }) {
     return (
       <div className="flex flex-col gap-8">
         {sourceCode.map((sc) => (
-          <SyntaxHighlighter language={sc.language} style={stackoverflowDark}>
-            {sc?.code}
+          <SyntaxHighlighter
+            key={sc.code}
+            language={sc.language}
+            style={stackoverflowDark}
+          >
+            {sc.code}
           </SyntaxHighlighter>
         ))}
       </div>
@@ -513,6 +521,7 @@ export default function Contract({ hash }: { hash: string }) {
                 ? [
                     `${key}`,
                     <Link
+                      key={key}
                       href={`/${selectedState[key]}`}
                       className="text-secondary hover:text-primary transition-colors"
                     >
@@ -526,7 +535,10 @@ export default function Contract({ hash }: { hash: string }) {
                   ]
                 : [
                     `${key}`,
-                    <div className="max-w-full text-ellipsis overflow-hidden">
+                    <div
+                      key={key}
+                      className="max-w-full text-ellipsis overflow-hidden"
+                    >
                       {formatTokenValue(
                         selectedState[key],
                         currentState.decimals ?? 0,
