@@ -13,44 +13,44 @@ import {
   Contract,
   ContractAbi,
   CurrentState,
+  SourceCode,
 } from "@/types/contracts";
-import { formatEther, formatTimestamp } from "@/utils/formatter";
+import {
+  formatTimestamp,
+  formatTokenValue,
+  parseTokenValue,
+  truncateMiddle,
+} from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { isAddress, keccak256, parseEther, toHex } from "viem";
-import {
-  useAccount,
-  useBlockNumber,
-  useSendTransaction,
-  useWaitForTransaction,
-} from "wagmi";
-import { startCase } from "lodash";
+import { formatUnits, isAddress, keccak256, toHex } from "viem";
+import { useAccount, useBlockNumber } from "wagmi";
+import { kebabCase, startCase } from "lodash";
 import { sendTransaction } from "@wagmi/core";
 import { waitForTransaction } from "wagmi/actions";
-import { List } from "@/components/List";
 import Link from "next/link";
 import { Address } from "@/components/Address";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Transfer } from "@/types/ethscriptions";
-import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
+import {
+  IoCheckmarkCircleOutline,
+  IoCloseCircleOutline,
+  IoCopyOutline,
+} from "react-icons/io5";
 import { targetNetwork } from "@/app/providers";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { stackoverflowDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 export default function Contract({ hash }: { hash: string }) {
   const { data: latestBlockNumber } = useBlockNumber({ watch: true });
   const { openConnectModal } = useConnectModal();
   const { address, isDisconnected } = useAccount();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createContractType, setCreateContractType] =
-    useState("AllowanceToken");
-  const [constructorArgs, setConstructorArgs] = useState<{
-    [key: string]: any;
-  }>({});
   const [currentState, setCurrentState] = useState<CurrentState | null>(null);
   const [contractAbi, setContractAbi] = useState<ContractAbi>({});
   const [callReceipts, setCallReceipts] = useState<CallReceipt[]>([]);
-  const [transfers, setTransfers] = useState<Transfer[]>([]);
+  const [sourceCode, setSourceCode] = useState<SourceCode | null>(null);
   const [methodValues, setMethodValues] = useState<{
     [key: string]: { [key: string]: string };
   }>({});
@@ -60,16 +60,15 @@ export default function Contract({ hash }: { hash: string }) {
   const [staticCallResults, setStaticCallResults] = useState<{
     [key: string]: any;
   }>({});
-  const [amountToBridge, setAmountToBridge] = useState("");
-  const [bridgeIsLoading, setBridgeIsLoading] = useState(false);
   const [hasMoreCallReceipts, setHasMoreCallReceipts] = useState(true);
   const [callReceiptsPage, setCallReceiptsPage] = useState(1);
   const [callReceipt, setCallReceipt] = useState<CallReceipt | null>(null);
   const [pendingCallTxnHash, setPendingCallTxnHash] = useState<string | null>(
     null
   );
+  const [addressCopied, setAddressCopied] = useState(false);
   const searchParams = useSearchParams();
-  const tab = searchParams.get("tab") ?? "details";
+  const tab = searchParams.get("tab") ?? "transactions";
 
   const writeMethods = useMemo(
     () =>
@@ -77,7 +76,24 @@ export default function Contract({ hash }: { hash: string }) {
         .filter((name) => {
           return (
             Object.keys(contractAbi[name]).length &&
-            contractAbi[name]["type"] !== "constructor"
+            contractAbi[name]["type"] !== "constructor" &&
+            contractAbi[name].state_mutability !== "view"
+          );
+        })
+        .map((name) => ({
+          name,
+          args: contractAbi[name]["args"],
+        })),
+    [contractAbi]
+  );
+
+  const readMethods = useMemo(
+    () =>
+      Object.keys(contractAbi)
+        .filter((name) => {
+          return (
+            Object.keys(contractAbi[name]).length &&
+            contractAbi[name].state_mutability === "view"
           );
         })
         .map((name) => ({
@@ -94,10 +110,14 @@ export default function Contract({ hash }: { hash: string }) {
           const contractRes = await axios.get(
             `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/${hash}`
           );
-          const { current_state = {}, abi = {} } =
-            contractRes.data.result ?? {};
+          const {
+            current_state = {},
+            abi = {},
+            source_code = null,
+          } = contractRes.data.result ?? {};
           setCurrentState(current_state);
           setContractAbi(abi);
+          setSourceCode(source_code);
         };
 
         fetchData();
@@ -214,10 +234,10 @@ export default function Contract({ hash }: { hash: string }) {
     setMethodLoading((loading) => ({ ...loading, [name]: false }));
   };
 
-  const renderDetails = () => {
+  const renderState = () => {
     return (
-      <List
-        items={[
+      <Table
+        rows={[
           ...Object.keys(currentState)
             .filter(
               (key) =>
@@ -226,50 +246,50 @@ export default function Contract({ hash }: { hash: string }) {
             )
             .map((key) =>
               isAddress(currentState[key])
-                ? {
-                    label: startCase(key),
-                    value: (
-                      <Link
-                        href={`/${currentState[key]}`}
-                        className="text-secondary hover:text-primary transition-colors text-lg"
-                      >
-                        <Address
-                          address={currentState[key]}
-                          disableAddressLink
-                          noAvatar
-                          noCopy
-                        />
-                      </Link>
-                    ),
-                  }
-                : {
-                    label: startCase(key),
-                    value: (
-                      <div className="text-lg max-w-full text-ellipsis overflow-hidden">
-                        {key === "total_supply" ||
-                        key === "max_supply" ||
-                        key === "per_mint_limit"
-                          ? `${formatEther(currentState[key])} ${
-                              currentState.symbol
-                            }`
-                          : currentState[key].toLocaleString()}
-                      </div>
-                    ),
-                  }
+                ? [
+                    startCase(key),
+                    <Link
+                      href={`/${currentState[key]}`}
+                      className="text-secondary hover:text-primary transition-colors"
+                    >
+                      <Address
+                        address={currentState[key]}
+                        disableAddressLink
+                        noAvatar
+                        noCopy
+                      />
+                    </Link>,
+                  ]
+                : [
+                    startCase(key),
+                    <div className="max-w-full text-ellipsis overflow-hidden">
+                      {formatTokenValue(
+                        currentState[key],
+                        currentState["decimals"] ?? 0,
+                        key,
+                        true,
+                        currentState.symbol
+                      )}
+                    </div>,
+                  ]
             ),
         ]}
       />
     );
   };
 
-  const renderMethods = () => {
+  const renderMethods = (
+    methods: {
+      name: string;
+      args: {
+        [key: string]: string;
+      };
+    }[]
+  ) => {
     return (
-      <div className="flex flex-col gap-6">
-        {writeMethods.map((method) => (
-          <div
-            key={method.name}
-            className="flex flex-col gap-3 border-b border-[rgba(255,255,255,0.2)] pb-6"
-          >
+      <div className="flex flex-col divide-y divide-line">
+        {methods.map((method) => (
+          <div key={method.name} className="flex flex-col gap-4 py-6">
             <Heading size="h5">{startCase(method.name)}</Heading>
             {Object.keys(method.args ?? {}).map((argument) => (
               <div key={argument} className="flex flex-col gap-1">
@@ -282,31 +302,26 @@ export default function Contract({ hash }: { hash: string }) {
                 <input
                   id={argument}
                   type="text"
-                  className="bg-black w-full block border-0 py-2 px-4 outline-none ring-1 ring-inset ring-[rgba(255,255,255,0.2)] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary"
+                  className="bg-black w-full block border-0 py-2 px-4 outline-none ring-1 ring-inset ring-line placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary"
                   placeholder={startCase(argument)}
                   onChange={(e) => {
                     setMethodValues((values) => ({
                       ...(values ?? {}),
                       [method.name]: {
                         ...(values[method.name] ?? {}),
-                        [argument]:
-                          (argument.includes("amount") ||
-                            argument === "value") &&
-                          e.target.value
-                            ? parseEther(e.target.value, "wei").toString()
-                            : e.target.value,
+                        [argument]: parseTokenValue(
+                          e.target.value,
+                          currentState.decimals ?? 0,
+                          argument
+                        ),
                       },
                     }));
                   }}
-                  value={
-                    (argument.includes("amount") || argument === "value") &&
-                    methodValues[method.name]?.[argument]
-                      ? formatEther(
-                          methodValues[method.name]?.[argument],
-                          false
-                        )
-                      : methodValues[method.name]?.[argument] ?? ""
-                  }
+                  value={formatTokenValue(
+                    methodValues[method.name]?.[argument],
+                    currentState.decimals ?? 0,
+                    argument
+                  )}
                 />
               </div>
             ))}
@@ -314,52 +329,38 @@ export default function Contract({ hash }: { hash: string }) {
               onClick={() => callMethod(method.name)}
               disabled={methodLoading[method.name]}
               loading={methodLoading[method.name]}
+              primary={false}
+              className="text-sm"
             >
               Call
             </Button>
-            <div>
-              {staticCallResults[method.name] !== null &&
-                staticCallResults[method.name] !== undefined && (
-                  <div>
-                    <div className="text-sm font-medium leading-6">
-                      Result
-                    </div>
-                    <div className="text-sm">
-                      {(method.name.includes("balance") ||
-                        method.name.includes("calculate_output_amount") ||
-                        method.name.includes("allowance")) && (
-                        <div>
-                          {formatEther(staticCallResults[method.name])}{" "}
-                          {currentState.symbol}
-                        </div>
-                      )}
-                      {!method.name.includes("balance") &&
-                        !method.name.includes("calculate_output_amount") &&
-                        !method.name.includes("allowance") && (
-                          <div>
-                            {typeof staticCallResults[method.name] == "object"
-                              ? JSON.stringify(staticCallResults[method.name])
-                              : staticCallResults[method.name]}
-                          </div>
+            {staticCallResults[method.name] !== null &&
+              staticCallResults[method.name] !== undefined && (
+                <div className="flex flex-col gap-1">
+                  <div className="text-sm font-medium leading-6">Result:</div>
+                  <div className="text-sm">
+                    {typeof staticCallResults[method.name] == "object"
+                      ? JSON.stringify(staticCallResults[method.name])
+                      : formatTokenValue(
+                          staticCallResults[method.name],
+                          currentState.decimals ?? 0,
+                          method.name,
+                          false,
+                          currentState.symbol
                         )}
-                    </div>
                   </div>
-                )}
-            </div>
+                </div>
+              )}
           </div>
         ))}
       </div>
     );
   };
 
-  const renderActivity = () => {
+  const renderTransactions = () => {
     return (
       <InfiniteScroll
-        dataLength={
-          transfers[0] && !hasMoreCallReceipts
-            ? callReceipts.length + 1
-            : callReceipts.length
-        }
+        dataLength={callReceipts.length}
         next={() => fetchCallReceipts()}
         loader={<p>Loading...</p>}
         className="!overflow-visible"
@@ -377,27 +378,28 @@ export default function Contract({ hash }: { hash: string }) {
                   <div
                     key={callReceipt.ethscription_id}
                     onClick={() => setCallReceipt(callReceipt)}
-                    className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors text-lg cursor-pointer"
+                    className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
                   >
                     {callReceipt.status === "success" ? (
-                      <IoCheckmarkCircle className="text-xl text-green-700" />
+                      <IoCheckmarkCircleOutline className="text-xl text-primary" />
                     ) : (
-                      <IoCloseCircle className="text-xl text-red-700" />
+                      <IoCloseCircleOutline className="text-xl text-red-500" />
                     )}
                     {startCase(callReceipt.function_name)}
                   </div>,
                   <div
                     key={callReceipt.ethscription_id}
-                    className="text-lg flex flex-row gap-1"
+                    className="flex flex-row gap-1"
                   >
                     <div className="overflow-hidden text-ellipsis max-w-[200px]">
-                      {formatEther(
+                      {formatUnits(
                         callReceipt.function_args.amount ||
                           callReceipt.function_args.token_a_amount ||
                           callReceipt.function_args.token_b_amount ||
                           callReceipt.function_args.input_amount ||
                           callReceipt.function_args.output_amount ||
-                          callReceipt.function_args.value
+                          callReceipt.function_args.value,
+                        currentState.decimals ?? 0
                       )}
                     </div>
                     {currentState.symbol}
@@ -405,7 +407,7 @@ export default function Contract({ hash }: { hash: string }) {
                   <Link
                     key={callReceipt.ethscription_id}
                     href={`https://ethscriptions.com/${callReceipt.caller}`}
-                    className="text-secondary hover:text-primary transition-colors text-lg"
+                    className="text-secondary hover:text-primary transition-colors"
                     target="_blank"
                   >
                     <Address
@@ -419,7 +421,7 @@ export default function Contract({ hash }: { hash: string }) {
                     <Link
                       key={callReceipt.ethscription_id}
                       href={`https://ethscriptions.com/${callReceipt.function_args.to}`}
-                      className="text-secondary hover:text-primary transition-colors text-lg"
+                      className="text-secondary hover:text-primary transition-colors"
                       target="_blank"
                     >
                       <Address
@@ -433,7 +435,7 @@ export default function Contract({ hash }: { hash: string }) {
                     <Link
                       key={callReceipt.ethscription_id}
                       href={`https://ethscriptions.com/${callReceipt.caller}`}
-                      className="text-secondary hover:text-primary transition-colors text-lg"
+                      className="text-secondary hover:text-primary transition-colors"
                       target="_blank"
                     >
                       <Address
@@ -448,7 +450,7 @@ export default function Contract({ hash }: { hash: string }) {
                     <div
                       key={callReceipt.ethscription_id}
                       onClick={() => setCallReceipt(callReceipt)}
-                      className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors text-lg cursor-pointer"
+                      className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
                     >
                       {formatTimestamp(callReceipt.timestamp)}
                     </div>
@@ -456,64 +458,6 @@ export default function Contract({ hash }: { hash: string }) {
                     "--"
                   ),
                 ]),
-              ...(transfers[0] && !hasMoreCallReceipts
-                ? [
-                    [
-                      <div
-                        key={transfers[0].transaction_hash}
-                        className="text-lg"
-                      >
-                        <>Create</>
-                      </div>,
-                      <div
-                        key={transfers[0].transaction_hash}
-                        className="text-lg"
-                      >
-                        {transfers[0].sale_price !== "0"
-                          ? `${formatEther(transfers[0].sale_price)} ETH`
-                          : "--"}
-                      </div>,
-                      <Link
-                        key={transfers[0].transaction_hash}
-                        href={`https://ethscriptions.com/${transfers[0].from}`}
-                        className="text-secondary hover:text-primary transition-colors text-lg"
-                        target="_blank"
-                      >
-                        <Address
-                          disableAddressLink={true}
-                          noAvatar={true}
-                          noCopy={true}
-                          address={transfers[0].from}
-                        />
-                      </Link>,
-                      <Link
-                        key={transfers[0].transaction_hash}
-                        href={`https://ethscriptions.com/${transfers[0].to}`}
-                        className="text-secondary hover:text-primary transition-colors text-lg"
-                        target="_blank"
-                      >
-                        <Address
-                          disableAddressLink={true}
-                          noAvatar={true}
-                          noCopy={true}
-                          address={transfers[0].to}
-                        />
-                      </Link>,
-                      formatTimestamp(transfers[0].timestamp) ? (
-                        <Link
-                          key={transfers[0].transaction_hash}
-                          href={`${targetNetwork.blockExplorers.default.url}/txn/${transfers[0].transaction_hash}`}
-                          target="_blank"
-                          className="text-secondary hover:text-primary transition-colors text-lg"
-                        >
-                          {formatTimestamp(transfers[0].timestamp)}
-                        </Link>
-                      ) : (
-                        "--"
-                      ),
-                    ],
-                  ]
-                : []),
             ]}
           />
         </div>
@@ -521,42 +465,99 @@ export default function Contract({ hash }: { hash: string }) {
     );
   };
 
-  const renderBalances = () => {
+  const renderCode = () => {
+    if (!sourceCode) return null;
+    return (
+      <SyntaxHighlighter
+        language={sourceCode.language}
+        style={stackoverflowDark}
+      >
+        {sourceCode?.code}
+      </SyntaxHighlighter>
+    );
+  };
+
+  const renderOther = () => {
+    const currentStateKeys = Object.keys(currentState);
+    const selectedStateKey = currentStateKeys.find(
+      (key) => kebabCase(key) === tab
+    );
+    const selectedState = selectedStateKey && currentState[selectedStateKey];
+    if (!selectedState) return null;
+    if (Array.isArray(selectedState)) {
+      const tableHeaders = selectedState.length
+        ? Object.keys(selectedState[0]).filter(
+            (key) =>
+              typeof selectedState[0][key] === "string" ||
+              typeof selectedState[0][key] === "number"
+          )
+        : [];
+      return (
+        <Table
+          headers={tableHeaders.map((header) => startCase(header))}
+          rows={selectedState.map((row) =>
+            tableHeaders.map((header) => row[header])
+          )}
+        />
+      );
+    }
     return (
       <Table
-        headers={["Address", "Amount"]}
-        rows={Object.keys(currentState.balances).map((address) => [
-          <Link
-            key={address}
-            href={`https://ethscriptions.com/${address}`}
-            className="text-secondary hover:text-primary transition-colors text-lg"
-            target="_blank"
-          >
-            <Address
-              disableAddressLink={true}
-              noAvatar={true}
-              noCopy={true}
-              address={address as `0x${string}`}
-            />
-          </Link>,
-          <div key={address} className="text-lg">
-            {formatEther(currentState.balances[address])} {currentState.symbol}
-          </div>,
-        ])}
+        rows={[
+          ...Object.keys(selectedState)
+            .filter(
+              (key) =>
+                typeof selectedState[key] === "string" ||
+                typeof selectedState[key] === "number"
+            )
+            .map((key) =>
+              isAddress(selectedState[key])
+                ? [
+                    `${key}`,
+                    <Link
+                      href={`/${selectedState[key]}`}
+                      className="text-secondary hover:text-primary transition-colors"
+                    >
+                      <Address
+                        address={selectedState[key]}
+                        disableAddressLink
+                        noAvatar
+                        noCopy
+                      />
+                    </Link>,
+                  ]
+                : [
+                    `${key}`,
+                    <div className="max-w-full text-ellipsis overflow-hidden">
+                      {formatTokenValue(
+                        selectedState[key],
+                        currentState.decimals ?? 0,
+                        key,
+                        true,
+                        selectedState.symbol
+                      )}
+                    </div>,
+                  ]
+            ),
+        ]}
       />
     );
   };
 
   const renderTab = () => {
     switch (tab) {
-      case "methods":
-        return renderMethods();
-      case "activity":
-        return renderActivity();
-      case "balances":
-        return renderBalances();
+      case "transactions":
+        return renderTransactions();
+      case "state":
+        return renderState();
+      case "write":
+        return renderMethods(writeMethods);
+      case "read":
+        return renderMethods(readMethods);
+      case "code":
+        return renderCode();
       default:
-        return renderDetails();
+        return renderOther();
     }
   };
 
@@ -565,15 +566,41 @@ export default function Contract({ hash }: { hash: string }) {
       <Header />
       <SectionContainer>
         <Section>
-          <div className="flex flex-col p-0 md:p-8 gap-4 md:gap-8">
+          <div className="flex flex-col p-0 md:p-8 gap-1">
+            <Heading size="h5" className="text-primary">
+              {startCase(currentState.contract_type)}
+            </Heading>
             {currentState.contract_type === "DexLiquidityPool" ? (
-              <Heading size="h2">Dex Liquidity Pool</Heading>
+              <Heading size="h1">Dex Liquidity Pool</Heading>
             ) : (
-              <Heading size="h2">
-                {currentState.name || "Contract"}{" "}
+              <Heading size="h1">
+                {currentState.name || "Contract"}
                 {currentState.symbol ? ` (${currentState.symbol})` : ""}
               </Heading>
             )}
+            <div className="w-fit mt-2">
+              <CopyToClipboard
+                text={hash}
+                onCopy={() => {
+                  setAddressCopied(true);
+                  setTimeout(() => {
+                    setAddressCopied(false);
+                  }, 1500);
+                }}
+              >
+                {addressCopied ? (
+                  <div className="flex items-center gap-2 cursor-pointer text-primary">
+                    <IoCheckmarkCircleOutline />
+                    <div>Copied!</div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 cursor-pointer text-secondary hover:text-primary">
+                    <IoCopyOutline />
+                    <div>{truncateMiddle(hash, 6, 4)}</div>
+                  </div>
+                )}
+              </CopyToClipboard>
+            </div>
           </div>
         </Section>
       </SectionContainer>
@@ -581,18 +608,53 @@ export default function Contract({ hash }: { hash: string }) {
         <Section className="py-0">
           <div className="px-0 md:px-8 flex gap-8 items-center h-min-full">
             <div className="flex gap-8 h-min-full">
-              <NavLink href="?tab=details" isActive={tab === "details"}>
-                Details
+              <NavLink
+                href="?tab=transactions"
+                isActive={tab === "transactions"}
+                className="whitespace-nowrap"
+              >
+                Transactions
               </NavLink>
-              <NavLink href="?tab=methods" isActive={tab === "methods"}>
-                Methods
+              <NavLink
+                href="?tab=state"
+                isActive={tab === "state"}
+                className="whitespace-nowrap"
+              >
+                State
               </NavLink>
-              <NavLink href="?tab=activity" isActive={tab === "activity"}>
-                Activity
+              <NavLink
+                href="?tab=read"
+                isActive={tab === "read"}
+                className="whitespace-nowrap"
+              >
+                Read
               </NavLink>
-              <NavLink href="?tab=balances" isActive={tab === "balances"}>
-                Balances
+              <NavLink
+                href="?tab=write"
+                isActive={tab === "write"}
+                className="whitespace-nowrap"
+              >
+                Write
               </NavLink>
+              <NavLink
+                href="?tab=code"
+                isActive={tab === "code"}
+                className="whitespace-nowrap"
+              >
+                Code
+              </NavLink>
+              {Object.keys(currentState)
+                .filter((key) => typeof currentState[key] === "object")
+                .map((key) => (
+                  <NavLink
+                    key={key}
+                    href={`?tab=${kebabCase(key)}`}
+                    isActive={tab === kebabCase(key)}
+                    className="whitespace-nowrap"
+                  >
+                    {startCase(key)}
+                  </NavLink>
+                ))}
             </div>
           </div>
         </Section>
@@ -616,66 +678,64 @@ export default function Contract({ hash }: { hash: string }) {
           <>
             <div className="flex flex-col gap-3">
               <Heading size="h6">Status</Heading>
-              <div className="text-lg flex flex-row items-center gap-2">
+              <div className="flex flex-row items-center gap-2">
                 {callReceipt.status === "success" ? (
-                  <IoCheckmarkCircle
+                  <IoCheckmarkCircleOutline
                     onClick={() => setCallReceipt(callReceipt)}
-                    className="text-xl text-green-700"
+                    className="text-xl text-primary"
                   />
                 ) : (
-                  <IoCloseCircle
+                  <IoCloseCircleOutline
                     onClick={() => setCallReceipt(callReceipt)}
-                    className="text-xl text-red-700"
+                    className="text-xl text-red-500"
                   />
                 )}
                 {startCase(callReceipt.status)}
               </div>
             </div>
-            <div className="flex flex-col gap-3 border-t border-[rgba(255,255,255,0.2)] mt-3 pt-3">
+            <div className="flex flex-col gap-3 border-t border-line mt-3 pt-3">
               <Heading size="h6">Function Name</Heading>
-              <div className="text-lg flex flex-row items-center gap-2">
+              <div className="flex flex-row items-center gap-2">
                 {startCase(callReceipt.function_name)}
               </div>
             </div>
-            <div className="flex flex-col gap-3 border-t border-[rgba(255,255,255,0.2)] mt-3 pt-3">
+            <div className="flex flex-col gap-3 border-t border-line mt-3 pt-3">
               <Heading size="h6">Function Arguments</Heading>
-              <div className="text-lg flex flex-row items-center gap-2 overflow-auto max-w-full">
+              <code className="pl-3 border-l-4 border-line overflow-auto max-w-full">
                 {JSON.stringify(callReceipt.function_args, undefined, 2)}
-              </div>
+              </code>
             </div>
             {!!callReceipt.logs.length && (
-              <div className="flex flex-col gap-3 border-t border-[rgba(255,255,255,0.2)] mt-3 pt-3">
+              <div className="flex flex-col gap-3 border-t border-line mt-3 pt-3">
                 <Heading size="h6">Logs</Heading>
                 {callReceipt.logs.map((log) => (
                   <code
-                    key={log}
-                    className="pl-3 border-l-4 border-gray-300 overflow-auto max-w-full"
+                    key={JSON.stringify(log)}
+                    className="pl-3 border-l-4 border-line overflow-auto max-w-full"
                   >
-                    {log}
+                    {`${log.event}: ${JSON.stringify(log.data, undefined, 2)}`}
                   </code>
                 ))}
               </div>
             )}
-            {!!callReceipt.error_messages.length && (
-              <div className="flex flex-col gap-3 border-t border-[rgba(255,255,255,0.2)] mt-3 pt-3">
-                <Heading size="h6">Error Messages</Heading>
-                {callReceipt.error_messages.map((message) => (
-                  <code
-                    key={message}
-                    className="pl-3 border-l-4 border-red-300 overflow-auto max-w-full"
-                  >
-                    {message}
-                  </code>
-                ))}
+            {!!callReceipt.error_message?.length && (
+              <div className="flex flex-col gap-3 border-t border-line mt-3 pt-3">
+                <Heading size="h6">Error Message</Heading>
+                <code
+                  key={callReceipt.error_message}
+                  className="pl-3 border-l-4 border-red-300 overflow-auto max-w-full"
+                >
+                  {callReceipt.error_message}
+                </code>
               </div>
             )}
-            <div className="flex flex-col gap-3 border-t border-[rgba(255,255,255,0.2)] mt-3 pt-3">
+            <div className="flex flex-col gap-3 border-t border-line mt-3 pt-3">
               <Heading size="h6">Timestamp</Heading>
               <Link
                 key={callReceipt.ethscription_id}
-                href={`${targetNetwork.blockExplorers.default.url}/txn/${callReceipt.ethscription_id}`}
+                href={`${targetNetwork.blockExplorers.default.url}/tx/${callReceipt.ethscription_id}`}
                 target="_blank"
-                className="text-secondary hover:text-primary transition-colors text-lg"
+                className="text-secondary hover:text-primary transition-colors"
               >
                 {formatTimestamp(callReceipt.timestamp)}
               </Link>

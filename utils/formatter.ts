@@ -1,5 +1,6 @@
 import { formatDistanceToNowStrict, parseISO } from "date-fns";
-import { formatEther as formatEth } from "viem";
+import { camelCase } from "lodash";
+import { formatEther as formatEth, formatUnits, parseUnits } from "viem";
 
 export const formatTimestamp = (dateStr: string) => {
   if (!dateStr) return null;
@@ -36,4 +37,76 @@ export const truncateMiddle = (
   const frontStr = str.substr(0, frontLength);
   const backStr = str.substr(str.length - backLength);
   return `${frontStr}...${backStr}`;
+};
+
+export const formatTokenValue = (
+  value: string | number,
+  decimals: number,
+  key?: string,
+  toLocaleString?: boolean,
+  unit?: string
+) => {
+  const isToken =
+    !key ||
+    [
+      "totalSupply",
+      "maxSupply",
+      "perMintLimit",
+      "maxPerAddress",
+      "amount",
+      "value",
+      "balance",
+      "calculateOutputAmount",
+      "tokenAAmount",
+      "tokenBAmount",
+      "inputAmount",
+      "outputAmount",
+      "allowance",
+    ].includes(camelCase(key));
+  if (!isToken) return value;
+  let formattedValue = "";
+  try {
+    if (toLocaleString) {
+      formattedValue = Number(
+        formatUnits(BigInt(value), decimals).toString()
+      ).toLocaleString();
+    } else {
+      formattedValue = formatUnits(BigInt(value), decimals).toString();
+    }
+    if (unit) {
+      return `${formattedValue} ${unit}`;
+    }
+    return formattedValue;
+  } catch (e) {
+    console.error(e);
+  }
+  return "0";
+};
+
+export const parseTokenValue = (
+  value: string,
+  decimals: number,
+  key?: string,
+  toLocaleString?: boolean
+) => {
+  const isToken =
+    !key ||
+    ["totalSupply", "maxSupply", "perMintLimit", "amount", "value"].includes(
+      camelCase(key)
+    );
+  if (!isToken) return value;
+  let formattedValue = "";
+  try {
+    if (toLocaleString) {
+      formattedValue = Number(
+        parseUnits(value, decimals).toString()
+      ).toLocaleString();
+    } else {
+      formattedValue = parseUnits(value, decimals).toString();
+    }
+    return formattedValue;
+  } catch (e) {
+    console.error(e);
+  }
+  return "0";
 };

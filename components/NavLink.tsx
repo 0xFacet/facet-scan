@@ -6,14 +6,14 @@ import { HTMLAttributeAnchorTarget, MouseEventHandler } from "react";
 export const NavLink = ({
   href,
   children,
-  classNames,
+  className,
   target,
   isActive,
   onClick,
 }: {
   href: string;
   children: React.ReactNode;
-  classNames?: string;
+  className?: string;
   target?: HTMLAttributeAnchorTarget;
   isActive?: boolean;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
@@ -25,7 +25,7 @@ export const NavLink = ({
       passHref
       className={`${
         isActive ? "border-b-2" : "text-secondary"
-      } h-20 no-underline pb-6 pt-7 px-2 text-base border-primary hover:text-primary transition-all duration-300 ${classNames}`}
+      } h-20 no-underline pb-6 pt-7 px-2 text-base border-primary hover:text-primary transition-all duration-300 ${className}`}
       target={target}
     >
       {children}

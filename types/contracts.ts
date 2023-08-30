@@ -48,20 +48,42 @@ export type CurrentState = (
 export interface CallReceipt {
   caller: `0x${string}`;
   contract_id: string;
-  error_messages: string[];
+  error_message: string;
   ethscription_id: string;
   function_args: { [key: string]: any };
   function_name: string;
-  logs: string[];
+  logs: { data: { [key: string]: any }; event: string }[];
   status: string;
   timestamp: string;
 }
 
-export type ContractAbi = { [key: string]: any };
+export interface ContractFunction {
+  args: {
+    [key: string]: string;
+  };
+  from_parent: boolean;
+  override_modifier: string;
+  parent_functions: ContractFunction[];
+  returns: string;
+  source: string;
+  state_mutability: string;
+  type: string;
+  visibility: string;
+}
+
+export type ContractAbi = {
+  [key: string]: ContractFunction;
+};
+
+export type SourceCode = {
+  code: string;
+  language: string;
+};
 
 export interface Contract {
   abi: ContractAbi;
   call_receipts: CallReceipt[];
   contract_id: string;
   current_state: CurrentState;
+  source_code: SourceCode;
 }

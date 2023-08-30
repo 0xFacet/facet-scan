@@ -36,13 +36,13 @@ export const Modal = ({
         ></div>
         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
           <div
-            className="relative transform overflow-hidden rounded-lg border-[1px] border-[rgba(255,255,255,0.2)] text-left transition-all w-full sm:my-8 sm:max-w-lg"
+            className="relative transform overflow-hidden border-[1px] border-line text-left transition-all w-full sm:my-8 sm:max-w-lg"
             style={{
               background:
                 "radial-gradient(100% 100% at 100% 100%, #1a1d0e 0%, #000 100%)",
             }}
           >
-            <div className="flex justify-between p-4 sm:p-6 border-b-[1px] border-[rgba(255,255,255,0.2)]">
+            <div className="flex justify-between p-4 sm:p-6 border-b-[1px] border-line">
               <h3
                 className="text-base font-semibold leading-6"
                 id="modal-title"
@@ -61,7 +61,7 @@ export const Modal = ({
               </div>
             </div>
             {!!confirmText && onConfirm && (
-              <div className="border-t-[1px] border-[rgba(255,255,255,0.2)] px-4 py-4 sm:flex sm:flex-row sm:px-6 gap-2">
+              <div className="border-t-[1px] border-line px-4 py-4 sm:flex sm:flex-row sm:px-6 gap-2">
                 <Button onClick={onConfirm} loading={loading}>
                   {confirmText}
                 </Button>

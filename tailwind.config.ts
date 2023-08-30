@@ -19,6 +19,7 @@ const config: Config = {
       primary: "#c3ff00",
       secondary: "#ffca9a",
       dark: "#131800",
+      line: "rgba(255,255,255,0.2)",
       lime: {
         DEFAULT: "#C3FF00",
         50: "#EEFFB8",

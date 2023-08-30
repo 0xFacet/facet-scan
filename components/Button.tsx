@@ -22,9 +22,9 @@ export const Button = ({
   <button
     type="button"
     className={clsx(
-      "px-4 py-2  w-fit justify-center font-bold text-base transition-all duration-300",
+      "relative w-fit flex px-4 py-2 justify-center items-center font-bold transition-all duration-300",
       className,
-      disabled ? "bg-gray-500" : "",
+      disabled ? "opacity-50" : "",
       primary
         ? "text-black bg-primary hover:bg-secondary"
         : "border-[1px] text-secondary border-secondary hover:text-primary hover:border-primary"
@@ -38,7 +38,7 @@ export const Button = ({
         <div role="status" className="absolute">
           <svg
             aria-hidden="true"
-            className="w-5 h-5 mx-3 text-gray-200 animate-spin dark:text-gray-600 fill-primary"
+            className="w-5 h-5 mx-3 text-gray-200 animate-spin dark:text-lime-700 fill-primary"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

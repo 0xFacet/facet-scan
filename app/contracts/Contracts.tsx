@@ -9,16 +9,22 @@ import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Table } from "@/components/Table";
 import { Contract, ContractAbi } from "@/types/contracts";
-import { formatEther } from "@/utils/formatter";
+import { formatTokenValue, parseTokenValue } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { keccak256, parseEther, toHex } from "viem";
-import { useAccount, useSendTransaction, useWaitForTransaction } from "wagmi";
-import { startCase } from "lodash";
+import { keccak256, toHex } from "viem";
+import {
+  useAccount,
+  useBlockNumber,
+  useSendTransaction,
+  useWaitForTransaction,
+} from "wagmi";
+import { kebabCase, startCase } from "lodash";
 
 export default function Contracts() {
+  const { data: latestBlockNumber } = useBlockNumber({ watch: true });
   const { openConnectModal } = useConnectModal();
   const { address, isDisconnected } = useAccount();
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -33,24 +39,34 @@ export default function Contracts() {
   }>({});
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tab = searchParams.get("tab") ?? "tokens";
-  const contractTypeChoices = (contractAbis && Object.keys(contractAbis)) || [];
+  const contractTypes = (contractAbis && Object.keys(contractAbis)) || [];
+  const tab =
+    searchParams.get("tab") ??
+    kebabCase(
+      contractTypes.find((type) =>
+        contracts.find(
+          (contract) => contract.current_state.contract_type === type
+        )
+      ) ?? ""
+    );
 
   useEffect(() => {
-    (async () => {
-      const contractsRes = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts`
-      );
-      setContracts(contractsRes.data.result);
-    })();
+    if (latestBlockNumber) {
+      (async () => {
+        const contractsRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts`
+        );
+        setContracts(contractsRes.data.result);
+      })();
 
-    (async () => {
-      const contractsRes = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/all-abis`
-      );
-      setContractAbis(contractsRes.data);
-    })();
-  }, []);
+      (async () => {
+        const contractsRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/all-abis`
+        );
+        setContractAbis(contractsRes.data);
+      })();
+    }
+  }, [latestBlockNumber]);
 
   const creationConstructorArgs =
     (contractAbis &&
@@ -58,10 +74,22 @@ export default function Contracts() {
       Object.keys(contractAbis[createContractType]["constructor"]["args"])) ||
     [];
 
+  const modifiedArgs: { [key: string]: any } = { ...constructorArgs };
+
+  if (modifiedArgs.decimals) {
+    for (let key in modifiedArgs) {
+      modifiedArgs[key] = parseTokenValue(
+        `${modifiedArgs[key]}`,
+        modifiedArgs.decimals,
+        key
+      );
+    }
+  }
+
   const createContractSalt = keccak256(Buffer.from(`${Date.now()}`));
   const createContractData = {
     protocol: createContractType,
-    constructorArgs: constructorArgs,
+    constructorArgs: modifiedArgs,
     salt: createContractSalt,
   };
   const createContractTx = useSendTransaction({
@@ -98,84 +126,28 @@ export default function Contracts() {
     }
   };
 
-  const renderTableHeaders = () =>
-    tab === "lps"
-      ? ["Pair", "Reserves", "Created"]
-      : [
-          "Name",
-          "Symbol",
-          "Max Supply",
-          "Total Supply",
-          "Per Mint Limit",
-          "Unique Holders",
-        ];
-
-  const renderTokenItem = (contract: Contract) => {
-    return [
-      <div
-        key={contract.contract_id}
-        className="flex flex-row items-center gap-6"
-      >
-        <div className="font-bold max-w-[100px] sm:max-w-none truncate overflow-hidden">
-          {contract.current_state.name}
-        </div>
-      </div>,
-      <div key={contract.contract_id} className="font-medium">
-        {contract.current_state.symbol}
-      </div>,
-      <div key={contract.contract_id} className="font-medium flex flex-col">
-        {formatEther(contract.current_state.max_supply)}{" "}
-        {contract.current_state.symbol}
-      </div>,
-      <div key={contract.contract_id} className="font-medium flex flex-col">
-        {formatEther(contract.current_state.total_supply)}{" "}
-        {contract.current_state.symbol}
-      </div>,
-      <div key={contract.contract_id} className="font-medium">
-        {formatEther(contract.current_state.per_mint_limit)}{" "}
-        {contract.current_state.symbol}
-      </div>,
-      <div key={contract.contract_id} className="font-medium">
-        {Object.keys(
-          contract.current_state.balances || {}
-        ).length.toLocaleString()}
-      </div>,
-    ];
+  const getTableColumns = () => {
+    const type = contractTypes.find((type) => kebabCase(type) === tab);
+    if (!type) return [];
+    const state = contracts.find(
+      (contract) => contract.current_state.contract_type === type
+    )?.current_state;
+    if (!state) return [];
+    const keys = Object.keys(state);
+    return keys.filter(
+      (key) =>
+        (typeof state[key] === "number" || typeof state[key] === "string") &&
+        kebabCase(key) !== "contract-type"
+    );
   };
 
-  const renderLiquidityPoolItem = (contract: Contract) => {
-    return [
-      <div key={contract.contract_id} className="font-medium">
-        {`${
-          contracts.find((c) => c.contract_id == contract.current_state.token0)
-            ?.current_state?.symbol
-        }/${
-          contracts.find((c) => c.contract_id == contract.current_state.token1)
-            ?.current_state?.symbol
-        }`}
-      </div>,
-      <div key={contract.contract_id} className="font-medium">
-        --
-      </div>,
-      <div key={contract.contract_id} className="font-medium">
-        --
-      </div>,
-    ];
+  const getTableRows = () => {
+    const type = contractTypes.find((type) => kebabCase(type) === tab);
+    if (!type) return [];
+    return contracts.filter(
+      (contract) => contract.current_state.contract_type === type
+    );
   };
-
-  const filteredContracts = contracts.filter((contract) => {
-    switch (tab) {
-      case "lps":
-        return contract.current_state.contract_type === "DexLiquidityPool";
-      case "bridges":
-        return contract.current_state.contract_type === "BridgeableToken";
-      default:
-        return (
-          contract.current_state.contract_type !== "BridgeableToken" &&
-          contract.current_state.contract_type !== "DexLiquidityPool"
-        );
-    }
-  });
 
   return (
     <div className="min-h-[100vh] flex flex-col">
@@ -199,15 +171,24 @@ export default function Contracts() {
         <Section className="py-0">
           <div className="px-0 md:px-8 flex gap-8 items-center h-min-full">
             <div className="flex gap-8 h-min-full">
-              <NavLink href="?tab=tokens" isActive={tab === "tokens"}>
-                Tokens
-              </NavLink>
-              <NavLink href="?tab=lps" isActive={tab === "lps"}>
-                Liquidity Pools
-              </NavLink>
-              <NavLink href="?tab=bridges" isActive={tab === "bridges"}>
-                Bridges
-              </NavLink>
+              {contractTypes
+                .filter(
+                  (type) =>
+                    !!contracts.find(
+                      (contract) =>
+                        contract.current_state.contract_type === type
+                    )
+                )
+                .map((type) => (
+                  <NavLink
+                    key={type}
+                    href={`?tab=${kebabCase(type)}`}
+                    isActive={tab === kebabCase(type)}
+                    className="whitespace-nowrap"
+                  >
+                    {startCase(type)}
+                  </NavLink>
+                ))}
             </div>
           </div>
         </Section>
@@ -216,18 +197,26 @@ export default function Contracts() {
         <Section className="flex-1">
           <div className="px-0 md:px-8">
             <Table
-              headers={renderTableHeaders()}
-              rows={filteredContracts.map((contract) => {
-                switch (contract.current_state.contract_type) {
-                  case "DexLiquidityPool":
-                    return renderLiquidityPoolItem(contract);
-                  default:
-                    return renderTokenItem(contract);
-                }
-              })}
+              headers={getTableColumns().map((key) => startCase(key))}
+              rows={getTableRows().map((row) =>
+                getTableColumns().map((column) => (
+                  <div
+                    key={`${row.contract_id}-${column}`}
+                    className="max-w-[100px] sm:max-w-none truncate overflow-hidden"
+                  >
+                    {formatTokenValue(
+                      row.current_state[column],
+                      row.current_state.decimals ?? 0,
+                      column,
+                      true,
+                      row.current_state.symbol
+                    )}
+                  </div>
+                ))
+              )}
               onRowClick={(rowIndex) =>
                 router.push(
-                  `/contracts/${filteredContracts[rowIndex].contract_id}`
+                  `/contracts/${getTableRows()[rowIndex].contract_id}`
                 )
               }
             />
@@ -240,7 +229,7 @@ export default function Contracts() {
         </Section>
       </SectionContainer>
       <Modal
-        show={contractTypeChoices.length > 0 && showCreateModal}
+        show={contractTypes.length > 0 && showCreateModal}
         confirmText="Deploy Contract"
         title="Create New Contract"
         onClose={() => {
@@ -262,18 +251,18 @@ export default function Contracts() {
             name="contract_type"
             id="contract_type"
             className="mt-2 block w-full rounded-none h-10 pl-3 pr-10 outline-none
-                border-[1px] border-[rgba(255,255,255,0.2)] bg-black focus:border-e-2 focus:border-primary sm:text-sm sm:leading-6"
+                border-[1px] border-line bg-black focus:border-e-2 focus:border-primary sm:text-sm sm:leading-6"
             onChange={(e) => setCreateContractType(e.target.value)}
             value={createContractType}
           >
-            {contractTypeChoices.map((choice) => (
-              <option key={choice} value={choice}>
-                {choice}
+            {contractTypes.map((type) => (
+              <option key={type} value={type}>
+                {startCase(type)}
               </option>
             ))}
           </select>
         </div>
-        <div className="border-t-[1px] border-[rgba(255,255,255,0.2)] w-full my-6" />
+        <div className="border-t-[1px] border-line w-full my-6" />
         <div className="block text-sm font-medium leading-6 mb-2">
           Constructor Arguments
         </div>
@@ -289,25 +278,16 @@ export default function Contracts() {
               <input
                 id={arg}
                 type="text"
-                className="block w-full outline-none bg-black border-0 p-2 ring-1 ring-inset ring-[rgba(255,255,255,0.2)] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                className="block w-full outline-none bg-black border-0 p-2 ring-1 ring-inset ring-line placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                 placeholder={startCase(arg)}
                 name={arg}
                 onChange={(e) => {
                   setConstructorArgs({
                     ...constructorArgs,
-                    [arg]:
-                      (arg === "_maxSupply" || arg === "_perMintLimit") &&
-                      e.target.value
-                        ? parseEther(e.target.value, "wei").toString()
-                        : e.target.value,
+                    [arg]: e.target.value,
                   });
                 }}
-                value={
-                  (arg === "_maxSupply" || arg === "_perMintLimit") &&
-                  constructorArgs[arg]
-                    ? formatEther(constructorArgs[arg], false)
-                    : constructorArgs[arg] || ""
-                }
+                value={constructorArgs[arg]}
               />
             </div>
           ))}
