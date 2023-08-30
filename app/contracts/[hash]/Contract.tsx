@@ -566,27 +566,29 @@ export default function Contract({ hash }: { hash: string }) {
   const renderStateParent = () => {
     return (
       <div className="flex flex-col gap-8">
-        <div className="flex gap-8 items-center h-min-full border-b border-line">
-          <div className="flex gap-8 h-min-full">
-            <NavLink
-              href="?tab=state&subtab=details"
-              isActive={subtab === "details"}
-              className="whitespace-nowrap"
-            >
-              Details
-            </NavLink>
-            {Object.keys(currentState)
-              .filter((key) => typeof currentState[key] === "object")
-              .map((key) => (
-                <NavLink
-                  key={key}
-                  href={`?tab=state&subtab=${kebabCase(key)}`}
-                  isActive={subtab === kebabCase(key)}
-                  className="whitespace-nowrap"
-                >
-                  {startCase(key)}
-                </NavLink>
-              ))}
+        <div className="max-w-full overflow-x-auto border-b border-line">
+          <div className="flex gap-8 items-center h-min-full">
+            <div className="flex gap-8 h-min-full">
+              <NavLink
+                href="?tab=state&subtab=details"
+                isActive={subtab === "details"}
+                className="whitespace-nowrap"
+              >
+                Details
+              </NavLink>
+              {Object.keys(currentState)
+                .filter((key) => typeof currentState[key] === "object")
+                .map((key) => (
+                  <NavLink
+                    key={key}
+                    href={`?tab=state&subtab=${kebabCase(key)}`}
+                    isActive={subtab === kebabCase(key)}
+                    className="whitespace-nowrap"
+                  >
+                    {startCase(key)}
+                  </NavLink>
+                ))}
+            </div>
           </div>
         </div>
         {renderStateSubTabs()}

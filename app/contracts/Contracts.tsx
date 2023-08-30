@@ -157,8 +157,7 @@ export default function Contracts() {
           <div className="flex flex-col p-0 md:p-8 gap-4 md:gap-8">
             <Heading>Dumb Contracts</Heading>
             <div className="text-xl">
-              Dumb Contracts execute tasks outside of the Ethereum Virtual
-              Machine, offering enhanced scalability and flexibility while
+              Dumb Contracts offers enhanced scalability and flexibility while
               reducing the constraints of on-chain gas fees and processing
               limitations.
             </div>
