@@ -371,9 +371,6 @@ export default function Contract({ hash }: { hash: string }) {
             headers={["Event", "Amount", "From", "To", "Date"]}
             rows={[
               ...callReceipts
-                .filter(
-                  (callReceipt) => callReceipt.function_name !== "constructor"
-                )
                 .map((callReceipt) => [
                   <div
                     key={callReceipt.ethscription_id}
@@ -398,7 +395,7 @@ export default function Contract({ hash }: { hash: string }) {
                           callReceipt.function_args.token_b_amount ||
                           callReceipt.function_args.input_amount ||
                           callReceipt.function_args.output_amount ||
-                          callReceipt.function_args.value,
+                          callReceipt.function_args.value || 0,
                         currentState.decimals ?? 0
                       )}
                     </div>

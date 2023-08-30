@@ -61,7 +61,7 @@ export default function Contracts() {
 
       (async () => {
         const contractsRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/all-abis`
+          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/deployable-contracts`
         );
         setContractAbis(contractsRes.data);
       })();
