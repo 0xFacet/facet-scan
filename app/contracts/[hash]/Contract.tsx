@@ -214,37 +214,36 @@ export default function Contract({ hash }: { hash: string }) {
     setSimulationResults((results) => ({ ...results, [name]: null }));
     try {
       if (address && !isDisconnected) {
-        const txnSalt = keccak256(Buffer.from(`${hash}${name}${Date.now()}`));
         const txnData = {
           contractId: hash,
           functionName: name,
           args: methodValues[name],
-          salt: txnSalt,
         };
-        
+
         const simulationRes = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate/call`,
           {
             params: {
               from: address,
-              data: JSON.stringify(txnData)
+              data: JSON.stringify(txnData),
             },
           }
-        )
-        
-        setSimulationResults((results) => (
-          { ...results, [name]: (simulationRes.data.result) })
         );
-        
-        if (simulationRes.data.result.status != 'success') {
+
+        setSimulationResults((results) => ({
+          ...results,
+          [name]: simulationRes.data.result,
+        }));
+
+        if (simulationRes.data.result.status != "success") {
           setMethodLoading((loading) => ({ ...loading, [name]: false }));
-          return
+          return;
         }
-        
+
         const txn = await sendTransaction({
           to: "0x0000000000000000000000000000000000000000",
           data: toHex(
-            `data:application/vnd.esc.contract.call+json,${JSON.stringify(
+            `data:application/vnd.esc.contract.call+json;esip6=true,${JSON.stringify(
               txnData
             )}`
           ),
@@ -356,10 +355,11 @@ export default function Contract({ hash }: { hash: string }) {
             >
               Call
             </Button>
-            {simulationResults[method.name]?.status == "call_error" &&
-            <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
-              {simulationResults[method.name].error_message}
-            </div>}
+            {simulationResults[method.name]?.status == "call_error" && (
+              <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
+                {simulationResults[method.name].error_message}
+              </div>
+            )}
             {staticCallResults[method.name] !== null &&
               staticCallResults[method.name] !== undefined && (
                 <div className="flex flex-col gap-1">
