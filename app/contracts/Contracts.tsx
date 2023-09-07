@@ -14,7 +14,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { keccak256, toHex } from "viem";
+import { toHex } from "viem";
 import {
   useAccount,
   useBlockNumber,
@@ -86,16 +86,14 @@ export default function Contracts() {
     }
   }
 
-  const createContractSalt = keccak256(Buffer.from(`${Date.now()}`));
   const createContractData = {
     protocol: createContractType,
     constructorArgs: modifiedArgs,
-    salt: createContractSalt,
   };
   const createContractTx = useSendTransaction({
     to: "0x0000000000000000000000000000000000000000",
     data: toHex(
-      `data:application/vnd.esc.contract.deploy+json,${JSON.stringify(
+      `data:application/vnd.esc.contract.deploy+json;esip6=true,${JSON.stringify(
         createContractData
       )}`
     ),
