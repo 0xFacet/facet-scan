@@ -5,6 +5,7 @@ import { Section } from "./Section";
 import { SectionContainer } from "./SectionContainer";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { NAVIGATION } from "@/app/Constant/navigation.constant"
 
 export const Header = () => {
   const path = usePathname();
@@ -29,29 +30,17 @@ export const Header = () => {
                   alt="Logo"
                 />
                 <h1 className="text-xl font-black text-black hidden sm:block">
-                  Ethscriptions VM
+                  {NAVIGATION.logo} VM
                 </h1>
               </div>
             </Link>
 
             <div className="flex space-x-8 h-min-full">
-              <NavLink className="font-semibold leading-6" href="/contracts" isActive={path === "/contracts"}>
-                Contracts
-              </NavLink>
-              <NavLink
-                href="https://github.com/ethscriptions-protocol"
-                target="_blank"
-                className="font-semibold leading-6"
-              >
-                GitHub
-              </NavLink>
-              <NavLink
-                href="https://docs.ethscriptions.com/v/ethscriptions-vm"
-                target="_blank"
-                className="font-semibold leading-6"
-              >
-                Docs
-              </NavLink>
+              {NAVIGATION.navigation.map((item, index) => (
+                <NavLink href={item.link} key={index} className="font-semibold leading-6" target={item.target ? '_blank' : "_self"}>
+                  {item.name}
+                </NavLink>
+              ))}
             </div>
           </div>
           <div className="flex gap-8 items-center h-min-full">

@@ -8,7 +8,8 @@ import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import Image from "next/image";
 import Link from "next/link";
-import Notification from "@/app/Notification";
+import Notification from "@/components/Notification";
+import { HERO, BUTTON } from "./Constant/landing.constant"
 
 export default function Home() {
   return (
@@ -20,21 +21,21 @@ export default function Home() {
           <div className="flex flex-col md:flex-row py-16 items-center justify-between w-full">
             <div className="flex flex-1 flex-col text-center md:text-left items-center md:items-start">
               <div className="text-6xl leading-[72px] font-semibold -tracking-wider w-full flex items-start flex-col">
-                The future of <h1 className="text-primary">decentralized</h1>
-                processing is here
+                {HERO.firstTitle} <h1 className="text-primary">{HERO.badge}</h1>
+                {HERO.secondTitle}
               </div>
               <div className="text-xl w-full mt-6">
-                Revolutionizing computation with Dumb Contracts
+                {HERO.description}
               </div>
               <div className="flex flex-row gap-4 w-full items-center mt-12">
                 <Link href="/contracts">
-                  <Button className={'rounded-lg'}>Create Now</Button>
+                  <Button className={'rounded-lg'}>{BUTTON.create}</Button>
                 </Link>
                 <Link
                   href="https://docs.ethscriptions.com/v/ethscriptions-vm"
                   target="_blank"
                 >
-                  <Button className={'rounded-lg'} primary={false}>Learn More</Button>
+                  <Button className={'rounded-lg'} primary={false}>{BUTTON.learn}</Button>
                 </Link>
               </div>
             </div>

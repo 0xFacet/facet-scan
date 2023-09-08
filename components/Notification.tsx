@@ -1,6 +1,6 @@
 import React from 'react'
-import { NOTIFICATION_CONSTANT, INotificationConstant } from "./notification.constant"
-import { SectionContainer } from "../../components/SectionContainer";
+import { NOTIFICATION_CONSTANT, INotificationConstant } from "../app/Constant/notification.constant"
+import { SectionContainer } from "./SectionContainer";
 
 export default function Index() {
     return (
