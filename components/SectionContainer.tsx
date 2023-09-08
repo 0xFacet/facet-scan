@@ -10,7 +10,7 @@ export const SectionContainer = ({
   return (
     <div
       className={clsx(
-        "flex flex-col w-full items-center px-4 border-b border-line",
+        "flex flex-col w-full items-center px-4",
         className
       )}
     >
