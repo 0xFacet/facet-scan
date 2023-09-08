@@ -10,7 +10,7 @@ export const Section = ({
   return (
     <section
       className={clsx(
-        "flex flex-col w-full max-w-7xl p-6 border-x border-line overflow-x-auto",
+        "flex flex-col w-full max-w-7xl p-6 overflow-x-auto",
         className
       )}
     >

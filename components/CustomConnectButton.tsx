@@ -20,11 +20,16 @@ export const CustomConnectButton = () => {
             {(() => {
               if (!connected) {
                 return (
-                  <BiWalletAlt
-                    onClick={openConnectModal}
-                    className="cursor-pointer text-secondary hover:text-primary"
-                    size={24}
-                  />
+                  <>
+                    {/* <BiWalletAlt
+                      onClick={openConnectModal}
+                      className="cursor-pointer text-secondary hover:text-primary"
+                      size={24}
+                    /> */}
+                    <Button className={'leading-6 px-[18px]  py-[10px] rounded-lg'} onClick={openConnectModal}>
+                      Connect Wallet
+                    </Button>
+                  </>
                 );
               }
 

@@ -6,7 +6,7 @@ export const Footer = () => {
   return (
     <SectionContainer className="border-none">
       <Section className="flex-1 items-center gap-4">
-        <div className="flex flex-row gap-2">
+        {/* <div className="flex flex-row gap-2">
           <Link href="/contracts" className="text-secondary hover:text-primary">
             Contracts
           </Link>
@@ -26,7 +26,7 @@ export const Footer = () => {
           >
             Docs
           </Link>
-        </div>
+        </div> */}
         <div>
           {"Built by "}
           <Link
