@@ -87,13 +87,15 @@ export default function Contracts() {
   }
 
   const createContractData = {
-    protocol: createContractType,
-    constructorArgs: modifiedArgs,
+    data: {
+      type: createContractType,
+      args: modifiedArgs,
+    }
   };
   const createContractTx = useSendTransaction({
     to: "0x0000000000000000000000000000000000000000",
     data: toHex(
-      `data:application/vnd.esc.contract.deploy+json;esip6=true,${JSON.stringify(
+      `data:application/vnd.esc;esip6=true,${JSON.stringify(
         createContractData
       )}`
     ),
@@ -199,7 +201,7 @@ export default function Contracts() {
               rows={getTableRows().map((row) =>
                 getTableColumns().map((column) => (
                   <div
-                    key={`${row.contract_id}-${column}`}
+                    key={`${row.address}-${column}`}
                     className="max-w-[100px] sm:max-w-none truncate overflow-hidden"
                   >
                     {formatTokenValue(
@@ -214,7 +216,7 @@ export default function Contracts() {
               )}
               onRowClick={(rowIndex) =>
                 router.push(
-                  `/contracts/${getTableRows()[rowIndex].contract_id}`
+                  `/contracts/${getTableRows()[rowIndex].address}`
                 )
               }
             />

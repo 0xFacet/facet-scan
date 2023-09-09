@@ -47,7 +47,7 @@ export type CurrentState = (
 
 export interface CallReceipt {
   caller: `0x${string}`;
-  contract_id: string;
+  contract_address: string;
   error_message: string;
   ethscription_id: string;
   function_args: { [key: string]: any };
@@ -83,7 +83,7 @@ export type SourceCode = {
 export interface Contract {
   abi: ContractAbi;
   call_receipts: CallReceipt[];
-  contract_id: string;
+  address: string;
   current_state: CurrentState;
   source_code: SourceCode[];
 }

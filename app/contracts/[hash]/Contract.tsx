@@ -215,17 +215,19 @@ export default function Contract({ hash }: { hash: string }) {
     try {
       if (address && !isDisconnected) {
         const txnData = {
-          contractId: hash,
-          functionName: name,
-          args: methodValues[name],
+          to: hash,
+          data: {
+            function: name,
+            args: methodValues[name],
+          }
         };
 
         const simulationRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate/call`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`,
           {
             params: {
               from: address,
-              data: JSON.stringify(txnData),
+              tx_payload: JSON.stringify(txnData),
             },
           }
         );
@@ -243,7 +245,7 @@ export default function Contract({ hash }: { hash: string }) {
         const txn = await sendTransaction({
           to: "0x0000000000000000000000000000000000000000",
           data: toHex(
-            `data:application/vnd.esc.contract.call+json;esip6=true,${JSON.stringify(
+            `data:application/vnd.esc;esip6=true,${JSON.stringify(
               txnData
             )}`
           ),
