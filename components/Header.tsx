@@ -44,13 +44,13 @@ export const Header = () => {
     <div
       className={clsx(
         "justify-center items-center z-20 flex p-1 text-xs bg-opacity-20",
-        numEthscriptionsBehind == null || numEthscriptionsBehind <= 1 ? "" : "",
+        numEthscriptionsBehind == null || numEthscriptionsBehind <= 1 ? "hidden" : "",
         numEthscriptionsBehind != null && numEthscriptionsBehind < 5 ? "bg-yellow-100" : "bg-red-100",
       )}
     >
       <div>
-        {/* VM Status: {numEthscriptionsBehind} transaction{numEthscriptionsBehind === 1 ? "" : "s"} behind */}
-        We just pushed <a className="underline" href="https://github.com/ethscriptions-protocol/ethscriptions-vm-server/pull/9">{"a big change"}</a> that will enable contracts to create other contracts. Unfortunately it invalidated all past test data.
+        VM Status: {numEthscriptionsBehind} transaction{numEthscriptionsBehind === 1 ? "" : "s"} behind
+        {/* We just pushed <a className="underline" href="https://github.com/ethscriptions-protocol/ethscriptions-vm-server/pull/9">{"a big change"}</a> that will enable contracts to create other contracts. Unfortunately it invalidated all past test data. */}
       </div>
     </div>
     <SectionContainer>
