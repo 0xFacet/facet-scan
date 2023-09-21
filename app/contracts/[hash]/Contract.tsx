@@ -219,7 +219,7 @@ export default function Contract({ hash }: { hash: string }) {
           data: {
             function: name,
             args: methodValues[name],
-          }
+          },
         };
 
         const simulationRes = await axios.get(
@@ -245,9 +245,7 @@ export default function Contract({ hash }: { hash: string }) {
         const txn = await sendTransaction({
           to: "0x0000000000000000000000000000000000000000",
           data: toHex(
-            `data:application/vnd.esc;esip6=true,${JSON.stringify(
-              txnData
-            )}`
+            `data:application/vnd.esc;esip6=true,${JSON.stringify(txnData)}`
           ),
         });
         setPendingCallTxnHash(txn.hash);
@@ -400,7 +398,7 @@ export default function Contract({ hash }: { hash: string }) {
             rows={[
               ...callReceipts.map((callReceipt) => [
                 <div
-                  key={callReceipt.ethscription_id}
+                  key={callReceipt.transaction_hash}
                   onClick={() => setCallReceipt(callReceipt)}
                   className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
                 >
@@ -412,7 +410,7 @@ export default function Contract({ hash }: { hash: string }) {
                   {startCase(callReceipt.function_name)}
                 </div>,
                 <div
-                  key={callReceipt.ethscription_id}
+                  key={callReceipt.transaction_hash}
                   className="flex flex-row gap-1"
                 >
                   <div className="overflow-hidden text-ellipsis max-w-[200px]">
@@ -430,7 +428,7 @@ export default function Contract({ hash }: { hash: string }) {
                   {currentState.symbol}
                 </div>,
                 <Link
-                  key={callReceipt.ethscription_id}
+                  key={callReceipt.transaction_hash}
                   href={`https://ethscriptions.com/${callReceipt.caller}`}
                   className="text-secondary hover:text-primary transition-colors"
                   target="_blank"
@@ -444,7 +442,7 @@ export default function Contract({ hash }: { hash: string }) {
                 </Link>,
                 !!callReceipt.function_args.to ? (
                   <Link
-                    key={callReceipt.ethscription_id}
+                    key={callReceipt.transaction_hash}
                     href={`https://ethscriptions.com/${callReceipt.function_args.to}`}
                     className="text-secondary hover:text-primary transition-colors"
                     target="_blank"
@@ -458,7 +456,7 @@ export default function Contract({ hash }: { hash: string }) {
                   </Link>
                 ) : (
                   <Link
-                    key={callReceipt.ethscription_id}
+                    key={callReceipt.transaction_hash}
                     href={`https://ethscriptions.com/${callReceipt.caller}`}
                     className="text-secondary hover:text-primary transition-colors"
                     target="_blank"
@@ -473,7 +471,7 @@ export default function Contract({ hash }: { hash: string }) {
                 ),
                 formatTimestamp(callReceipt.timestamp) ? (
                   <div
-                    key={callReceipt.ethscription_id}
+                    key={callReceipt.transaction_hash}
                     onClick={() => setCallReceipt(callReceipt)}
                     className="flex flex-row items-center gap-2 text-secondary hover:text-primary transition-colors cursor-pointer"
                   >
@@ -786,8 +784,8 @@ export default function Contract({ hash }: { hash: string }) {
             <div className="flex flex-col gap-3 border-t border-line mt-3 pt-3">
               <Heading size="h6">Timestamp</Heading>
               <Link
-                key={callReceipt.ethscription_id}
-                href={`${targetNetwork.blockExplorers.default.url}/tx/${callReceipt.ethscription_id}`}
+                key={callReceipt.transaction_hash}
+                href={`${targetNetwork.blockExplorers.default.url}/tx/${callReceipt.transaction_hash}`}
                 target="_blank"
                 className="text-secondary hover:text-primary transition-colors"
               >

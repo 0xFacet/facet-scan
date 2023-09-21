@@ -49,7 +49,7 @@ export interface CallReceipt {
   caller: `0x${string}`;
   contract_address: string;
   error_message: string;
-  ethscription_id: string;
+  transaction_hash: string;
   function_args: { [key: string]: any };
   function_name: string;
   logs: { data: { [key: string]: any }; event: string }[];
