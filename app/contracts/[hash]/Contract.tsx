@@ -355,7 +355,7 @@ export default function Contract({ hash }: { hash: string }) {
             >
               Call
             </Button>
-            {simulationResults[method.name]?.status == "call_error" && (
+            {simulationResults[method.name]?.status == "error" && (
               <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
                 {simulationResults[method.name].error_message}
               </div>
