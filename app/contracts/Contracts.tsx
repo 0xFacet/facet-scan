@@ -90,7 +90,7 @@ export default function Contracts() {
     data: {
       type: createContractType,
       args: modifiedArgs,
-    }
+    },
   };
   const createContractTx = useSendTransaction({
     to: "0x0000000000000000000000000000000000000000",
@@ -197,27 +197,17 @@ export default function Contracts() {
         <Section className="flex-1">
           <div className="px-0 md:px-8">
             <Table
-              headers={getTableColumns().map((key) => startCase(key))}
-              rows={getTableRows().map((row) =>
-                getTableColumns().map((column) => (
-                  <div
-                    key={`${row.address}-${column}`}
-                    className="max-w-[100px] sm:max-w-none truncate overflow-hidden"
-                  >
-                    {formatTokenValue(
-                      row.current_state[column],
-                      row.current_state.decimals ?? 0,
-                      column,
-                      true,
-                      row.current_state.symbol
-                    )}
-                  </div>
-                ))
-              )}
+              headers={["Contract Address"]}
+              rows={getTableRows().map((row) => [
+                <div
+                  key={row.address}
+                  className="max-w-[100px] sm:max-w-none truncate overflow-hidden"
+                >
+                  {row.address}
+                </div>,
+              ])}
               onRowClick={(rowIndex) =>
-                router.push(
-                  `/contracts/${getTableRows()[rowIndex].address}`
-                )
+                router.push(`/contracts/${getTableRows()[rowIndex].address}`)
               }
             />
           </div>
