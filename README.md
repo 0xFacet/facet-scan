@@ -6,10 +6,10 @@ Before starting the development server, you need to set up the environment varia
 
 ```
 NEXT_PUBLIC_NETWORK=goerli
-NEXT_PUBLIC_API_BASE_URI=https://goerli-api.facetscan.com
+NEXT_PUBLIC_API_BASE_URI=https://goerli-api.facet.org
 ```
 
-If you decide to clone the `facet-vm` repo and get the API running on your local machine, replace `https://goerli-api.facetscan.com` in the `.env` file with your localhost URL.
+If you decide to clone the `facet-vm` repo and get the API running on your local machine, replace `https://goerli-api.facet.org` in the `.env` file with your localhost URL.
 
 ### Running the Development Server
 
