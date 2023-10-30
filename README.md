@@ -6,10 +6,10 @@ Before starting the development server, you need to set up the environment varia
 
 ```
 NEXT_PUBLIC_NETWORK=goerli
-NEXT_PUBLIC_API_BASE_URI=https://goerli-api.ethscriptionsvm.com
+NEXT_PUBLIC_API_BASE_URI=https://goerli-api.facetscan.com
 ```
 
-If you decide to clone the `ethscriptions-vm-api` repo and get the API running on your local machine, replace `https://goerli-api.ethscriptionsvm.com` in the `.env` file with your localhost URL.
+If you decide to clone the `facet-vm` repo and get the API running on your local machine, replace `https://goerli-api.facetscan.com` in the `.env` file with your localhost URL.
 
 ### Running the Development Server
 
@@ -27,5 +27,5 @@ You can start editing the page by modifying `pages/index.tsx`. The page auto-upd
 
 To learn more about this stack, take a look at the following resources:
 
-- [Ethscriptions VM Documentation](https://docs.ethscriptions.com/v/ethscriptions-vm) - Learn how to create dumb contracts.
-- [Ethscriptions Discord](https://discord.gg/ethscriptions) - Join our community of builders!
+- [Facet Documentation](https://docs.ethscriptions.com/v/ethscriptions-vm) - Learn how to create dumb contracts.
+- [Facet Discord](https://discord.gg/facet) - Join our community of builders!

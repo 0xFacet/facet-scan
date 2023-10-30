@@ -7,9 +7,15 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ethscriptions VM",
+  title: "FacetScan",
   description:
     "The future of decentralized processing is here. Revolutionizing computation with Dumb Contracts.",
+  icons: [
+    {
+      rel: "icon",
+      url: "https://facetscan.com/assets/images/facet-social.png",
+    },
+  ],
 };
 
 function RootLayout({ children }: { children: React.ReactNode }) {

@@ -12,7 +12,7 @@ export const Footer = () => {
           </Link>
           &bull;
           <Link
-            href="https://github.com/ethscriptions-protocol"
+            href="https://github.com/0xfacet"
             target="_blank"
             className="text-secondary hover:text-primary"
           >
@@ -28,14 +28,9 @@ export const Footer = () => {
           </Link>
         </div>
         <div>
-          {"Built by "}
-          <Link
-            href="https://ethscriptions.com"
-            target="_blank"
-            className="text-secondary hover:text-primary"
-          >
-            Ethscriptions
-          </Link>
+          {"Facet Computing, Inc. "}
+          &copy;
+          {` ${new Date().getFullYear()}`}
         </div>
       </Section>
     </SectionContainer>

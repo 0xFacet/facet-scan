@@ -30,13 +30,13 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
 const projectId = "174129d09efd705c1f5e32b53891075d";
 
 const { wallets } = getDefaultWallets({
-  appName: "Ethscriptions VM",
+  appName: "FacetScan",
   projectId,
   chains,
 });
 
 const demoAppInfo = {
-  appName: "Ethscriptions VM",
+  appName: "FacetScan",
 };
 
 const connectors = connectorsForWallets([
