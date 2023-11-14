@@ -1,7 +1,5 @@
 import Contracts from "./Contracts";
 
-function Page() {
+export default function Page() {
   return <Contracts />;
 }
-
-export default Page;

@@ -492,15 +492,17 @@ export default function Contract({ hash }: { hash: string }) {
     if (!sourceCode.length) return null;
     return (
       <div className="flex flex-col gap-8">
-        {sourceCode.map((sc) => (
-          <SyntaxHighlighter
-            key={sc.code}
-            language={sc.language}
-            style={stackoverflowDark}
-          >
-            {sc.code}
-          </SyntaxHighlighter>
-        ))}
+        {/* {sourceCode.map((sc) => (
+          <>
+            <SyntaxHighlighter
+              key={sc.code}
+              language={sc.language}
+              style={stackoverflowDark}
+            >
+              {sc.code}
+            </SyntaxHighlighter>
+          </>
+        ))} */}
       </div>
     );
   };
@@ -630,8 +632,7 @@ export default function Contract({ hash }: { hash: string }) {
   };
 
   return (
-    <div className="min-h-[100vh] flex flex-col">
-      <Header />
+    <div className="flex flex-col flex-1">
       <SectionContainer>
         <Section>
           <div className="flex flex-col p-0 md:p-8 gap-1">
@@ -720,7 +721,6 @@ export default function Contract({ hash }: { hash: string }) {
           <div className="px-0 md:px-8">{renderTab()}</div>
         </Section>
       </SectionContainer>
-      <Footer />
       <Modal
         title="Call Receipt"
         show={!!callReceipt}

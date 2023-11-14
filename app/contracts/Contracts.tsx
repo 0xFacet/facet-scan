@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/Button";
-import { Header } from "@/components/Header";
 import { Heading } from "@/components/Heading";
 import { Modal } from "@/components/Modal";
 import { NavLink } from "@/components/NavLink";
@@ -9,7 +8,7 @@ import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Table } from "@/components/Table";
 import { Contract, ContractAbi } from "@/types/contracts";
-import { formatTokenValue, parseTokenValue } from "@/utils/formatter";
+import { parseTokenValue } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,7 +21,6 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { kebabCase, startCase } from "lodash";
-import { Footer } from "@/components/Footer";
 
 export default function Contracts() {
   const { data: latestBlockNumber } = useBlockNumber({ watch: true });
@@ -150,8 +148,7 @@ export default function Contracts() {
   };
 
   return (
-    <div className="min-h-[100vh] flex flex-col">
-      <Header />
+    <div className="flex flex-col flex-1">
       <SectionContainer>
         <Section>
           <div className="flex flex-col p-0 md:p-8 gap-4 md:gap-8">
@@ -213,7 +210,6 @@ export default function Contracts() {
           </div>
         </Section>
       </SectionContainer>
-      <Footer />
       <Modal
         show={contractTypes.length > 0 && showCreateModal}
         confirmText="Deploy Contract"

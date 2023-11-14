@@ -3,26 +3,28 @@ import "@rainbow-me/rainbowkit/styles.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "./providers";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FacetScan",
+  title: "Facet Block Explorer",
   description:
-    "The future of decentralized processing is here. Revolutionizing computation with Dumb Contracts.",
-  icons: [
-    {
-      rel: "icon",
-      url: "https://facetscan.com/assets/images/facet-social.png",
-    },
-  ],
+    "Facet Scan allows you to explore and search for blocks, transactions, addresses, and contracts on the Facet VM.",
 };
 
 function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="min-h-[100vh] flex flex-col">
+            <Header />
+            {children}
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );
