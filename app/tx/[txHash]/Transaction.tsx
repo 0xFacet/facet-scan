@@ -18,14 +18,14 @@ export default function Transaction({ transaction }: Props) {
               Transaction
             </Heading>
             <div
-              key={transaction.id}
+              key={transaction.transaction_hash}
               className="flex flex-row gap justify-between border-t border-line py-4"
             >
               <div>
-                <div className="font-bold">{transaction.ethscription_id}</div>
+                <div className="font-bold">{transaction.transaction_hash}</div>
                 <div className="opacity-50">
                   {`${formatDistanceToNowStrict(
-                    new Date(transaction.creation_timestamp * 1000)
+                    new Date(transaction.timestamp)
                   )} ago`}
                 </div>
               </div>

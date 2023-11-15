@@ -36,7 +36,7 @@ export default function Block({ block }: Props) {
                 </div>
               </div>
               <div>
-                {pluralize(block.ethscriptions?.length ?? 0, "transaction")}
+                {pluralize(block.transaction_count ?? 0, "transaction")}
               </div>
             </div>
           </div>
