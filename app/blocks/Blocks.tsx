@@ -21,12 +21,12 @@ export default function Blocks({ totalBlocks, blocks }: Props) {
       <SectionContainer className="flex-1">
         <Section className="flex-1 justify-center gap-8">
           <div className="flex-1">
-            <Heading size="h5" className="py-4">
+            <Heading size="h5" className="py-4 border-b border-line">
               Blocks
             </Heading>
             {blocks.map((block) => (
               <Link key={block.id} href={`/block/${block.block_number}`}>
-                <div className="flex flex-row gap justify-between border-t border-line py-4">
+                <div className="flex flex-row gap justify-between border-b border-line py-4 hover:text-primary">
                   <div>
                     <div className="font-bold">
                       Block #{block.block_number.toLocaleString()}
@@ -38,7 +38,7 @@ export default function Blocks({ totalBlocks, blocks }: Props) {
                     </div>
                   </div>
                   <div>
-                    {pluralize(block.ethscriptions?.length ?? 0, "transaction")}
+                    {pluralize(block.transaction_count ?? 0, "transaction")}
                   </div>
                 </div>
               </Link>

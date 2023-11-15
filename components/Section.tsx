@@ -8,13 +8,13 @@ export const Section = ({
   className?: string;
 }) => {
   return (
-    <section
+    <div
       className={clsx(
-        "flex flex-col w-full max-w-7xl p-6 overflow-x-auto",
+        "flex flex-col w-full max-w-7xl p-4 sm:p-8 overflow-x-auto",
         className
       )}
     >
       {children}
-    </section>
+    </div>
   );
 };

@@ -1,3 +1,10 @@
+export interface DeployableContract {
+  name: string;
+  source_code: string;
+  init_code_hash: string;
+  abi: { [key: string]: { [key: string]: any } };
+}
+
 export interface CurrentStateSimpleToken {
   contract_type: "SimpleToken";
   name: string;

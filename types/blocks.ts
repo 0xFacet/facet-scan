@@ -1,20 +1,16 @@
 export interface Transaction {
-  block_blockhash: string;
+  transaction_hash: string;
+  caller: string;
+  status: string;
+  function_name: string;
+  function_args: { [key: string]: any };
+  logs: any[];
+  timestamp: string;
+  error_message?: string | null;
+  contract_address: string;
   block_number: number;
-  content_sha: string;
-  content_uri: string;
-  contract_actions_processed_at: string;
-  created_at: string;
-  creation_timestamp: number;
-  creator: string;
-  current_owner: string;
-  ethscription_id: string;
-  id: number;
-  initial_owner: string;
-  mimetype: string;
-  previous_owner: string | null;
   transaction_index: number;
-  updated_at: string;
+  block_blockhash: string;
 }
 
 export interface Block {
@@ -27,5 +23,5 @@ export interface Block {
   processing_state: string;
   timestamp: number;
   updated_at: string;
-  ethscriptions?: Transaction[];
+  transaction_count?: number;
 }

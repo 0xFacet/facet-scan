@@ -13,7 +13,7 @@ export const Header = () => {
 
   return (
     <SectionContainer>
-      <Section className="py-0">
+      <Section className="py-0 sm:py-0">
         <div className="flex justify-between items-center">
           <Link href="/">
             <Image

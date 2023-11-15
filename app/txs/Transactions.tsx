@@ -19,13 +19,13 @@ export default function Transactions({
       <SectionContainer className="flex-1">
         <Section className="flex-1 justify-center gap-8">
           <div className="flex-1">
-            <Heading size="h5" className="py-4">
+            <Heading size="h5" className="py-4 border-b border-line">
               Transactions
             </Heading>
             {transactions.map((transaction) => (
               <div
                 key={transaction.id}
-                className="flex flex-row gap justify-between border-t border-line py-4"
+                className="flex flex-row gap justify-between border-b border-line py-4 hover:bg-[rgba(255,255,255,0.02)] hover:text-primary"
               >
                 <div>
                   <div className="font-bold">{transaction.ethscription_id}</div>

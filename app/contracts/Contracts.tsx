@@ -6,70 +6,36 @@ import { Modal } from "@/components/Modal";
 import { NavLink } from "@/components/NavLink";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
-import { Table } from "@/components/Table";
-import { Contract, ContractAbi } from "@/types/contracts";
+import { DeployableContract } from "@/types/contracts";
 import { parseTokenValue } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toHex } from "viem";
-import {
-  useAccount,
-  useBlockNumber,
-  useSendTransaction,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useSendTransaction, useWaitForTransaction } from "wagmi";
 import { kebabCase, startCase } from "lodash";
 
-export default function Contracts() {
-  const { data: latestBlockNumber } = useBlockNumber({ watch: true });
+interface Props {
+  deployableContracts: DeployableContract[];
+}
+
+export default function Contracts({ deployableContracts }: Props) {
   const { openConnectModal } = useConnectModal();
   const { address, isDisconnected } = useAccount();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createContractType, setCreateContractType] = useState("");
+  const [selectedContract, setSelectedContract] =
+    useState<DeployableContract | null>(null);
   const [constructorArgs, setConstructorArgs] = useState<{
     [key: string]: any;
   }>({});
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [contractAbis, setContractAbis] = useState<{
-    [key: string]: ContractAbi;
-  }>({});
   const searchParams = useSearchParams();
   const router = useRouter();
-  const contractTypes = (contractAbis && Object.keys(contractAbis)) || [];
-  const tab =
-    searchParams.get("tab") ??
-    kebabCase(
-      contractTypes.find((type) =>
-        contracts.find(
-          (contract) => contract.current_state.contract_type === type
-        )
-      ) ?? ""
-    );
-
-  useEffect(() => {
-    if (latestBlockNumber) {
-      (async () => {
-        const contractsRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts`
-        );
-        setContracts(contractsRes.data.result);
-      })();
-
-      (async () => {
-        const contractsRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/deployable-contracts`
-        );
-        setContractAbis(contractsRes.data);
-      })();
-    }
-  }, [latestBlockNumber]);
+  const contractTypes = deployableContracts.map(({ name }) => name);
+  const tab = searchParams.get("tab") ?? kebabCase(contractTypes[0] ?? "");
 
   const creationConstructorArgs =
-    (contractAbis &&
-      contractAbis[createContractType] &&
-      Object.keys(contractAbis[createContractType]["constructor"]["args"])) ||
+    (selectedContract?.abi &&
+      Object.keys(selectedContract.abi["constructor"]["args"])) ||
     [];
 
   const modifiedArgs: { [key: string]: any } = { ...constructorArgs };
@@ -85,15 +51,17 @@ export default function Contracts() {
   }
 
   const createContractData = {
+    op: "create",
     data: {
-      type: createContractType,
       args: modifiedArgs,
+      source_code: selectedContract?.source_code,
+      init_code_hash: selectedContract?.init_code_hash,
     },
   };
   const createContractTx = useSendTransaction({
     to: "0x0000000000000000000000000000000000000000",
     data: toHex(
-      `data:application/vnd.esc;esip6=true,${JSON.stringify(
+      `data:application/vnd.facet.tx+json;esip6=true,${JSON.stringify(
         createContractData
       )}`
     ),
@@ -114,7 +82,7 @@ export default function Contracts() {
 
   const createContract = async () => {
     try {
-      if (createContractType.length && address && !isDisconnected) {
+      if (selectedContract && address && !isDisconnected) {
         createContractTx.sendTransaction();
       } else if (openConnectModal) {
         openConnectModal();
@@ -124,28 +92,13 @@ export default function Contracts() {
     }
   };
 
-  const getTableColumns = () => {
-    const type = contractTypes.find((type) => kebabCase(type) === tab);
-    if (!type) return [];
-    const state = contracts.find(
-      (contract) => contract.current_state.contract_type === type
-    )?.current_state;
-    if (!state) return [];
-    const keys = Object.keys(state);
-    return keys.filter(
-      (key) =>
-        (typeof state[key] === "number" || typeof state[key] === "string") &&
-        kebabCase(key) !== "contract-type"
-    );
-  };
-
-  const getTableRows = () => {
-    const type = contractTypes.find((type) => kebabCase(type) === tab);
-    if (!type) return [];
-    return contracts.filter(
-      (contract) => contract.current_state.contract_type === type
-    );
-  };
+  // const getTableRows = () => {
+  //   const type = contractTypes.find((type) => kebabCase(type) === tab);
+  //   if (!type) return [];
+  //   return contracts.filter(
+  //     (contract) => contract.current_state.contract_type === type
+  //   );
+  // };
 
   return (
     <div className="flex flex-col flex-1">
@@ -165,27 +118,19 @@ export default function Contracts() {
         </Section>
       </SectionContainer>
       <SectionContainer>
-        <Section className="py-0">
+        <Section className="py-0 sm:py-0">
           <div className="px-0 md:px-8 flex gap-8 items-center h-min-full">
             <div className="flex gap-8 h-min-full">
-              {contractTypes
-                .filter(
-                  (type) =>
-                    !!contracts.find(
-                      (contract) =>
-                        contract.current_state.contract_type === type
-                    )
-                )
-                .map((type) => (
-                  <NavLink
-                    key={type}
-                    href={`?tab=${kebabCase(type)}`}
-                    isActive={tab === kebabCase(type)}
-                    className="whitespace-nowrap"
-                  >
-                    {startCase(type)}
-                  </NavLink>
-                ))}
+              {contractTypes.map((type) => (
+                <NavLink
+                  key={type}
+                  href={`?tab=${kebabCase(type)}`}
+                  isActive={tab === kebabCase(type)}
+                  className="whitespace-nowrap"
+                >
+                  {startCase(type)}
+                </NavLink>
+              ))}
             </div>
           </div>
         </Section>
@@ -193,7 +138,7 @@ export default function Contracts() {
       <SectionContainer className="flex-1">
         <Section className="flex-1">
           <div className="px-0 md:px-8">
-            <Table
+            {/* <Table
               headers={["Contract Address"]}
               rows={getTableRows().map((row) => [
                 <div
@@ -206,7 +151,7 @@ export default function Contracts() {
               onRowClick={(rowIndex) =>
                 router.push(`/contracts/${getTableRows()[rowIndex].address}`)
               }
-            />
+            /> */}
           </div>
         </Section>
       </SectionContainer>
@@ -217,7 +162,7 @@ export default function Contracts() {
         onClose={() => {
           setShowCreateModal(false);
         }}
-        onConfirm={createContractType.length ? createContract : undefined}
+        onConfirm={selectedContract ? createContract : undefined}
         loading={createLoading}
       >
         <label
@@ -232,8 +177,14 @@ export default function Contracts() {
             id="contract_type"
             className="mt-2 block w-full rounded-none h-10 pl-3 pr-10 outline-none
                 border-[1px] border-line bg-black focus:border-e-2 focus:border-primary sm:text-sm sm:leading-6"
-            onChange={(e) => setCreateContractType(e.target.value)}
-            value={createContractType}
+            onChange={(e) =>
+              setSelectedContract(
+                deployableContracts.find(
+                  ({ name }) => name === e.target.value
+                ) || null
+              )
+            }
+            value={selectedContract?.name}
           >
             <option value="">Select a Contract Type</option>
             {contractTypes.map((type) => (
@@ -243,7 +194,7 @@ export default function Contracts() {
             ))}
           </select>
         </div>
-        {!!createContractType.length && (
+        {!!selectedContract && (
           <>
             <div className="border-t-[1px] border-line w-full my-6" />
             <div className="block text-sm font-medium leading-6 mb-2">
