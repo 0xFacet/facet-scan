@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
 import { Modal } from "@/components/Modal";
 import { NavLink } from "@/components/NavLink";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
-import { DeployableContract } from "@/types/contracts";
+import { Contract, ContractArtifact } from "@/types/contracts";
 import { parseTokenValue } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,23 +14,41 @@ import { useState } from "react";
 import { toHex } from "viem";
 import { useAccount, useSendTransaction, useWaitForTransaction } from "wagmi";
 import { kebabCase, startCase } from "lodash";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Table } from "@/components/Table";
+import { Pagination } from "@/components/pagination";
 
 interface Props {
-  deployableContracts: DeployableContract[];
+  contractArtifacts: ContractArtifact[];
+  contracts: Contract[];
+  totalContracts: number;
 }
 
-export default function Contracts({ deployableContracts }: Props) {
+export default function Contracts({
+  contractArtifacts,
+  contracts,
+  totalContracts,
+}: Props) {
   const { openConnectModal } = useConnectModal();
   const { address, isDisconnected } = useAccount();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedContract, setSelectedContract] =
-    useState<DeployableContract | null>(null);
+    useState<ContractArtifact | null>(null);
   const [constructorArgs, setConstructorArgs] = useState<{
     [key: string]: any;
   }>({});
   const searchParams = useSearchParams();
   const router = useRouter();
-  const contractTypes = deployableContracts.map(({ name }) => name);
+  const contractTypes = contractArtifacts.map(({ name }) => name);
   const tab = searchParams.get("tab") ?? kebabCase(contractTypes[0] ?? "");
 
   const creationConstructorArgs =
@@ -92,34 +110,26 @@ export default function Contracts({ deployableContracts }: Props) {
     }
   };
 
-  // const getTableRows = () => {
-  //   const type = contractTypes.find((type) => kebabCase(type) === tab);
-  //   if (!type) return [];
-  //   return contracts.filter(
-  //     (contract) => contract.current_state.contract_type === type
-  //   );
-  // };
-
   return (
     <div className="flex flex-col flex-1">
-      <SectionContainer>
+      <SectionContainer className="bg-[url(/card-bg.svg)] bg-no-repeat bg-cover xl:bg-[length:1536px] bg-center border-none">
         <Section>
-          <div className="flex flex-col p-0 md:p-8 gap-4 md:gap-8">
-            <Heading>Dumb Contracts</Heading>
+          <div className="flex flex-col py-0 md:py-16 gap-4 md:gap-8">
+            <Heading>Contracts</Heading>
             <div className="text-xl">
-              Dumb Contracts offers enhanced scalability and flexibility while
+              Contracts offers enhanced scalability and flexibility while
               reducing the constraints of on-chain gas fees and processing
               limitations.
             </div>
-            <Button onClick={() => setShowCreateModal(true)}>
+            <Button onClick={() => setShowCreateModal(true)} className="w-fit">
               Create Contract
             </Button>
           </div>
         </Section>
       </SectionContainer>
-      <SectionContainer>
+      <SectionContainer className="border-t">
         <Section className="py-0 sm:py-0">
-          <div className="px-0 md:px-8 flex gap-8 items-center h-min-full">
+          <div className="px-0 flex gap-8 items-center h-min-full">
             <div className="flex gap-8 h-min-full">
               {contractTypes.map((type) => (
                 <NavLink
@@ -137,10 +147,10 @@ export default function Contracts({ deployableContracts }: Props) {
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <div className="px-0 md:px-8">
-            {/* <Table
+          <div className="flex flex-col border border-line rounded-xl overflow-x-hidden divide-y divide-line px-4">
+            <Table
               headers={["Contract Address"]}
-              rows={getTableRows().map((row) => [
+              rows={contracts.map((row) => [
                 <div
                   key={row.address}
                   className="max-w-[100px] sm:max-w-none truncate overflow-hidden"
@@ -149,52 +159,50 @@ export default function Contracts({ deployableContracts }: Props) {
                 </div>,
               ])}
               onRowClick={(rowIndex) =>
-                router.push(`/contracts/${getTableRows()[rowIndex].address}`)
+                router.push(`/address/${contracts[rowIndex].address}`)
               }
-            /> */}
+            />
           </div>
+          <Pagination count={totalContracts} />
         </Section>
       </SectionContainer>
       <Modal
-        show={contractTypes.length > 0 && showCreateModal}
+        open={contractTypes.length > 0 && showCreateModal}
+        onOpenChange={(open) => setShowCreateModal(open)}
         confirmText="Deploy Contract"
         title="Create New Contract"
-        onClose={() => {
+        onCancel={() => {
           setShowCreateModal(false);
         }}
         onConfirm={selectedContract ? createContract : undefined}
         loading={createLoading}
       >
-        <label
-          htmlFor="contract_type"
-          className="block text-sm font-medium leading-6 mb-2"
-        >
-          Contract Type
-        </label>
-        <div className="mb-4">
-          <select
-            name="contract_type"
-            id="contract_type"
-            className="mt-2 block w-full rounded-none h-10 pl-3 pr-10 outline-none
-                border-[1px] border-line bg-black focus:border-e-2 focus:border-primary sm:text-sm sm:leading-6"
-            onChange={(e) =>
+        <div className="space-y-2 relative">
+          <Label htmlFor="select-input">Contract Type</Label>
+          <Select
+            onValueChange={(value) =>
               setSelectedContract(
-                deployableContracts.find(
-                  ({ name }) => name === e.target.value
-                ) || null
+                contractArtifacts.find(({ name }) => name === value) || null
               )
             }
-            value={selectedContract?.name}
+            value={selectedContract?.name ?? "-"}
           >
-            <option value="">Select a Contract Type</option>
-            {contractTypes.map((type) => (
-              <option key={type} value={type}>
-                {startCase(type)}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="relative w-full">
+              <SelectValue placeholder="Select an option" />
+            </SelectTrigger>
+            <SelectContent className="absolute z-[1000] py-1 mt-1 bg-black rounded-md shadow-lg max-h-60 overflow-auto">
+              <SelectGroup>
+                <SelectItem value="-">Select a Contract Type</SelectItem>
+                {contractTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
-        {!!selectedContract && (
+        {!!selectedContract && !!creationConstructorArgs.length && (
           <>
             <div className="border-t-[1px] border-line w-full my-6" />
             <div className="block text-sm font-medium leading-6 mb-2">
@@ -202,17 +210,10 @@ export default function Contracts({ deployableContracts }: Props) {
             </div>
             <div className="flex flex-col gap-4">
               {creationConstructorArgs.map((arg) => (
-                <div key={arg}>
-                  <label
-                    className="block text-xs font-medium leading-6"
-                    htmlFor={arg}
-                  >
-                    {startCase(arg)}
-                  </label>
-                  <input
+                <div key={arg} className="space-y-2">
+                  <Label htmlFor={arg}>{startCase(arg)}</Label>
+                  <Input
                     id={arg}
-                    type="text"
-                    className="block w-full outline-none bg-black border-0 p-2 ring-1 ring-inset ring-line placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                     placeholder={startCase(arg)}
                     name={arg}
                     onChange={(e) => {
@@ -222,6 +223,7 @@ export default function Contracts({ deployableContracts }: Props) {
                       });
                     }}
                     value={constructorArgs[arg]}
+                    type="text"
                   />
                 </div>
               ))}

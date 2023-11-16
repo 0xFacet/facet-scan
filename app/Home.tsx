@@ -62,7 +62,7 @@ export default function Home({
           <div className="flex flex-wrap bg-transparent">
             <div className="flex-1 min-w-[150px]">
               <input
-                className="w-full text-md sm:text-lg md:text-2xl bg-transparent outline-none px-6 py-4 sm:px-12 sm:py-8 border-2 border-primary rounded-l-2xl sm:rounded-l-3xl"
+                className="w-full bg-black/20 text-md sm:text-lg md:text-2xl outline-none px-6 py-4 sm:px-12 sm:py-8 border-2 border-primary rounded-l-2xl sm:rounded-l-3xl rounded-r-none"
                 placeholder="Search by card, address, transaction, or block"
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
@@ -70,7 +70,7 @@ export default function Home({
             </div>
             <button
               type="submit"
-              className="disabled:opacity-50 opacity-90 hover:opacity-100 p-4 sm:p-8 text-md sm:text-lg md:text-2xl bg-primary text-black border-primary rounded-r-2xl sm:rounded-r-2xl"
+              className="disabled:opacity-50 opacity-90 hover:opacity-100 p-4 sm:p-8 text-md sm:text-lg md:text-2xl bg-primary text-black border-primary rounded-r-2xl sm:rounded-r-2xl rounded-l-none"
               onClick={submitSearch}
             >
               <BiSearch />
@@ -82,7 +82,9 @@ export default function Home({
         <Section className="flex-1 py-8 gap-8 max-w-3xl mx-auto">
           <div className="flex flex-1 flex-col sm:flex-row flex-wrap">
             <div className="flex flex-col flex-1 items-center justify-center text-center gap-2 p-8">
-              <Heading size="h2">{totalBlocks.toLocaleString()}</Heading>
+              <Heading size="h2">
+                {Number(totalBlocks).toLocaleString()}
+              </Heading>
               <div className="text-accent">Total Blocks</div>
             </div>
             <div className="flex flex-col flex-1 items-center justify-center text-center gap-2 p-8">
@@ -115,7 +117,7 @@ export default function Home({
                       </Link>
                       <div className="text-gray text-sm">
                         {`${formatDistanceToNowStrict(
-                          new Date(block.timestamp * 1000)
+                          new Date(Number(block.timestamp) * 1000)
                         )} ago`}
                       </div>
                     </div>
@@ -154,7 +156,7 @@ export default function Home({
                       </Link>
                       <div className="text-gray text-sm">
                         {`${formatDistanceToNowStrict(
-                          new Date(transaction.timestamp)
+                          new Date(Number(transaction.block_timestamp) * 1000)
                         )} ago`}
                       </div>
                     </div>

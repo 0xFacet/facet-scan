@@ -1,47 +1,53 @@
+import { CopyText } from "@/components/CopyText";
 import { Heading } from "@/components/Heading";
 import { NavLink } from "@/components/NavLink";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
-import { fetchTransaction } from "@/utils/data";
+import { fetchContract } from "@/utils/data";
 
-export default async function TransactionLayout({
+export default async function AddressLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { txHash: string };
+  params: { hash: string };
 }) {
-  const transaction = await fetchTransaction(params.txHash);
+  const contract = await fetchContract(params.hash);
   return (
     <div className="flex flex-col flex-1">
       <SectionContainer>
         <Section>
-          <Heading size="h2" className="py-4">
-            Transaction Details
-          </Heading>
+          <div className="spacing-y-1 py-4">
+            <Heading size="h2">{!!contract ? "Contract" : "Address"}</Heading>
+            <div className="w-fit mt-2">
+              <CopyText text={params.hash} />
+            </div>
+          </div>
         </Section>
       </SectionContainer>
       <SectionContainer>
         <Section className="py-0 sm:py-0">
           <div className="flex gap-8">
             <NavLink
-              href={`/tx/${params.txHash}`}
+              href={`/address/${params.hash}`}
               className="whitespace-nowrap"
             >
-              Overview
+              Transactions
             </NavLink>
             <NavLink
-              href={`/tx/${params.txHash}/internal`}
+              href={`/address/${params.hash}/internal`}
               className="whitespace-nowrap"
             >
               Internal Transactions
             </NavLink>
-            <NavLink
-              href={`/tx/${params.txHash}/logs`}
-              className="whitespace-nowrap"
-            >
-              Logs ({transaction.logs.length})
-            </NavLink>
+            {!!contract && (
+              <NavLink
+                href={`/address/${params.hash}/contract`}
+                className="whitespace-nowrap"
+              >
+                Contract
+              </NavLink>
+            )}
           </div>
         </Section>
       </SectionContainer>

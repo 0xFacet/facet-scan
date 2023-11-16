@@ -22,40 +22,40 @@ export default async function Page({
 
   return (
     <div className="flex flex-col flex-1">
+      <SectionContainer>
+        <Section>
+          <Heading size="h2" className="py-4">
+            Blocks
+          </Heading>
+        </Section>
+      </SectionContainer>
       <SectionContainer className="flex-1">
-        <Section className="flex-1 justify-center gap-8">
-          <div className="flex-1">
-            <Heading size="h2" className="py-4">
-              Blocks
-            </Heading>
-            <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden divide-y divide-line px-4">
-              {blocks.map((block) => (
-                <div
-                  key={block.id}
-                  className="flex flex-row gap justify-between py-4"
-                >
-                  <div>
-                    <Link href={`/block/${block.block_number}`}>
-                      <div className="font-bold">
-                        Block #{block.block_number}
-                      </div>
-                    </Link>
-                    <div className="opacity-50">
-                      {`${formatDistanceToNowStrict(
-                        new Date(block.timestamp * 1000)
-                      )} ago`}
-                    </div>
-                  </div>
-                  <div>
-                    <Link href={`/txs?block=${block.block_number}`}>
-                      {pluralize(block.transaction_count ?? 0, "transaction")}
-                    </Link>
+        <Section className="flex-1">
+          <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden divide-y divide-line px-4">
+            {blocks.map((block) => (
+              <div
+                key={block.id}
+                className="flex flex-row gap justify-between py-4"
+              >
+                <div>
+                  <Link href={`/block/${block.block_number}`}>
+                    <div className="font-bold">Block #{block.block_number}</div>
+                  </Link>
+                  <div className="opacity-50">
+                    {`${formatDistanceToNowStrict(
+                      new Date(Number(block.timestamp) * 1000)
+                    )} ago`}
                   </div>
                 </div>
-              ))}
-            </div>
-            <Pagination count={Math.ceil(totalBlocks / 20)} />
+                <div>
+                  <Link href={`/txs?block=${block.block_number}`}>
+                    {pluralize(block.transaction_count ?? 0, "transaction")}
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
+          <Pagination count={Math.ceil(totalBlocks / 20)} />
         </Section>
       </SectionContainer>
     </div>

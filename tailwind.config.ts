@@ -15,8 +15,12 @@ const config: Config = {
       },
       colors: {
         primary: "#C3FF00",
+        "primary-foreground": "#1A1D0E",
         accent: "#888888",
         dark: "#1A1D0E",
+        background:
+          "radial-gradient(100% 100% at 100% 100%, #1a1d0e 0%, #000000 100%)",
+        input: "rgba(255,255,255,0.1)",
         line: "rgba(255,255,255,0.1)",
         lime: {
           DEFAULT: "#C3FF00",

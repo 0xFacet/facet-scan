@@ -6,11 +6,8 @@ import { NavLink } from "./NavLink";
 import { Section } from "./Section";
 import { SectionContainer } from "./SectionContainer";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 
 export const Header = () => {
-  const path = usePathname();
-
   return (
     <SectionContainer>
       <Section className="py-0 sm:py-0">
@@ -35,12 +32,8 @@ export const Header = () => {
           </Link>
           <div className="flex gap-8 items-center h-min-full">
             <div className="flex gap-8 h-min-full">
-              <NavLink href="/contracts" isActive={path === "/contracts"}>
-                Contracts
-              </NavLink>
-              <NavLink href="https://github.com/0xfacet" target="_blank">
-                GitHub
-              </NavLink>
+              <NavLink href="/txs">Transactions</NavLink>
+              <NavLink href="/contracts">Contracts</NavLink>
             </div>
             <CustomConnectButton />
           </div>

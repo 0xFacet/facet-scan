@@ -2,11 +2,10 @@ import { formatDistanceToNowStrict, parseISO } from "date-fns";
 import { camelCase } from "lodash";
 import { formatEther as formatEth, formatUnits, parseUnits } from "viem";
 
-export const formatTimestamp = (dateStr: string) => {
-  if (!dateStr) return null;
+export const formatTimestamp = (date: Date) => {
+  if (!date) return null;
 
-  const targetDate = parseISO(dateStr);
-  const timeAgo = formatDistanceToNowStrict(targetDate, {
+  const timeAgo = formatDistanceToNowStrict(date, {
     roundingMethod: "floor",
   });
 

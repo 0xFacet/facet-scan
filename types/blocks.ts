@@ -1,13 +1,13 @@
 export interface Transaction {
   transaction_hash: string;
-  caller: string;
+  from: `0x${string}`;
+  to: `0x${string}`;
   status: string;
-  function_name: string;
-  function_args: { [key: string]: any };
+  function: string;
+  args: { [key: string]: any };
   logs: any[];
-  timestamp: string;
+  block_timestamp: string;
   error_message?: string | null;
-  contract_address: string;
   block_number: number;
   transaction_index: number;
   block_blockhash: string;
@@ -21,14 +21,15 @@ export interface Transaction {
 export interface InternalTransaction {
   transaction_hash: string;
   internal_transaction_index: string;
-  from_address: string;
-  to_contract_address: string;
+  from: `0x${string}`;
+  to: `0x${string}`;
   effective_contract_address: string;
   function: string;
   args: { [key: string]: any };
   call_type: string;
   return_value?: string | null;
   logs: any[];
+  block_timestamp: string;
   error?: string | null;
   status: string;
   block_number: string;
@@ -44,7 +45,7 @@ export interface Block {
   imported_at: string;
   parent_blockhash: string;
   processing_state: string;
-  timestamp: number;
+  timestamp: string;
   updated_at: string;
   transaction_count?: number;
 }

@@ -81,8 +81,8 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                   </div>
                 ),
                 value: (
-                  <Link href={`/address/${transaction.from_address}`}>
-                    {transaction.from_address}
+                  <Link href={`/address/${transaction.from}`}>
+                    {transaction.from}
                   </Link>
                 ),
               },
@@ -96,11 +96,11 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                   </div>
                 ),
                 value: (
-                  <Link href={`/address/${transaction.to_contract_address}`}>
-                    {transaction.to_contract_address}
+                  <Link href={`/address/${transaction.to}`}>
+                    {transaction.to}
                   </Link>
                 ),
-                hidden: !transaction.to_contract_address,
+                hidden: !transaction.to,
               },
               {
                 label: (
@@ -123,11 +123,13 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                   </div>
                 ),
                 value: (
-                  <List
-                    items={Object.entries(transaction.args).map(
-                      ([label, value]) => ({ label, value })
-                    )}
-                  />
+                  <div className="border border-line rounded-xl px-4">
+                    <List
+                      items={Object.entries(transaction.args).map(
+                        ([label, value]) => ({ label, value })
+                      )}
+                    />
+                  </div>
                 ),
               },
             ]}

@@ -5,23 +5,23 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 interface Props {
   count: number;
+  perPage?: number;
 }
 
-export function Pagination({ count }: Props) {
+export function Pagination({ count, perPage = 20 }: Props) {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
   const pathname = usePathname();
 
   const params = new URLSearchParams(searchParams);
-  const ITEM_PER_PAGE = 20;
-  const lastPage = Math.ceil(count / ITEM_PER_PAGE);
+  const lastPage = Math.ceil(count / perPage);
 
   let page = Number(searchParams.get("page") || "1");
   if (page < 1) page = 1;
   if (page > lastPage) page = lastPage;
 
-  const hasPrev = ITEM_PER_PAGE * (page - 1) > 0;
-  const hasNext = ITEM_PER_PAGE * (page - 1) + ITEM_PER_PAGE < count;
+  const hasPrev = perPage * (page - 1) > 0;
+  const hasNext = perPage * (page - 1) + perPage < count;
 
   const handleChangePage = (type: "prev" | "next") => {
     type === "prev"
@@ -41,7 +41,7 @@ export function Pagination({ count }: Props) {
         </Button>
         <div className="text-base">
           Page {page.toLocaleString()} of{" "}
-          {Math.ceil(count / ITEM_PER_PAGE).toLocaleString()}
+          {Math.ceil(count / perPage).toLocaleString()}
         </div>
         <Button
           variant="outline"

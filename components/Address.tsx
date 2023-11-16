@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import Blockies from "react-blockies";
 import { CopyToClipboard } from "react-copy-to-clipboard";

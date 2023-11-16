@@ -6,7 +6,7 @@ export const Footer = () => {
   return (
     <SectionContainer className="border-none">
       <Section className="flex-1 items-center gap-4">
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 flex-wrap justify-center">
           <Link href="/blocks">Blocks</Link>
           &bull;
           <Link href="/txs">Transactions</Link>
@@ -25,7 +25,7 @@ export const Footer = () => {
           </Link>
         </div>
         <div>
-          {"Facet Computing, Inc. "}
+          {"Facet Blockchain Technologies, LLC "}
           &copy;
           {` ${new Date().getFullYear()}`}
         </div>

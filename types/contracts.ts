@@ -1,4 +1,4 @@
-export interface DeployableContract {
+export interface ContractArtifact {
   name: string;
   source_code: string;
   init_code_hash: string;
@@ -51,18 +51,6 @@ export type CurrentState = (
 ) & {
   [key: string]: any;
 };
-
-export interface CallReceipt {
-  caller: `0x${string}`;
-  contract_address: string;
-  error_message: string;
-  transaction_hash: string;
-  function_args: { [key: string]: any };
-  function_name: string;
-  logs: { data: { [key: string]: any }; event: string }[];
-  status: string;
-  timestamp: string;
-}
 
 export interface ContractFunction {
   args: {

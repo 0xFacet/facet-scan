@@ -1,3 +1,5 @@
+"use client";
+
 import clsx from "clsx";
 
 export const Table = ({
@@ -41,9 +43,7 @@ export const Table = ({
           <tr
             key={ri}
             className={clsx(
-              ri === rows.length - 1
-                ? "border-b border-line"
-                : "border-b border-[rgba(255,255,255,0.1)]",
+              ri > 0 ? "border-t border-line" : "",
               onRowClick
                 ? "cursor-pointer text-secondary hover:text-primary"
                 : ""

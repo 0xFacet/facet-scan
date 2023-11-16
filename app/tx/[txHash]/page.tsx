@@ -96,8 +96,10 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                 <div className="flex items-center gap-1">
                   <HiOutlineClock className="text-xl" />
                   {`${formatDistanceToNowStrict(
-                    new Date(transaction.timestamp)
-                  )} ago (${new Date(transaction.timestamp).toUTCString()})`}
+                    new Date(Number(transaction.block_timestamp) * 1000)
+                  )} ago (${new Date(
+                    Number(transaction.block_timestamp) * 1000
+                  ).toUTCString()})`}
                 </div>
               ),
             },
@@ -133,6 +135,17 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                   : 0
               } Gwei`,
             },
+            {
+              label: (
+                <div className="flex items-center gap-1">
+                  <Tooltip label="The amount of gas used on the transaction.">
+                    <HiOutlineQuestionMarkCircle className="text-xl" />
+                  </Tooltip>
+                  Gas Used
+                </div>
+              ),
+              value: Number(transaction.gas_used).toLocaleString(),
+            },
           ]}
         />
       </div>
@@ -149,8 +162,8 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                 </div>
               ),
               value: (
-                <Link href={`/address/${transaction.caller}`}>
-                  {transaction.caller}
+                <Link href={`/address/${transaction.from}`}>
+                  {transaction.from}
                 </Link>
               ),
             },
@@ -164,11 +177,11 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                 </div>
               ),
               value: (
-                <Link href={`/address/${transaction.contract_address}`}>
-                  {transaction.contract_address}
+                <Link href={`/address/${transaction.to}`}>
+                  {transaction.to}
                 </Link>
               ),
-              hidden: !transaction.contract_address,
+              hidden: !transaction.to,
             },
             {
               label: (
@@ -179,7 +192,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                   Function Name
                 </div>
               ),
-              value: transaction.function_name ?? "constructor",
+              value: transaction.function ?? "constructor",
             },
             {
               label: (
@@ -191,11 +204,13 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                 </div>
               ),
               value: (
-                <List
-                  items={Object.entries(transaction.function_args).map(
-                    ([label, value]) => ({ label, value })
-                  )}
-                />
+                <div className="border border-line rounded-xl px-4">
+                  <List
+                    items={Object.entries(transaction.args).map(
+                      ([label, value]) => ({ label, value })
+                    )}
+                  />
+                </div>
               ),
             },
           ]}
