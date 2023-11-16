@@ -7,22 +7,19 @@ export const Footer = () => {
     <SectionContainer className="border-none">
       <Section className="flex-1 items-center gap-4">
         <div className="flex flex-row gap-2">
-          <Link href="/contracts" className="text-secondary hover:text-primary">
-            Contracts
-          </Link>
+          <Link href="/blocks">Blocks</Link>
           &bull;
-          <Link
-            href="https://github.com/0xfacet"
-            target="_blank"
-            className="text-secondary hover:text-primary"
-          >
+          <Link href="/txs">Transactions</Link>
+          &bull;
+          <Link href="/contracts">Contracts</Link>
+          &bull;
+          <Link href="https://github.com/0xfacet" target="_blank">
             GitHub
           </Link>
           &bull;
           <Link
             href="https://docs.ethscriptions.com/v/ethscriptions-vm"
             target="_blank"
-            className="text-secondary hover:text-primary"
           >
             Docs
           </Link>

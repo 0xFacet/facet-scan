@@ -1,4 +1,4 @@
-import { Block, Transaction } from "@/types/blocks";
+import { Block, Transaction, InternalTransaction } from "@/types/blocks";
 import { DeployableContract } from "@/types/contracts";
 
 export const fetchTotalBlocks = async () => {
@@ -41,12 +41,28 @@ export const fetchTotalTransactions = async () => {
   return result as number;
 };
 
-export const fetchTransactions = async ({ page = 1, perPage = 20 } = {}) => {
+export const fetchTransactions = async ({
+  page = 1,
+  perPage = 20,
+  block,
+}: {
+  page?: string | number;
+  perPage?: string | number;
+  block?: string | number;
+} = {}) => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URI}/transactions`);
-  url.search = new URLSearchParams({
-    page: `${page}`,
-    per_page: `${perPage}`,
-  }).toString();
+  if (block) {
+    url.search = new URLSearchParams({
+      page: `${page}`,
+      per_page: `${perPage}`,
+      block_number: `${block}`,
+    }).toString();
+  } else {
+    url.search = new URLSearchParams({
+      page: `${page}`,
+      per_page: `${perPage}`,
+    }).toString();
+  }
   const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
     res.json()
   );
@@ -61,6 +77,17 @@ export const fetchTransaction = async (txHash: string) => {
     res.json()
   );
   return result as Transaction;
+};
+
+export const fetchInternalTransactions = async (txHash: string) => {
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URI}/contract_calls`);
+  url.search = new URLSearchParams({
+    transaction_hash: txHash,
+  }).toString();
+  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
+    res.json()
+  );
+  return result as InternalTransaction[];
 };
 
 export const fetchDeployableContracts = async () => {

@@ -10,7 +10,7 @@ body {
   background: radial-gradient(
     100vw 100vw at 100vw 100vh,
     #1a1d0e 0%,
-    #000 100%
+    #000000 100%
   );
   color: white;
   margin: 0;
@@ -19,4 +19,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  a {
+    @apply hover:text-primary transition-all duration-300;
+  }
 }

@@ -81,17 +81,17 @@ export default function Home({
       <SectionContainer className="border-t">
         <Section className="flex-1 py-8 gap-8 max-w-3xl mx-auto">
           <div className="flex flex-1 flex-col sm:flex-row flex-wrap">
-            <div className="flex flex-col flex-1 items-center justify-center text-center gap-1 p-8 border-r-0 sm:border-r border-line">
-              <Heading size="h3">{totalBlocks.toLocaleString()}</Heading>
-              <div className="opacity-50">Total Blocks</div>
+            <div className="flex flex-col flex-1 items-center justify-center text-center gap-2 p-8">
+              <Heading size="h2">{totalBlocks.toLocaleString()}</Heading>
+              <div className="text-accent">Total Blocks</div>
             </div>
-            <div className="flex flex-col flex-1 items-center justify-center text-center gap-1 p-8 border-r-0 sm:border-r border-line">
-              <Heading size="h3">{totalTransactions.toLocaleString()}</Heading>
-              <div className="opacity-50">Total Transactions</div>
+            <div className="flex flex-col flex-1 items-center justify-center text-center gap-2 p-8">
+              <Heading size="h2">{totalTransactions.toLocaleString()}</Heading>
+              <div className="text-accent">Total Transactions</div>
             </div>
-            <div className="flex flex-col flex-1 items-center justify-center text-center gap-1 p-8">
-              <Heading size="h3">{(84038).toLocaleString()}</Heading>
-              <div className="opacity-50">Total Wallets</div>
+            <div className="flex flex-col flex-1 items-center justify-center text-center gap-2 p-8">
+              <Heading size="h2">{(84038).toLocaleString()}</Heading>
+              <div className="text-accent">Total Wallets</div>
             </div>
           </div>
         </Section>
@@ -99,59 +99,73 @@ export default function Home({
       <SectionContainer className="flex-1">
         <Section className="flex-1 justify-center gap-8">
           <div className="flex flex-col sm:flex-row gap-8">
-            <div className="flex flex-col flex-1 gap-8">
-              <Heading size="h5">Latest Blocks</Heading>
-              <div className="border-t border-line">
+            <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden">
+              <div className="p-4 border-b border-line">Latest Blocks</div>
+              <div className="px-4">
                 {blocks.map((block) => (
-                  <Link key={block.id} href={`/block/${block.block_number}`}>
-                    <div className="flex flex-row gap justify-between border-b border-line py-4 hover:text-primary">
-                      <div>
+                  <div
+                    key={block.id}
+                    className="flex-1 flex flex-row gap justify-between border-b border-line py-4"
+                  >
+                    <div>
+                      <Link href={`/block/${block.block_number}`}>
                         <div className="font-bold">
-                          Block #{block.block_number.toLocaleString()}
+                          Block #{block.block_number}
                         </div>
-                        <div className="opacity-50">
-                          {`${formatDistanceToNowStrict(
-                            new Date(block.timestamp * 1000)
-                          )} ago`}
-                        </div>
-                      </div>
-                      <div>
-                        {pluralize(block.transaction_count ?? 0, "transaction")}
+                      </Link>
+                      <div className="text-gray text-sm">
+                        {`${formatDistanceToNowStrict(
+                          new Date(block.timestamp * 1000)
+                        )} ago`}
                       </div>
                     </div>
-                  </Link>
+                    <div>
+                      <Link href={`/txs?block=${block.block_number}`}>
+                        {pluralize(block.transaction_count ?? 0, "transaction")}
+                      </Link>
+                    </div>
+                  </div>
                 ))}
               </div>
-              <Button variant="outline" onClick={() => router.push("/blocks")}>
-                View all blocks
-              </Button>
+              <div className="p-4">
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/blocks")}
+                >
+                  View all blocks
+                </Button>
+              </div>
             </div>
-            <div className="flex flex-col flex-1 gap-8">
-              <Heading size="h5">Latest Transactions</Heading>
-              <div className="border-t border-line">
+            <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden">
+              <div className="p-4 border-b border-line">
+                Latest Transactions
+              </div>
+              <div className="px-4">
                 {transactions.map((transaction) => (
-                  <Link
+                  <div
                     key={transaction.transaction_hash}
-                    href={`/tx/${transaction.transaction_hash}`}
+                    className="flex-1 flex flex-row gap justify-between border-b border-line py-4"
                   >
-                    <div className="flex flex-row gap justify-between border-b border-line py-4 hover:text-primary">
-                      <div>
-                        <div className="font-bold">
+                    <div className="w-full">
+                      <Link href={`/tx/${transaction.transaction_hash}`}>
+                        <div className="font-bold truncate">
                           {transaction.transaction_hash}
                         </div>
-                        <div className="opacity-50">
-                          {`${formatDistanceToNowStrict(
-                            new Date(transaction.timestamp)
-                          )} ago`}
-                        </div>
+                      </Link>
+                      <div className="text-gray text-sm">
+                        {`${formatDistanceToNowStrict(
+                          new Date(transaction.timestamp)
+                        )} ago`}
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
-              <Button variant="outline" onClick={() => router.push("/txs")}>
-                View all transactions
-              </Button>
+              <div className="p-4">
+                <Button variant="outline" onClick={() => router.push("/txs")}>
+                  View all transactions
+                </Button>
+              </div>
             </div>
           </div>
         </Section>

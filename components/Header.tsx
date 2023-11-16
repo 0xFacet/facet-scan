@@ -19,16 +19,16 @@ export const Header = () => {
             <Image
               src="/facet-scan-lockup.svg"
               alt="Facet Scan"
-              width={196}
-              height={35}
+              width={167.7}
+              height={32}
               priority
               className="hidden sm:block"
             />
             <Image
               src="/facet-brandmark.svg"
               alt="Facet Scan"
-              width={35}
-              height={35}
+              width={32}
+              height={32}
               priority
               className="block sm:hidden"
             />
