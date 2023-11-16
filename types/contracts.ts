@@ -1,3 +1,5 @@
+import { InternalTransaction } from "./blocks";
+
 export interface ContractArtifact {
   name: string;
   source_code: string;
@@ -77,7 +79,7 @@ export type SourceCode = {
 
 export interface Contract {
   abi: ContractAbi;
-  call_receipts: CallReceipt[];
+  call_receipts: InternalTransaction[];
   address: string;
   current_state: CurrentState;
   source_code: SourceCode[];

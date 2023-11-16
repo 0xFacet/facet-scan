@@ -8,7 +8,9 @@ import { BiXCircle, BiCheckCircle } from "react-icons/bi";
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 
 export default async function Page({ params }: { params: { txHash: string } }) {
-  const transactions = await fetchInternalTransactions(params.txHash);
+  const { transactions } = await fetchInternalTransactions({
+    txHash: params.txHash,
+  });
 
   const renderStatus = (transaction: InternalTransaction) => {
     switch (transaction.status) {
