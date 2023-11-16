@@ -1,5 +1,5 @@
 import { List } from "@/components/List";
-import { Tooltip } from "@/components/ToolTip";
+import { Tooltip } from "@/components/Tooltip";
 import { fetchTransaction } from "@/utils/data";
 import { formatDistanceToNowStrict } from "date-fns";
 import { capitalize } from "lodash";

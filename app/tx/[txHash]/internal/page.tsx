@@ -1,5 +1,5 @@
 import { List } from "@/components/List";
-import { Tooltip } from "@/components/ToolTip";
+import { Tooltip } from "@/components/Tooltip";
 import { InternalTransaction } from "@/types/blocks";
 import { fetchInternalTransactions } from "@/utils/data";
 import { capitalize } from "lodash";
