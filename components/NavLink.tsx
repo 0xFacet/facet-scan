@@ -9,16 +9,20 @@ export const NavLink = ({
   children,
   className,
   target,
+  isActive,
   onClick,
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
   target?: HTMLAttributeAnchorTarget;
+  isActive?: boolean;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 }) => {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  if (isActive === undefined) {
+    isActive = pathname === href;
+  }
   return (
     <Link
       href={href}
