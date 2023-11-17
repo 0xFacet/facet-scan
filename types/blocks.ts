@@ -1,3 +1,10 @@
+export interface Log {
+  data: { [key: string]: any };
+  event: string;
+  contractType: string;
+  contractAddress: string;
+}
+
 export interface Transaction {
   transaction_hash: string;
   from: `0x${string}`;
@@ -5,7 +12,7 @@ export interface Transaction {
   status: string;
   function: string;
   args: { [key: string]: any };
-  logs: any[];
+  logs: Log[];
   block_timestamp: string;
   error_message?: string | null;
   block_number: number;
@@ -28,7 +35,7 @@ export interface InternalTransaction {
   args: { [key: string]: any };
   call_type: string;
   return_value?: string | null;
-  logs: any[];
+  logs: Log[];
   block_timestamp: string;
   error?: string | null;
   status: string;

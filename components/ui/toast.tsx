@@ -1,63 +1,68 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import { BiXCircle, BiCheckCircle } from "react-icons/bi";
 
 type ToastProps = {
+  id: number;
   message: string;
-  type: "success" | "error";
+  type: "success" | "error" | "info";
+  distance: number;
+  onHeightChange: (id: number, height: number) => void;
 };
 
-const Toast: React.FC<ToastProps> = ({ message, type }) => {
-  const bgColor = type === "success" ? "bg-green-500" : "bg-red-500";
+const Toast: React.FC<ToastProps> = ({
+  id,
+  message,
+  type,
+  distance,
+  onHeightChange,
+}) => {
+  const toastRef = useRef<HTMLDivElement>(null);
 
-  return <div className="bg-blue-500">Test</div>;
+  useEffect(() => {
+    if (toastRef.current) {
+      onHeightChange(id, toastRef.current.offsetHeight);
+    }
+  }, [id, onHeightChange]);
 
-  // return type === "success" ? (
-  //   <div
-  //     aria-live="assertive"
-  //     className="flex items-center bg-green-500 text-white text-sm font-bold px-4 py-3 rounded shadow-lg transition-all duration-500 ease-in-out"
-  //     role="alert"
-  //   >
-  //     <svg
-  //       className=" h-5 w-5 mr-3"
-  //       fill="none"
-  //       height="24"
-  //       stroke="currentColor"
-  //       strokeLinecap="round"
-  //       strokeLinejoin="round"
-  //       strokeWidth="2"
-  //       viewBox="0 0 24 24"
-  //       width="24"
-  //       xmlns="http://www.w3.org/2000/svg"
-  //     >
-  //       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-  //       <polyline points="22 4 12 14.01 9 11.01" />
-  //     </svg>
-  //     <span>{message}</span>
-  //   </div>
-  // ) : (
-  //   <div
-  //     aria-live="assertive"
-  //     className="flex items-center bg-red-500 text-white text-sm font-bold px-4 py-3 rounded shadow-lg mt-4 transition-all duration-500 ease-in-out"
-  //     role="alert"
-  //   >
-  //     <svg
-  //       className=" h-5 w-5 mr-3"
-  //       fill="none"
-  //       height="24"
-  //       stroke="currentColor"
-  //       strokeLinecap="round"
-  //       strokeLinejoin="round"
-  //       strokeWidth="2"
-  //       viewBox="0 0 24 24"
-  //       width="24"
-  //       xmlns="http://www.w3.org/2000/svg"
-  //     >
-  //       <circle cx="12" cy="12" r="10" />
-  //       <line x1="12" x2="12" y1="8" y2="12" />
-  //       <line x1="12" x2="12.01" y1="16" y2="16" />
-  //     </svg>
-  //     <span>{message}</span>
-  //   </div>
-  // );
+  return (
+    <div
+      className="absolute overflow-hidden right-0 transition-all duration-500 ease-in-out"
+      style={{ bottom: distance, maxWidth: "calc(100vw - 50px)" }}
+    >
+      {type === "success" ? (
+        <div
+          ref={toastRef}
+          aria-live="assertive"
+          className="flex gap-2 items-center bg-green-500 text-white text-sm font-bold px-4 py-3 rounded shadow-lg"
+          role="alert"
+        >
+          <BiCheckCircle className="text-lg" />
+          <span className="whitespace-nowrap truncate">{message}</span>
+        </div>
+      ) : type === "error" ? (
+        <div
+          ref={toastRef}
+          aria-live="assertive"
+          className="flex gap-2 items-center bg-red-500 text-white text-sm font-bold px-4 py-3 rounded shadow-lg mt-4"
+          role="alert"
+        >
+          <BiXCircle className="text-lg" />
+          <span className="whitespace-nowrap truncate">{message}</span>
+        </div>
+      ) : (
+        <div
+          ref={toastRef}
+          aria-live="assertive"
+          className="flex gap-2 items-center bg-gray-800 text-white text-sm font-bold px-4 py-3 rounded shadow-lg mt-4"
+          role="alert"
+        >
+          <span className="whitespace-nowrap truncate">{message}</span>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Toast;

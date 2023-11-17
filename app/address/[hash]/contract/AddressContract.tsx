@@ -3,7 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { Contract } from "@/types/contracts";
-import { formatTokenValue, parseTokenValue } from "@/utils/formatter";
+import {
+  formatTokenValue,
+  parseTokenValue,
+  truncateMiddle,
+} from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
@@ -25,6 +29,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useToast } from "@/contexts/toast-context";
+import { Transaction } from "@/types/blocks";
 
 interface Props {
   hash: string;
@@ -98,11 +103,29 @@ export default function WalletAddress({ hash, contract }: Props) {
           const callReceiptRes = await axios.get(
             `${process.env.NEXT_PUBLIC_API_BASE_URI}/transactions/${pendingCallTxnHash}`
           );
-          const receipt = callReceiptRes.data.result;
+          const receipt = callReceiptRes.data.result as Transaction;
 
           if (receipt) {
             setPendingCallTxnHash(null);
-            showToast({ message: "Transaction created", type: "success" });
+            if (receipt.status === "success") {
+              showToast({
+                message: `Transaction succeeded (${truncateMiddle(
+                  receipt.transaction_hash,
+                  8,
+                  8
+                )})`,
+                type: "success",
+              });
+            } else {
+              showToast({
+                message: `Transaction failed (${truncateMiddle(
+                  receipt.transaction_hash,
+                  8,
+                  8
+                )})`,
+                type: "error",
+              });
+            }
             setMethodLoading({});
           }
         };
@@ -179,6 +202,10 @@ export default function WalletAddress({ hash, contract }: Props) {
           ),
         });
         setPendingCallTxnHash(txn.hash);
+        showToast({
+          message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
+          type: "info",
+        });
       } else if (openConnectModal) {
         openConnectModal();
       }

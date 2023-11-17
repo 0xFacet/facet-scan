@@ -1,14 +1,27 @@
+"use client";
+
+import { PlaceholderToast } from "@/components/PlaceholderToast";
+import { ToastContainer } from "@/components/ToastContainers";
 import Toast from "@/components/ui/toast";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 
 type ToastContextType = {
-  showToast: (toast: Omit<ToastData, "id">) => void;
+  showToast: (toast: Omit<ToastData, "id" | "timeoutId">) => void;
 };
 
 type ToastData = {
   id: number;
   message: string;
-  type: "success" | "error";
+  type: "success" | "error" | "info";
+  timeoutId?: NodeJS.Timeout;
 };
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -26,28 +39,75 @@ type ToastProviderProps = {
 };
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  const [toasts, setToasts] = useState<ToastData[]>([
-    { message: "test", type: "success", id: 123 },
-    { message: "hi", type: "success", id: 122 },
-  ]);
+  const [toasts, setToasts] = useState<ToastData[]>([]);
+  const [heights, setHeights] = useState<{ [key: number]: number }>({});
+  const [distances, setDistances] = useState<{ [key: number]: number }>({});
+  const toastsRef = useRef<ToastData[]>([]);
 
-  const showToast = (toast: Omit<ToastData, "id">) => {
+  const showToast = (toast: Omit<ToastData, "id" | "timeoutId">) => {
     const id = new Date().getTime();
-    setToasts([...toasts, { ...toast, id }]);
+    const timeoutId = setTimeout(() => {
+      removeToast(id);
+    }, 10_000);
+
+    setToasts((prevToasts) => [...prevToasts, { ...toast, id, timeoutId }]);
   };
+
+  const removeToast = (id: number) => {
+    setToasts((prevToasts) =>
+      prevToasts.filter((toast) => {
+        if (toast.id === id) {
+          clearTimeout(toast.timeoutId);
+        }
+        return toast.id !== id;
+      })
+    );
+  };
+
+  const handleHeightChange = useCallback((id: number, height: number) => {
+    setHeights((prevHeights) => ({ ...prevHeights, [id]: height }));
+  }, []);
+
+  const handleDistanceChange = useCallback((id: number, distance: number) => {
+    setDistances((prevDistances) => ({ ...prevDistances, [id]: distance }));
+  }, []);
+
+  useEffect(() => {
+    toastsRef.current = toasts;
+  }, [toasts]);
+
+  useEffect(() => {
+    return () => {
+      toastsRef.current.forEach((toast) => {
+        if (toast.timeoutId) {
+          clearTimeout(toast.timeoutId);
+        }
+      });
+    };
+  }, []);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
-      {/* <div className="relative w-[100vw] h-[100vh]">
-        <div className="fixed flex flex-col gap-4 bottom-0 m-6 max-w-sm ">
-          {toasts.map((toast) => (
-            <div key={toast.id}>
-              <Toast message={toast.message} type={toast.type} />
-            </div>
-          ))}
-        </div>
-      </div> */}
       {children}
+      <ToastContainer>
+        {toasts.map((toast, index) => (
+          <div key={toast.id}>
+            <Toast
+              id={toast.id}
+              message={toast.message}
+              type={toast.type}
+              distance={distances[toast.id] || 0}
+              onHeightChange={handleHeightChange}
+            />
+            <PlaceholderToast
+              id={toast.id}
+              index={index}
+              height={heights[toast.id] || 0}
+              onDistanceChange={handleDistanceChange}
+            />
+          </div>
+        ))}
+      </ToastContainer>
     </ToastContext.Provider>
   );
 };
