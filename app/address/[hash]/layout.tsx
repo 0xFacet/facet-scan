@@ -17,9 +17,9 @@ export default async function AddressLayout({
     <div className="flex flex-col flex-1">
       <SectionContainer>
         <Section>
-          <div className="spacing-y-1 py-4">
+          <div className="py-4">
             <Heading size="h2">{!!contract ? "Contract" : "Address"}</Heading>
-            <div className="w-fit mt-2">
+            <div className="w-fit mt-1 text-accent">
               <CopyText text={params.hash} />
             </div>
           </div>
@@ -27,7 +27,7 @@ export default async function AddressLayout({
       </SectionContainer>
       <SectionContainer>
         <Section className="py-0 sm:py-0">
-          <div className="flex gap-8">
+          <div className="flex gap-4">
             <NavLink
               href={`/address/${params.hash}`}
               className="whitespace-nowrap"

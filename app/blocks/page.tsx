@@ -5,6 +5,8 @@ import { Pagination } from "@/components/pagination";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Heading } from "@/components/Heading";
 import Link from "next/link";
+import { Table } from "@/components/Table";
+import { formatTimestamp } from "@/utils/formatter";
 
 function pluralize(count: number, word: string) {
   return `${count.toLocaleString()} ${word}${count === 1 ? "" : "s"}`;
@@ -31,29 +33,33 @@ export default async function Page({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden divide-y divide-line px-4">
-            {blocks.map((block) => (
-              <div
-                key={block.id}
-                className="flex flex-row gap justify-between py-4"
-              >
-                <div>
-                  <Link href={`/block/${block.block_number}`}>
-                    <div className="font-bold">Block #{block.block_number}</div>
-                  </Link>
-                  <div className="opacity-50">
-                    {`${formatDistanceToNowStrict(
-                      new Date(Number(block.timestamp) * 1000)
-                    )} ago`}
-                  </div>
-                </div>
-                <div>
-                  <Link href={`/txs?block=${block.block_number}`}>
-                    {pluralize(block.transaction_count ?? 0, "transaction")}
-                  </Link>
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col border border-line rounded-xl divide-y divide-line">
+            <div className="overflow-auto px-4">
+              <Table
+                headers={["Block", "Age", "Transactions"]}
+                rows={[
+                  ...blocks.map((block) => [
+                    <Link
+                      key={block.block_number}
+                      href={`/block/${block.block_number}`}
+                    >
+                      {block.block_number}
+                    </Link>,
+                    block.timestamp
+                      ? formatTimestamp(
+                          new Date(Number(block.timestamp) * 1000)
+                        )
+                      : "--",
+                    <Link
+                      key={block.block_number}
+                      href={`/txs?block=${block.block_number}`}
+                    >
+                      {block.transaction_count ?? 0}
+                    </Link>,
+                  ]),
+                ]}
+              />
+            </div>
           </div>
           <Pagination count={Math.ceil(totalBlocks / 20)} />
         </Section>

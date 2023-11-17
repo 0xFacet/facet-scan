@@ -14,13 +14,7 @@ export const Table = ({
   return (
     <table className="min-w-full text-left">
       {!!headers?.length && (
-        <thead
-          className={
-            rows.length
-              ? "border-b border-[rgba(255,255,255,0.1)]"
-              : "border-b-[2px] border-line"
-          }
-        >
+        <thead className="border-b border-line">
           <tr>
             {headers.map((header, i) => (
               <th

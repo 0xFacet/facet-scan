@@ -5,6 +5,7 @@ import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Button } from "@/components/ui/button";
 import { Block, Transaction } from "@/types/blocks";
+import { truncateMiddle } from "@/utils/formatter";
 import { formatDistanceToNowStrict } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -102,7 +103,9 @@ export default function Home({
         <Section className="flex-1 justify-center gap-8">
           <div className="flex flex-col sm:flex-row gap-8">
             <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden">
-              <div className="p-4 border-b border-line">Latest Blocks</div>
+              <div className="p-4 border-b border-line text-accent">
+                Latest Blocks
+              </div>
               <div className="px-4">
                 {blocks.map((block) => (
                   <div
@@ -139,19 +142,19 @@ export default function Home({
               </div>
             </div>
             <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden">
-              <div className="p-4 border-b border-line">
+              <div className="p-4 border-b border-line text-accent">
                 Latest Transactions
               </div>
               <div className="px-4">
                 {transactions.map((transaction) => (
                   <div
                     key={transaction.transaction_hash}
-                    className="flex-1 flex flex-row gap justify-between border-b border-line py-4"
+                    className="flex-1 flex flex-row gap-8 justify-between border-b border-line py-4"
                   >
-                    <div className="w-full">
+                    <div className="flex flex-col flex-1">
                       <Link href={`/tx/${transaction.transaction_hash}`}>
                         <div className="font-bold truncate">
-                          {transaction.transaction_hash}
+                          {truncateMiddle(transaction.transaction_hash, 8, 8)}
                         </div>
                       </Link>
                       <div className="text-gray text-sm">
@@ -159,6 +162,22 @@ export default function Home({
                           new Date(Number(transaction.block_timestamp) * 1000)
                         )} ago`}
                       </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <div className="flex gap-4 justify-between">
+                        <span className="text-accent">{"From "}</span>
+                        <Link href={`/address/${transaction.from}`}>
+                          {truncateMiddle(transaction.from, 8, 8)}
+                        </Link>
+                      </div>
+                      {!!transaction.to && (
+                        <div className="flex gap-4 justify-between">
+                          <span className="text-accent">{"To "}</span>
+                          <Link href={`/address/${transaction.to}`}>
+                            {truncateMiddle(transaction.to, 8, 8)}
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table } from "@/components/Table";
 import { Pagination } from "@/components/pagination";
+import { Address } from "@/components/Address";
 
 interface Props {
   contractArtifacts: ContractArtifact[];
@@ -129,8 +130,8 @@ export default function Contracts({
       </SectionContainer>
       <SectionContainer className="border-t">
         <Section className="py-0 sm:py-0">
-          <div className="px-0 flex gap-8 items-center h-min-full">
-            <div className="flex gap-8 h-min-full">
+          <div className="px-0 flex gap-4 items-center">
+            <div className="flex gap-4">
               {contractTypes.map((type) => (
                 <NavLink
                   key={type}
@@ -138,7 +139,7 @@ export default function Contracts({
                   isActive={tab === kebabCase(type)}
                   className="whitespace-nowrap"
                 >
-                  {startCase(type)}
+                  {type}
                 </NavLink>
               ))}
             </div>
@@ -147,21 +148,18 @@ export default function Contracts({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <div className="flex flex-col border border-line rounded-xl overflow-x-hidden divide-y divide-line px-4">
-            <Table
-              headers={["Contract Address"]}
-              rows={contracts.map((row) => [
-                <div
-                  key={row.address}
-                  className="max-w-[100px] sm:max-w-none truncate overflow-hidden"
-                >
-                  {row.address}
-                </div>,
-              ])}
-              onRowClick={(rowIndex) =>
-                router.push(`/address/${contracts[rowIndex].address}`)
-              }
-            />
+          <div className="flex flex-col border border-line rounded-xl divide-y divide-line">
+            <div className="overflow-auto px-4">
+              <Table
+                headers={["Contract Address"]}
+                rows={contracts.map((row) => [
+                  <Address address={row.address} key={row.address} />,
+                ])}
+              />
+              {!contracts.length && (
+                <div className="py-4">No contracts found</div>
+              )}
+            </div>
           </div>
           <Pagination count={totalContracts} />
         </Section>
@@ -178,7 +176,7 @@ export default function Contracts({
         loading={createLoading}
       >
         <div className="space-y-2 relative">
-          <Label htmlFor="select-input">Contract Type</Label>
+          <Label>Contract Type</Label>
           <Select
             onValueChange={(value) =>
               setSelectedContract(

@@ -10,8 +10,8 @@
 	}
 
 	@keyframes opacity-animation {
-		0%, 50%, 100% { fill-opacity: 0.06; }
-  	25% { fill-opacity: 0.14; }
+		0%, 50%, 100% { fill-opacity: 0.05; }
+  	25% { fill-opacity: 0.15; }
 	}
 
 	.path1 { animation-delay: 0s; }

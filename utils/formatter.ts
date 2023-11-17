@@ -45,6 +45,7 @@ export const formatTokenValue = (
   toLocaleString?: boolean,
   unit?: string
 ) => {
+  if (!value) return "";
   const isToken =
     !key ||
     [

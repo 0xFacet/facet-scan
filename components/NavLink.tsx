@@ -29,8 +29,8 @@ export const NavLink = ({
       onClick={onClick}
       passHref
       className={`${
-        isActive ? "border-b-2" : ""
-      } h-16 no-underline pb-4 pt-5 px-2 text-base border-primary ${className}`}
+        isActive ? "border-b-2 text-white" : "text-accent"
+      } h-16 no-underline flex items-center px-2 text-sm border-primary ${className}`}
       target={target}
     >
       {children}

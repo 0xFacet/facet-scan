@@ -1,11 +1,7 @@
 "use client";
 
-import { Button } from "@/components/Button";
-import { Heading } from "@/components/Heading";
+import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
-import { Table } from "@/components/Table";
 import { Contract } from "@/types/contracts";
 import { formatTokenValue, parseTokenValue } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
@@ -16,10 +12,19 @@ import { isAddress, toHex } from "viem";
 import { useAccount, useBlockNumber } from "wagmi";
 import { startCase } from "lodash";
 import { sendTransaction } from "@wagmi/core";
-import { Address } from "@/components/Address";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { stackoverflowDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { Transaction } from "@/types/blocks";
+import { Address } from "@/components/Address";
+import { List } from "@/components/List";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useToast } from "@/contexts/toast-context";
 
 interface Props {
   hash: string;
@@ -47,6 +52,7 @@ export default function WalletAddress({ hash, contract }: Props) {
   );
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") ?? "details";
+  const { showToast } = useToast();
 
   const writeMethods = useMemo(
     () =>
@@ -96,7 +102,7 @@ export default function WalletAddress({ hash, contract }: Props) {
 
           if (receipt) {
             setPendingCallTxnHash(null);
-            // setCallReceipt(receipt);
+            showToast({ message: "Transaction created", type: "success" });
             setMethodLoading({});
           }
         };
@@ -106,7 +112,7 @@ export default function WalletAddress({ hash, contract }: Props) {
         console.log(e);
       }
     }
-  }, [latestBlockNumber, pendingCallTxnHash]);
+  }, [latestBlockNumber, pendingCallTxnHash, showToast]);
 
   const staticCall = async (name: string) => {
     setStaticCallResults((results) => ({ ...results, [name]: null }));
@@ -125,82 +131,83 @@ export default function WalletAddress({ hash, contract }: Props) {
   };
 
   const callMethod = async (name: string) => {
-    if (
-      contract?.abi[name].state_mutability == "view" ||
-      contract?.abi[name].state_mutability == "pure"
-    ) {
-      return staticCall(name);
-    }
-    setMethodLoading((loading) => ({ ...loading, [name]: true }));
-    setSimulationResults((results) => ({ ...results, [name]: null }));
-    try {
-      if (address && !isDisconnected) {
-        const txnData = {
-          to: hash,
-          data: {
-            function: name,
-            args: methodValues[name],
-          },
-        };
+    showToast({ message: "Transaction submitted", type: "success" });
+    // if (
+    //   contract?.abi[name].state_mutability == "view" ||
+    //   contract?.abi[name].state_mutability == "pure"
+    // ) {
+    //   return staticCall(name);
+    // }
+    // setMethodLoading((loading) => ({ ...loading, [name]: true }));
+    // setSimulationResults((results) => ({ ...results, [name]: null }));
+    // try {
+    //   if (address && !isDisconnected) {
+    //     const txnData = {
+    //       op: "call",
+    //       data: {
+    //         to: hash,
+    //         function: name,
+    //         args: methodValues[name],
+    //       },
+    //     };
 
-        const simulationRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`,
-          {
-            params: {
-              from: address,
-              tx_payload: JSON.stringify(txnData),
-            },
-          }
-        );
+    //     const simulationRes = await axios.get(
+    //       `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`,
+    //       {
+    //         params: {
+    //           from: address,
+    //           tx_payload: JSON.stringify(txnData),
+    //         },
+    //       }
+    //     );
 
-        setSimulationResults((results) => ({
-          ...results,
-          [name]: simulationRes.data.result,
-        }));
+    //     setSimulationResults((results) => ({
+    //       ...results,
+    //       [name]: simulationRes.data.result,
+    //     }));
 
-        if (simulationRes.data.result.status != "success") {
-          setMethodLoading((loading) => ({ ...loading, [name]: false }));
-          return;
-        }
+    //     if (simulationRes.data.result.status != "success") {
+    //       setMethodLoading((loading) => ({ ...loading, [name]: false }));
+    //       return;
+    //     }
 
-        const txn = await sendTransaction({
-          to: "0x0000000000000000000000000000000000000000",
-          data: toHex(
-            `data:application/vnd.esc;esip6=true,${JSON.stringify(txnData)}`
-          ),
-        });
-        setPendingCallTxnHash(txn.hash);
-      } else if (openConnectModal) {
-        openConnectModal();
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    //     const txn = await sendTransaction({
+    //       to: "0x0000000000000000000000000000000000000000",
+    //       data: toHex(
+    //         `data:application/vnd.facet.tx+json;esip6=true,${JSON.stringify(
+    //           txnData
+    //         )}`
+    //       ),
+    //     });
+    //     setPendingCallTxnHash(txn.hash);
+    //   } else if (openConnectModal) {
+    //     openConnectModal();
+    //   }
+    // } catch (e) {
+    //   console.log(e);
+    // }
   };
 
   const renderStateDetails = () => {
     return contract ? (
-      <Table
-        rows={[
-          ...Object.keys(contract.current_state)
-            .filter(
-              (key) =>
-                typeof contract.current_state[key] === "string" ||
-                typeof contract.current_state[key] === "number"
-            )
-            .map((key) =>
-              isAddress(contract.current_state[key])
-                ? [
-                    startCase(key),
-                    <Address
-                      key={key}
-                      address={contract.current_state[key]}
-                      noAvatar
-                      noCopy
-                    />,
-                  ]
-                : [
-                    startCase(key),
+      <List
+        items={...Object.keys(contract.current_state)
+          .filter(
+            (key) =>
+              typeof contract.current_state[key] === "string" ||
+              typeof contract.current_state[key] === "number"
+          )
+          .map((key) =>
+            isAddress(contract.current_state[key])
+              ? {
+                  label: startCase(key),
+                  value: (
+                    <Address key={key} address={contract.current_state[key]} />
+                  ),
+                }
+              : {
+                  label: startCase(key),
+                  value: (
                     <div
                       key={key}
                       className="max-w-full text-ellipsis overflow-hidden"
@@ -212,10 +219,10 @@ export default function WalletAddress({ hash, contract }: Props) {
                         true,
                         contract.current_state.symbol
                       )}
-                    </div>,
-                  ]
-            ),
-        ]}
+                    </div>
+                  ),
+                }
+          )}
       />
     ) : null;
   };
@@ -229,78 +236,76 @@ export default function WalletAddress({ hash, contract }: Props) {
     }[]
   ) => {
     return contract ? (
-      <div className="flex flex-col divide-y divide-line">
+      <Accordion className="w-full" collapsible type="single">
         {methods.map((method) => (
-          <div key={method.name} className="flex flex-col gap-4 py-6">
-            <Heading size="h5">{startCase(method.name)}</Heading>
-            {Object.keys(method.args ?? {}).map((argument) => (
-              <div key={argument} className="flex flex-col gap-1">
-                <label
-                  className="block text-sm font-medium leading-6"
-                  htmlFor={argument}
-                >
-                  {startCase(argument)}
-                </label>
-                <input
-                  id={argument}
-                  type="text"
-                  className="bg-black w-full block border-0 py-2 px-4 outline-none ring-1 ring-inset ring-line placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary"
-                  placeholder={startCase(argument)}
-                  onChange={(e) => {
-                    setMethodValues((values) => ({
-                      ...(values ?? {}),
-                      [method.name]: {
-                        ...(values[method.name] ?? {}),
-                        [argument]: parseTokenValue(
-                          e.target.value,
-                          contract.current_state.decimals ?? 0,
-                          argument
-                        ),
-                      },
-                    }));
-                  }}
-                  value={formatTokenValue(
-                    methodValues[method.name]?.[argument],
-                    contract.current_state.decimals ?? 0,
-                    argument
-                  )}
-                />
-              </div>
-            ))}
-            <Button
-              onClick={() => callMethod(method.name)}
-              disabled={methodLoading[method.name]}
-              loading={methodLoading[method.name]}
-              primary={false}
-              className="text-sm"
-            >
-              Call
-            </Button>
-            {simulationResults[method.name]?.status == "error" && (
-              <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
-                {simulationResults[method.name].error_message}
-              </div>
-            )}
-            {staticCallResults[method.name] !== null &&
-              staticCallResults[method.name] !== undefined && (
-                <div className="flex flex-col gap-1">
-                  <div className="text-sm font-medium leading-6">Result:</div>
-                  <div className="text-sm break-all">
-                    {typeof staticCallResults[method.name] == "object"
-                      ? JSON.stringify(staticCallResults[method.name])
-                      : formatTokenValue(
-                          staticCallResults[method.name],
-                          contract.current_state.decimals ?? 0,
-                          method.name,
-                          false,
-                          contract.current_state.symbol
-                        )}
-                  </div>
+          <AccordionItem key={method.name} value={method.name}>
+            <AccordionTrigger>{method.name}</AccordionTrigger>
+            <AccordionContent className="text-sm text-gray-600 dark:text-gray-400 space-y-4">
+              {Object.keys(method.args ?? {}).map((arg) => (
+                <div key={arg} className="space-y-2">
+                  <Label htmlFor={arg}>
+                    {arg} ({method.args[arg]})
+                  </Label>
+                  <Input
+                    id={arg}
+                    placeholder={`${arg} (${method.args[arg]})`}
+                    name={arg}
+                    onChange={(e) => {
+                      setMethodValues((values) => ({
+                        ...(values ?? {}),
+                        [method.name]: {
+                          ...(values[method.name] ?? {}),
+                          [arg]: parseTokenValue(
+                            e.target.value,
+                            contract.current_state.decimals ?? 0,
+                            arg
+                          ),
+                        },
+                      }));
+                    }}
+                    value={formatTokenValue(
+                      methodValues[method.name]?.[arg],
+                      contract.current_state.decimals ?? 0,
+                      arg
+                    )}
+                    type="text"
+                  />
+                </div>
+              ))}
+              <Button
+                onClick={() => callMethod(method.name)}
+                disabled={methodLoading[method.name]}
+                variant="outline"
+                className="w-fit"
+              >
+                Call
+              </Button>
+              {simulationResults[method.name]?.status == "error" && (
+                <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
+                  {simulationResults[method.name].error_message}
                 </div>
               )}
-          </div>
+              {staticCallResults[method.name] !== null &&
+                staticCallResults[method.name] !== undefined && (
+                  <div className="flex flex-col gap-1">
+                    <div className="text-sm font-medium leading-6">Result:</div>
+                    <div className="text-sm break-all">
+                      {typeof staticCallResults[method.name] == "object"
+                        ? JSON.stringify(staticCallResults[method.name])
+                        : formatTokenValue(
+                            staticCallResults[method.name],
+                            contract.current_state.decimals ?? 0,
+                            method.name,
+                            false,
+                            contract.current_state.symbol
+                          )}
+                    </div>
+                  </div>
+                )}
+            </AccordionContent>
+          </AccordionItem>
         ))}
-      </div>
+      </Accordion>
     ) : null;
   };
 
@@ -309,15 +314,23 @@ export default function WalletAddress({ hash, contract }: Props) {
     return (
       <div className="flex flex-col gap-8">
         {contract.source_code.map((sc) => (
-          <>
+          <div key={sc.code} className="py-4">
             <SyntaxHighlighter
-              key={sc.code}
               language={sc.language}
-              style={stackoverflowDark}
+              style={{
+                ...stackoverflowDark,
+                hljs: {
+                  display: "block",
+                  overflowX: "auto",
+                  padding: "0.5em",
+                  color: "#ffffff",
+                  background: "transparent",
+                },
+              }}
             >
               {sc.code}
             </SyntaxHighlighter>
-          </>
+          </div>
         ))}
       </div>
     );
@@ -340,45 +353,37 @@ export default function WalletAddress({ hash, contract }: Props) {
 
   return (
     <div className="flex flex-col border border-line rounded-xl overflow-x-hidden divide-y divide-line">
-      <SectionContainer>
-        <Section className="py-0 sm:py-0">
-          <div className="flex gap-8 items-center">
-            <div className="flex gap-8">
-              <NavLink
-                href="?tab=details"
-                isActive={tab === "details"}
-                className="whitespace-nowrap"
-              >
-                Details
-              </NavLink>
-              <NavLink
-                href="?tab=read"
-                isActive={tab === "read"}
-                className="whitespace-nowrap"
-              >
-                Read
-              </NavLink>
-              <NavLink
-                href="?tab=write"
-                isActive={tab === "write"}
-                className="whitespace-nowrap"
-              >
-                Write
-              </NavLink>
-              <NavLink
-                href="?tab=code"
-                isActive={tab === "code"}
-                className="whitespace-nowrap"
-              >
-                Code
-              </NavLink>
-            </div>
-          </div>
-        </Section>
-      </SectionContainer>
-      <SectionContainer className="flex-1">
-        <Section className="flex-1">{renderTab()}</Section>
-      </SectionContainer>
+      <div className="flex gap-4 px-4">
+        <NavLink
+          href="?tab=details"
+          isActive={tab === "details"}
+          className="whitespace-nowrap"
+        >
+          Details
+        </NavLink>
+        <NavLink
+          href="?tab=read"
+          isActive={tab === "read"}
+          className="whitespace-nowrap"
+        >
+          Read
+        </NavLink>
+        <NavLink
+          href="?tab=write"
+          isActive={tab === "write"}
+          className="whitespace-nowrap"
+        >
+          Write
+        </NavLink>
+        <NavLink
+          href="?tab=code"
+          isActive={tab === "code"}
+          className="whitespace-nowrap"
+        >
+          Code
+        </NavLink>
+      </div>
+      <div className="px-4">{renderTab()}</div>
     </div>
   );
 }

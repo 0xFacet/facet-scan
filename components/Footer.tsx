@@ -5,18 +5,14 @@ import { SectionContainer } from "./SectionContainer";
 export const Footer = () => {
   return (
     <SectionContainer className="border-none">
-      <Section className="flex-1 items-center gap-4">
-        <div className="flex flex-row gap-2 flex-wrap justify-center">
+      <Section className="flex-1 items-center gap-4 text-accent text-sm">
+        <div className="flex flex-row gap-4 flex-wrap justify-center">
           <Link href="/blocks">Blocks</Link>
-          &bull;
           <Link href="/txs">Transactions</Link>
-          &bull;
           <Link href="/contracts">Contracts</Link>
-          &bull;
           <Link href="https://github.com/0xfacet" target="_blank">
             GitHub
           </Link>
-          &bull;
           <Link
             href="https://docs.ethscriptions.com/v/ethscriptions-vm"
             target="_blank"

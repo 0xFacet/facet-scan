@@ -31,7 +31,7 @@ export const Header = () => {
             />
           </Link>
           <div className="flex gap-8 items-center h-min-full">
-            <div className="flex gap-8 h-min-full">
+            <div className="flex gap-4 h-min-full">
               <NavLink href="/txs">Transactions</NavLink>
               <NavLink href="/contracts">Contracts</NavLink>
             </div>

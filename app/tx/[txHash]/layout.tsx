@@ -23,7 +23,7 @@ export default async function TransactionLayout({
       </SectionContainer>
       <SectionContainer>
         <Section className="py-0 sm:py-0">
-          <div className="flex gap-8">
+          <div className="flex gap-4">
             <NavLink
               href={`/tx/${params.txHash}`}
               className="whitespace-nowrap"

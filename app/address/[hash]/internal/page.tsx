@@ -21,72 +21,67 @@ export default async function Page({
   });
   return (
     <>
-      <div className="flex flex-col border border-line rounded-xl overflow-x-hidden divide-y divide-line px-4">
-        <Table
-          headers={["Parent Txn Hash", "Method", "Block", "Age", "From", "To"]}
-          rows={[
-            ...transactions.map((transaction) => [
-              <Link
-                key={transaction.transaction_hash}
-                href={`/tx/${transaction.transaction_hash}`}
-                className="flex items-center gap-1"
-              >
-                {transaction.status === "failure" && (
-                  <IoAlertCircleOutline className="text-xl text-red-500" />
-                )}
-                {truncateMiddle(transaction.transaction_hash, 6, 4)}
-              </Link>,
-              transaction.function ? (
-                <div
-                  key={transaction.transaction_hash}
-                  className="flex items-center gap-1 text-gray-400 border border-gray-700 bg-gray-950 rounded-md px-2 py-1 text-xs"
-                >
-                  {capitalize(transaction.function)}
-                </div>
-              ) : (
-                "--"
-              ),
-              <Link
-                key={transaction.transaction_hash}
-                href={`/block/${transaction.block_number}`}
-              >
-                {transaction.block_number}
-              </Link>,
-              transaction.block_timestamp
-                ? formatTimestamp(
-                    new Date(Number(transaction.block_timestamp) * 1000)
-                  )
-                : "--",
-              <Link
-                key={transaction.transaction_hash}
-                href={`/address/${transaction.from}`}
-              >
-                <Address
-                  disableAddressLink={true}
-                  noAvatar={true}
-                  noCopy={true}
-                  address={transaction.from}
-                />
-              </Link>,
-              !!transaction.to ? (
+      <div className="flex flex-col border border-line rounded-xl divide-y divide-line">
+        <div className="overflow-auto px-4">
+          <Table
+            headers={[
+              "Parent Txn Hash",
+              "Method",
+              "Block",
+              "Age",
+              "From",
+              "To",
+            ]}
+            rows={[
+              ...transactions.map((transaction) => [
                 <Link
                   key={transaction.transaction_hash}
-                  href={`/address/${transaction.to}`}
+                  href={`/tx/${transaction.transaction_hash}`}
+                  className="flex items-center gap-1"
                 >
+                  {transaction.status === "failure" && (
+                    <IoAlertCircleOutline className="text-xl text-red-500" />
+                  )}
+                  {truncateMiddle(transaction.transaction_hash, 8, 8)}
+                </Link>,
+                transaction.function ? (
+                  <div
+                    key={transaction.transaction_hash}
+                    className="flex items-center gap-1 text-gray-400 border border-gray-700 bg-gray-950 rounded-md px-2 py-1 text-xs"
+                  >
+                    {capitalize(transaction.function)}
+                  </div>
+                ) : (
+                  "--"
+                ),
+                <Link
+                  key={transaction.transaction_hash}
+                  href={`/block/${transaction.block_number}`}
+                >
+                  {transaction.block_number}
+                </Link>,
+                transaction.block_timestamp
+                  ? formatTimestamp(
+                      new Date(Number(transaction.block_timestamp) * 1000)
+                    )
+                  : "--",
+                <Address
+                  key={transaction.transaction_hash}
+                  address={transaction.from}
+                />,
+                !!transaction.to ? (
                   <Address
-                    disableAddressLink={true}
-                    noAvatar={true}
-                    noCopy={true}
+                    key={transaction.transaction_hash}
                     address={transaction.to}
                   />
-                </Link>
-              ) : (
-                "--"
-              ),
-            ]),
-          ]}
-        />
-        {!transactions.length && <div className="py-4">No transactions</div>}
+                ) : (
+                  "--"
+                ),
+              ]),
+            ]}
+          />
+          {!transactions.length && <div className="py-4">No transactions</div>}
+        </div>
       </div>
       <Pagination count={count} />
     </>
