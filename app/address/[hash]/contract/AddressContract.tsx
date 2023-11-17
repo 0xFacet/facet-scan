@@ -131,61 +131,60 @@ export default function WalletAddress({ hash, contract }: Props) {
   };
 
   const callMethod = async (name: string) => {
-    showToast({ message: "Transaction submitted", type: "success" });
-    // if (
-    //   contract?.abi[name].state_mutability == "view" ||
-    //   contract?.abi[name].state_mutability == "pure"
-    // ) {
-    //   return staticCall(name);
-    // }
-    // setMethodLoading((loading) => ({ ...loading, [name]: true }));
-    // setSimulationResults((results) => ({ ...results, [name]: null }));
-    // try {
-    //   if (address && !isDisconnected) {
-    //     const txnData = {
-    //       op: "call",
-    //       data: {
-    //         to: hash,
-    //         function: name,
-    //         args: methodValues[name],
-    //       },
-    //     };
+    if (
+      contract?.abi[name].state_mutability == "view" ||
+      contract?.abi[name].state_mutability == "pure"
+    ) {
+      return staticCall(name);
+    }
+    setMethodLoading((loading) => ({ ...loading, [name]: true }));
+    setSimulationResults((results) => ({ ...results, [name]: null }));
+    try {
+      if (address && !isDisconnected) {
+        const txnData = {
+          op: "call",
+          data: {
+            to: hash,
+            function: name,
+            args: methodValues[name],
+          },
+        };
 
-    //     const simulationRes = await axios.get(
-    //       `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`,
-    //       {
-    //         params: {
-    //           from: address,
-    //           tx_payload: JSON.stringify(txnData),
-    //         },
-    //       }
-    //     );
+        const simulationRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`,
+          {
+            params: {
+              from: address,
+              tx_payload: JSON.stringify(txnData),
+            },
+          }
+        );
 
-    //     setSimulationResults((results) => ({
-    //       ...results,
-    //       [name]: simulationRes.data.result,
-    //     }));
+        setSimulationResults((results) => ({
+          ...results,
+          [name]: simulationRes.data.result,
+        }));
 
-    //     if (simulationRes.data.result.status != "success") {
-    //       setMethodLoading((loading) => ({ ...loading, [name]: false }));
-    //       return;
-    //     }
+        if (simulationRes.data.result.status != "success") {
+          setMethodLoading((loading) => ({ ...loading, [name]: false }));
+          return;
+        }
 
-    //     const txn = await sendTransaction({
-    //       to: "0x0000000000000000000000000000000000000000",
-    //       data: toHex(
-    //         `data:application/vnd.facet.tx+json;esip6=true,${JSON.stringify(
-    //           txnData
-    //         )}`
-    //       ),
-    //     });
-    //     setPendingCallTxnHash(txn.hash);
-    //   } else if (openConnectModal) {
-    //     openConnectModal();
-    //   }
-    // } catch (e) {
-    //   console.log(e);
-    // }
+        const txn = await sendTransaction({
+          to: "0x0000000000000000000000000000000000000000",
+          data: toHex(
+            `data:application/vnd.facet.tx+json;esip6=true,${JSON.stringify(
+              txnData
+            )}`
+          ),
+        });
+        setPendingCallTxnHash(txn.hash);
+      } else if (openConnectModal) {
+        openConnectModal();
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const renderStateDetails = () => {
