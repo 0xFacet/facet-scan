@@ -128,32 +128,15 @@ export default function Contracts({
           </div>
         </Section>
       </SectionContainer>
-      <SectionContainer className="border-t">
-        <Section className="py-0 sm:py-0">
-          <div className="px-0 flex gap-4 items-center">
-            <div className="flex gap-4">
-              {contractTypes.map((type) => (
-                <NavLink
-                  key={type}
-                  href={`?tab=${kebabCase(type)}`}
-                  isActive={tab === kebabCase(type)}
-                  className="whitespace-nowrap"
-                >
-                  {type}
-                </NavLink>
-              ))}
-            </div>
-          </div>
-        </Section>
-      </SectionContainer>
-      <SectionContainer className="flex-1">
+      <SectionContainer className="flex-1 border-t">
         <Section className="flex-1">
           <div className="flex flex-col border border-line rounded-xl divide-y divide-line">
             <div className="overflow-auto px-4">
               <Table
-                headers={["Contract Address"]}
+                headers={["Contract Address", "Contract Type"]}
                 rows={contracts.map((row) => [
                   <Address address={row.address} key={row.address} />,
+                  row.current_type,
                 ])}
               />
               {!contracts.length && (

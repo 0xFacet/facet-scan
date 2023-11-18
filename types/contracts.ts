@@ -78,6 +78,9 @@ export type SourceCode = {
 };
 
 export interface Contract {
+  transaction_hash: string;
+  current_type: string;
+  current_init_code_hash: string;
   abi: ContractAbi;
   call_receipts: InternalTransaction[];
   address: string;
