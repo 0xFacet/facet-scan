@@ -7,7 +7,11 @@ import { NavLink } from "@/components/NavLink";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Contract, ContractArtifact } from "@/types/contracts";
-import { parseTokenValue } from "@/utils/formatter";
+import {
+  formatTimestamp,
+  parseTokenValue,
+  truncateMiddle,
+} from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -27,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Table } from "@/components/Table";
 import { Pagination } from "@/components/pagination";
 import { Address } from "@/components/Address";
+import Link from "next/link";
 
 interface Props {
   contractArtifacts: ContractArtifact[];
@@ -133,10 +138,36 @@ export default function Contracts({
           <div className="flex flex-col border border-line rounded-xl divide-y divide-line">
             <div className="overflow-auto px-4">
               <Table
-                headers={["Contract Address", "Contract Type"]}
+                headers={[
+                  "Contract Address",
+                  "Contract Type",
+                  "Deployer",
+                  "Deployment Txn",
+                  "Age",
+                ]}
                 rows={contracts.map((row) => [
                   <Address address={row.address} key={row.address} />,
                   row.current_type,
+                  <Link
+                    key={row.transaction_hash}
+                    href={`/address/${row.deployment_transaction.from}`}
+                  >
+                    {truncateMiddle(row.deployment_transaction.from, 8, 8)}
+                  </Link>,
+                  <Link
+                    key={row.transaction_hash}
+                    href={`/tx/${row.transaction_hash}`}
+                  >
+                    {truncateMiddle(row.transaction_hash, 8, 8)}
+                  </Link>,
+                  row.deployment_transaction.block_timestamp
+                    ? formatTimestamp(
+                        new Date(
+                          Number(row.deployment_transaction.block_timestamp) *
+                            1000
+                        )
+                      )
+                    : "--",
                 ])}
               />
               {!contracts.length && (

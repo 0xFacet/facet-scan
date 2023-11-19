@@ -1,4 +1,4 @@
-import { InternalTransaction } from "./blocks";
+import { InternalTransaction, Transaction } from "./blocks";
 
 export interface ContractArtifact {
   name: string;
@@ -86,4 +86,5 @@ export interface Contract {
   address: string;
   current_state: CurrentState;
   source_code: SourceCode[];
+  deployment_transaction: Transaction;
 }

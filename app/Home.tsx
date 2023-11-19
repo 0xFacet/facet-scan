@@ -118,7 +118,7 @@ export default function Home({
                           Block #{block.block_number}
                         </div>
                       </Link>
-                      <div className="text-gray text-sm">
+                      <div className="text-gray text-sm mt-1">
                         {`${formatDistanceToNowStrict(
                           new Date(Number(block.timestamp) * 1000)
                         )} ago`}
@@ -157,7 +157,7 @@ export default function Home({
                           {truncateMiddle(transaction.transaction_hash, 8, 8)}
                         </div>
                       </Link>
-                      <div className="text-gray text-sm">
+                      <div className="text-gray text-sm mt-1">
                         {`${formatDistanceToNowStrict(
                           new Date(Number(transaction.block_timestamp) * 1000)
                         )} ago`}
