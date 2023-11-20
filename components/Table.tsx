@@ -12,9 +12,9 @@ export const Table = ({
   onRowClick?: (index: number) => void;
 }) => {
   return (
-    <table className="min-w-full text-left">
+    <table className="min-w-full text-left divide-y divide-line">
       {!!headers?.length && (
-        <thead className="border-b border-line">
+        <thead>
           <tr>
             {headers.map((header, i) => (
               <th
@@ -32,7 +32,7 @@ export const Table = ({
           </tr>
         </thead>
       )}
-      <tbody>
+      <tbody className="divide-y divide-line">
         {rows.map((row, ri) => (
           <tr
             key={ri}

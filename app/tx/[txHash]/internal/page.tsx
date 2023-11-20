@@ -1,3 +1,4 @@
+import { Card } from "@/components/Card";
 import { List } from "@/components/List";
 import { Tooltip } from "@/components/Tooltip";
 import { InternalTransaction } from "@/types/blocks";
@@ -45,10 +46,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
   return (
     <div className="flex flex-col gap-8">
       {transactions.map((transaction) => (
-        <div
-          key={transaction.internal_transaction_index}
-          className="border border-line rounded-xl px-4"
-        >
+        <Card key={transaction.internal_transaction_index}>
           <List
             items={[
               {
@@ -125,18 +123,18 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                   </div>
                 ),
                 value: (
-                  <div className="border border-line rounded-xl px-4">
+                  <Card>
                     <List
                       items={Object.entries(transaction.args).map(
                         ([label, value]) => ({ label, value })
                       )}
                     />
-                  </div>
+                  </Card>
                 ),
               },
             ]}
           />
-        </div>
+        </Card>
       ))}
     </div>
   );

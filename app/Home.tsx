@@ -1,5 +1,6 @@
 "use client";
 
+import { Card } from "@/components/Card";
 import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
@@ -109,95 +110,82 @@ export default function Home({
         </Section>
       </SectionContainer>
       <SectionContainer className="flex-1">
-        <Section className="flex-1 justify-center gap-8">
-          <div className="flex flex-col sm:flex-row gap-8">
-            <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden">
-              <div className="p-4 border-b border-line text-accent">
-                Latest Blocks
-              </div>
-              <div className="px-4">
-                {blocks.map((block) => (
-                  <div
-                    key={block.id}
-                    className="flex-1 flex flex-row gap justify-between border-b border-line py-4"
-                  >
-                    <div>
-                      <Link href={`/block/${block.block_number}`}>
-                        <div className="font-bold">
-                          Block #{block.block_number}
-                        </div>
-                      </Link>
-                      <div className="text-gray text-sm mt-1">
-                        {`${formatDistanceToNowStrict(
-                          new Date(Number(block.timestamp) * 1000)
-                        )} ago`}
-                      </div>
+        <Section className="flex-1 flex-col sm:flex-row gap-4 sm:gap-8">
+          <Card>
+            <div className="py-4 text-accent">Latest Blocks</div>
+            {blocks.map((block) => (
+              <div
+                key={block.id}
+                className="flex-1 flex flex-row gap-8 justify-between py-4"
+              >
+                <div>
+                  <Link href={`/block/${block.block_number}`}>
+                    <div className="font-bold whitespace-nowrap">
+                      Block #{block.block_number}
                     </div>
-                    <div>
-                      <Link href={`/txs?block=${block.block_number}`}>
-                        {pluralize(block.transaction_count ?? 0, "transaction")}
-                      </Link>
-                    </div>
+                  </Link>
+                  <div className="text-gray text-sm mt-1">
+                    {`${formatDistanceToNowStrict(
+                      new Date(Number(block.timestamp) * 1000)
+                    )} ago`}
                   </div>
-                ))}
+                </div>
+                <div className="whitespace-nowrap">
+                  <Link href={`/txs?block=${block.block_number}`}>
+                    {pluralize(block.transaction_count ?? 0, "transaction")}
+                  </Link>
+                </div>
               </div>
-              <div className="p-4">
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/blocks")}
-                >
-                  View all blocks
-                </Button>
-              </div>
+            ))}
+            <div className="py-4">
+              <Button variant="outline" onClick={() => router.push("/blocks")}>
+                View all blocks
+              </Button>
             </div>
-            <div className="flex flex-col flex-1 border border-line rounded-xl overflow-x-hidden">
-              <div className="p-4 border-b border-line text-accent">
-                Latest Transactions
-              </div>
-              <div className="px-4">
-                {transactions.map((transaction) => (
-                  <div
-                    key={transaction.transaction_hash}
-                    className="flex-1 flex flex-row gap-8 justify-between border-b border-line py-4"
-                  >
-                    <div className="flex flex-col flex-1">
-                      <Link href={`/tx/${transaction.transaction_hash}`}>
-                        <div className="font-bold truncate">
-                          {truncateMiddle(transaction.transaction_hash, 8, 8)}
-                        </div>
-                      </Link>
-                      <div className="text-gray text-sm mt-1">
-                        {`${formatDistanceToNowStrict(
-                          new Date(Number(transaction.block_timestamp) * 1000)
-                        )} ago`}
-                      </div>
+          </Card>
+          <Card>
+            <div className="py-4 text-accent">Latest Transactions</div>
+            {transactions.map((transaction) => (
+              <div
+                key={transaction.transaction_hash}
+                className="flex-1 flex flex-row gap-8 justify-between py-4"
+              >
+                <div>
+                  <Link href={`/tx/${transaction.transaction_hash}`}>
+                    <div className="font-bold truncate">
+                      {truncateMiddle(transaction.transaction_hash, 8, 8)}
                     </div>
-                    <div className="flex flex-col">
-                      <div className="flex gap-4 justify-between">
-                        <span className="text-accent">{"From "}</span>
-                        <Link href={`/address/${transaction.from}`}>
-                          {truncateMiddle(transaction.from, 8, 8)}
-                        </Link>
-                      </div>
-                      {!!transaction.to && (
-                        <div className="flex gap-4 justify-between">
-                          <span className="text-accent">{"To "}</span>
-                          <Link href={`/address/${transaction.to}`}>
-                            {truncateMiddle(transaction.to, 8, 8)}
-                          </Link>
-                        </div>
-                      )}
-                    </div>
+                  </Link>
+                  <div className="text-gray text-sm mt-1">
+                    {`${formatDistanceToNowStrict(
+                      new Date(Number(transaction.block_timestamp) * 1000)
+                    )} ago`}
                   </div>
-                ))}
+                </div>
+                <div>
+                  <div className="flex gap-4 justify-between">
+                    <span className="text-accent">{"From "}</span>
+                    <Link href={`/address/${transaction.from}`}>
+                      {truncateMiddle(transaction.from, 8, 8)}
+                    </Link>
+                  </div>
+                  {!!transaction.to && (
+                    <div className="flex gap-4 justify-between">
+                      <span className="text-accent">{"To "}</span>
+                      <Link href={`/address/${transaction.to}`}>
+                        {truncateMiddle(transaction.to, 8, 8)}
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="p-4">
-                <Button variant="outline" onClick={() => router.push("/txs")}>
-                  View all transactions
-                </Button>
-              </div>
+            ))}
+            <div className="py-4">
+              <Button variant="outline" onClick={() => router.push("/txs")}>
+                View all transactions
+              </Button>
             </div>
-          </div>
+          </Card>
         </Section>
       </SectionContainer>
     </div>

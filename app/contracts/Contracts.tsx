@@ -32,6 +32,7 @@ import { Table } from "@/components/Table";
 import { Pagination } from "@/components/pagination";
 import { Address } from "@/components/Address";
 import Link from "next/link";
+import { Card } from "@/components/Card";
 
 interface Props {
   contractArtifacts: ContractArtifact[];
@@ -135,46 +136,44 @@ export default function Contracts({
       </SectionContainer>
       <SectionContainer className="flex-1 border-t">
         <Section className="flex-1">
-          <div className="flex flex-col border border-line rounded-xl divide-y divide-line">
-            <div className="overflow-auto px-4">
-              <Table
-                headers={[
-                  "Contract Address",
-                  "Contract Type",
-                  "Deployer",
-                  "Deployment Txn",
-                  "Age",
-                ]}
-                rows={contracts.map((row) => [
-                  <Address address={row.address} key={row.address} />,
-                  row.current_type,
-                  <Link
-                    key={row.transaction_hash}
-                    href={`/address/${row.deployment_transaction.from}`}
-                  >
-                    {truncateMiddle(row.deployment_transaction.from, 8, 8)}
-                  </Link>,
-                  <Link
-                    key={row.transaction_hash}
-                    href={`/tx/${row.transaction_hash}`}
-                  >
-                    {truncateMiddle(row.transaction_hash, 8, 8)}
-                  </Link>,
-                  row.deployment_transaction.block_timestamp
-                    ? formatTimestamp(
-                        new Date(
-                          Number(row.deployment_transaction.block_timestamp) *
-                            1000
-                        )
+          <Card>
+            <Table
+              headers={[
+                "Contract Address",
+                "Contract Type",
+                "Deployer",
+                "Deployment Txn",
+                "Age",
+              ]}
+              rows={contracts.map((row) => [
+                <Address address={row.address} key={row.address} />,
+                row.current_type,
+                <Link
+                  key={row.transaction_hash}
+                  href={`/address/${row.deployment_transaction.from}`}
+                >
+                  {truncateMiddle(row.deployment_transaction.from, 8, 8)}
+                </Link>,
+                <Link
+                  key={row.transaction_hash}
+                  href={`/tx/${row.transaction_hash}`}
+                >
+                  {truncateMiddle(row.transaction_hash, 8, 8)}
+                </Link>,
+                row.deployment_transaction.block_timestamp
+                  ? formatTimestamp(
+                      new Date(
+                        Number(row.deployment_transaction.block_timestamp) *
+                          1000
                       )
-                    : "--",
-                ])}
-              />
-              {!contracts.length && (
-                <div className="py-4">No contracts found</div>
-              )}
-            </div>
-          </div>
+                    )
+                  : "--",
+              ])}
+            />
+            {!contracts.length && (
+              <div className="py-4">No contracts found</div>
+            )}
+          </Card>
           <Pagination count={totalContracts} />
         </Section>
       </SectionContainer>

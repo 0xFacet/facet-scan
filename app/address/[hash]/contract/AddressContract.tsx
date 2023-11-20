@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/accordion";
 import { useToast } from "@/contexts/toast-context";
 import { Transaction } from "@/types/blocks";
+import { Card } from "@/components/Card";
 
 interface Props {
   hash: string;
@@ -378,8 +379,8 @@ export default function WalletAddress({ hash, contract }: Props) {
   };
 
   return (
-    <div className="flex flex-col border border-line rounded-xl overflow-x-hidden divide-y divide-line">
-      <div className="flex gap-4 px-4">
+    <Card>
+      <div className="flex gap-4">
         <NavLink
           href="?tab=details"
           isActive={tab === "details"}
@@ -409,7 +410,7 @@ export default function WalletAddress({ hash, contract }: Props) {
           Code
         </NavLink>
       </div>
-      <div className="px-4">{renderTab()}</div>
-    </div>
+      {renderTab()}
+    </Card>
   );
 }

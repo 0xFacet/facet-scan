@@ -1,3 +1,4 @@
+import { Card } from "@/components/Card";
 import { List } from "@/components/List";
 import { Tooltip } from "@/components/Tooltip";
 import { fetchTransaction } from "@/utils/data";
@@ -43,7 +44,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="border border-line rounded-xl px-4">
+      <Card>
         <List
           items={[
             {
@@ -148,8 +149,8 @@ export default async function Page({ params }: { params: { txHash: string } }) {
             },
           ]}
         />
-      </div>
-      <div className="border border-line rounded-xl px-4">
+      </Card>
+      <Card>
         <List
           items={[
             {
@@ -204,18 +205,18 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                 </div>
               ),
               value: (
-                <div className="border border-line rounded-xl px-4">
+                <Card>
                   <List
                     items={Object.entries(transaction.args).map(
                       ([label, value]) => ({ label, value })
                     )}
                   />
-                </div>
+                </Card>
               ),
             },
           ]}
         />
-      </div>
+      </Card>
     </div>
   );
 }

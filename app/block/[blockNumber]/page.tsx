@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
+import { Card } from "@/components/Card";
 
 function pluralize(count: number, word: string) {
   return `${count.toLocaleString()} ${word}${count === 1 ? "" : "s"}`;
@@ -30,7 +31,7 @@ export default async function Page({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <div className="border border-line rounded-xl px-4">
+          <Card>
             <List
               items={[
                 {
@@ -77,7 +78,7 @@ export default async function Page({
                 },
               ]}
             />
-          </div>
+          </Card>
         </Section>
       </SectionContainer>
     </div>

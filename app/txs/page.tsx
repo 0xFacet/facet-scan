@@ -1,4 +1,5 @@
 import { Address } from "@/components/Address";
+import { Card } from "@/components/Card";
 import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
@@ -38,80 +39,78 @@ export default async function Page({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <div className="flex flex-col border border-line rounded-xl divide-y divide-line">
-            <div className="overflow-auto px-4">
-              <Table
-                headers={[
-                  "Transaction Hash",
-                  "Method",
-                  "Block",
-                  "Age",
-                  "From",
-                  "To",
-                  "Txn Fee",
-                ]}
-                rows={[
-                  ...transactions.map((transaction) => [
-                    <Link
+          <Card>
+            <Table
+              headers={[
+                "Transaction Hash",
+                "Method",
+                "Block",
+                "Age",
+                "From",
+                "To",
+                "Txn Fee",
+              ]}
+              rows={[
+                ...transactions.map((transaction) => [
+                  <Link
+                    key={transaction.transaction_hash}
+                    href={`/tx/${transaction.transaction_hash}`}
+                    className="flex items-center gap-1"
+                  >
+                    {transaction.status === "failure" && (
+                      <IoAlertCircleOutline className="text-xl text-red-500" />
+                    )}
+                    {truncateMiddle(transaction.transaction_hash, 8, 8)}
+                  </Link>,
+                  transaction.function ? (
+                    <div
                       key={transaction.transaction_hash}
-                      href={`/tx/${transaction.transaction_hash}`}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 text-gray-400 border border-gray-700 bg-gray-950 rounded-md px-2 py-1 text-xs"
                     >
-                      {transaction.status === "failure" && (
-                        <IoAlertCircleOutline className="text-xl text-red-500" />
-                      )}
-                      {truncateMiddle(transaction.transaction_hash, 8, 8)}
-                    </Link>,
-                    transaction.function ? (
-                      <div
-                        key={transaction.transaction_hash}
-                        className="flex items-center gap-1 text-gray-400 border border-gray-700 bg-gray-950 rounded-md px-2 py-1 text-xs"
-                      >
-                        {capitalize(transaction.function)}
-                      </div>
-                    ) : (
-                      "--"
-                    ),
-                    <Link
-                      key={transaction.transaction_hash}
-                      href={`/block/${transaction.block_number}`}
-                    >
-                      {transaction.block_number}
-                    </Link>,
-                    transaction.block_timestamp
-                      ? formatTimestamp(
-                          new Date(Number(transaction.block_timestamp) * 1000)
-                        )
-                      : "--",
+                      {capitalize(transaction.function)}
+                    </div>
+                  ) : (
+                    "--"
+                  ),
+                  <Link
+                    key={transaction.transaction_hash}
+                    href={`/block/${transaction.block_number}`}
+                  >
+                    {transaction.block_number}
+                  </Link>,
+                  transaction.block_timestamp
+                    ? formatTimestamp(
+                        new Date(Number(transaction.block_timestamp) * 1000)
+                      )
+                    : "--",
+                  <Address
+                    key={transaction.transaction_hash}
+                    address={transaction.from}
+                  />,
+                  !!transaction.to ? (
                     <Address
                       key={transaction.transaction_hash}
-                      address={transaction.from}
-                    />,
-                    !!transaction.to ? (
-                      <Address
-                        key={transaction.transaction_hash}
-                        address={transaction.to}
-                      />
-                    ) : (
-                      "--"
-                    ),
-                    transaction.transaction_fee
-                      ? Number(
-                          Number(
-                            formatEther(
-                              BigInt(transaction.transaction_fee.split(".")[0])
-                            )
-                          ).toFixed(5)
-                        )
-                      : 0,
-                  ]),
-                ]}
-              />
-              {!transactions.length && (
-                <div className="py-4">No transactions</div>
-              )}
-            </div>
-          </div>
+                      address={transaction.to}
+                    />
+                  ) : (
+                    "--"
+                  ),
+                  transaction.transaction_fee
+                    ? Number(
+                        Number(
+                          formatEther(
+                            BigInt(transaction.transaction_fee.split(".")[0])
+                          )
+                        ).toFixed(5)
+                      )
+                    : 0,
+                ]),
+              ]}
+            />
+            {!transactions.length && (
+              <div className="py-4">No transactions</div>
+            )}
+          </Card>
           <Pagination count={count} />
         </Section>
       </SectionContainer>

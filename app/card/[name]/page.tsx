@@ -7,6 +7,7 @@ import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { truncateMiddle } from "@/utils/formatter";
 import { HiOutlineClock } from "react-icons/hi2";
+import { Card } from "@/components/Card";
 
 export default async function Page({ params }: { params: { name: string } }) {
   const card = await fetchCard(params.name);
@@ -23,7 +24,7 @@ export default async function Page({ params }: { params: { name: string } }) {
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <div className="border border-line rounded-xl px-4">
+          <Card>
             <List
               items={[
                 {
@@ -55,7 +56,7 @@ export default async function Page({ params }: { params: { name: string } }) {
                 },
               ]}
             />
-          </div>
+          </Card>
         </Section>
       </SectionContainer>
     </div>
