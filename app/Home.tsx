@@ -32,6 +32,7 @@ interface Props {
   blocks: Block[];
   totalTransactions: number;
   transactions: Transaction[];
+  totalWallets: number;
 }
 
 export default function Home({
@@ -39,6 +40,7 @@ export default function Home({
   blocks,
   totalTransactions,
   transactions,
+  totalWallets,
 }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -93,7 +95,7 @@ export default function Home({
               <div className="text-accent">Total Transactions</div>
             </div>
             <div className="flex flex-col flex-1 items-center justify-center text-center gap-2 p-8">
-              <Heading size="h2">{(84038).toLocaleString()}</Heading>
+              <Heading size="h2">{totalWallets.toLocaleString()}</Heading>
               <div className="text-accent">Total Wallets</div>
             </div>
           </div>

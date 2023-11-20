@@ -38,7 +38,10 @@ export const fetchTotalTransactions = async () => {
   const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
     res.json()
   );
-  return result as number;
+  return result as {
+    transaction_count: number;
+    unique_from_address_count: number;
+  };
 };
 
 export const fetchTransactions = async ({
