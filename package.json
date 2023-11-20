@@ -27,7 +27,7 @@
     "lodash": "^4.17.21",
     "lokijs": "^1.5.12",
     "lucide-react": "^0.292.0",
-    "next": "^14.0.2",
+    "next": "^14.0.3",
     "pino-pretty": "^10.2.0",
     "react": "^18.2.0",
     "react-blockies": "^1.4.1",
@@ -53,7 +53,7 @@
     "@types/react-syntax-highlighter": "^15.5.7",
     "autoprefixer": "^10.4.15",
     "eslint": "^8",
-    "eslint-config-next": "^14.0.2",
+    "eslint-config-next": "^14.0.3",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"

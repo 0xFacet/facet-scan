@@ -1,5 +1,7 @@
 import { Block, Transaction, InternalTransaction } from "@/types/blocks";
+import { Card } from "@/types/cards";
 import { Contract, ContractArtifact } from "@/types/contracts";
+import { Ethscription } from "@/types/ethscriptions";
 
 export const fetchTotalBlocks = async () => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URI}/blocks/total`);
@@ -183,4 +185,20 @@ export const fetchContract = async (address: string) => {
     res.json()
   );
   return result as Contract;
+};
+
+export const fetchCard = async (name: string) => {
+  const url = new URL(
+    "https://mainnet-api.ethscriptions.com/api/ethscriptions/filtered"
+  );
+  url.search = new URLSearchParams({
+    creator: "0x038b9e0eef0f926682d3a9b1918611efec9cc741", // pre-registration smart contract
+    media_type: JSON.stringify(name),
+  }).toString();
+  const res = await fetch(url.href).then((res) => res.json());
+  const { ethscriptions }: { ethscriptions: Ethscription[] } = res;
+  const ethscription = ethscriptions[0];
+  if (!ethscription) throw "Card not found";
+  const card = JSON.parse(ethscription.content_uri.split(";rule=esip6,")[1]);
+  return card as Card;
 };

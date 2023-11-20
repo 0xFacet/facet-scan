@@ -17,8 +17,13 @@ function pluralize(count: number, word: string) {
   return `${count.toLocaleString()} ${word}${count === 1 ? "" : "s"}`;
 }
 
-function isCardName(name: string) {
+function isCardNameWithAt(name: string) {
   const regex = /^@[a-zA-Z0-9]{1,31}$/;
+  return regex.test(name);
+}
+
+function isCardName(name: string) {
+  const regex = /^[a-zA-Z0-9]{1,31}$/;
   return regex.test(name);
 }
 
@@ -46,14 +51,16 @@ export default function Home({
   const [search, setSearch] = useState("");
 
   const submitSearch = () => {
-    if (isCardName(search)) {
-      router.push(`/card/${search}`);
+    if (isCardNameWithAt(search)) {
+      router.push(`/card/${search.replace("@", "").toLowerCase()}`);
     } else if (isAddress(search)) {
       router.push(`/address/${search}`);
     } else if (isTxHash(search)) {
       router.push(`/tx/${search}`);
     } else if (Number.isInteger(Number(search))) {
       router.push(`/block/${search}`);
+    } else if (isCardName(search)) {
+      router.push(`/card/${search.toLowerCase()}`);
     }
   };
 
