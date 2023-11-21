@@ -21,7 +21,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
             {capitalize(transaction.status)}
           </div>
         );
-      case "error":
+      case "failure":
         return (
           <div className="flex flex-col gap-2 flex-wrap overflow-hidden">
             <div className="flex items-center gap-1 text-red-400 border border-red-700 bg-red-950 rounded-md px-2 py-1 text-sm w-fit">

@@ -7,8 +7,7 @@ import { Table } from "@/components/Table";
 import { Pagination } from "@/components/pagination";
 import { fetchTransactions } from "@/utils/data";
 import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
-import { formatDistanceToNowStrict } from "date-fns";
-import { capitalize } from "lodash";
+import { startCase } from "lodash";
 import Link from "next/link";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { formatEther } from "viem";
@@ -67,7 +66,7 @@ export default async function Page({
                       key={transaction.transaction_hash}
                       className="flex items-center gap-1 text-gray-400 border border-gray-700 bg-gray-950 rounded-md px-2 py-1 text-xs"
                     >
-                      {capitalize(transaction.function)}
+                      {startCase(transaction.function)}
                     </div>
                   ) : (
                     "--"

@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { BiSearch } from "react-icons/bi";
+import { IoAlertCircleOutline } from "react-icons/io5";
 import { isAddress } from "viem";
 
 function pluralize(count: number, word: string) {
@@ -154,7 +155,15 @@ export default function Home({
                 className="flex-1 flex flex-row gap-8 justify-between py-4"
               >
                 <div>
-                  <Link href={`/tx/${transaction.transaction_hash}`}>
+                  <Link
+                    key={transaction.transaction_hash}
+                    href={`/tx/${transaction.transaction_hash}`}
+                    className="flex items-center gap-1"
+                  >
+                    {transaction.status === "failure" && (
+                      <IoAlertCircleOutline className="text-xl text-red-500" />
+                    )}
+
                     <div className="font-bold truncate">
                       {truncateMiddle(transaction.transaction_hash, 8, 8)}
                     </div>

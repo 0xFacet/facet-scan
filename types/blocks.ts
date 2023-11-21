@@ -9,7 +9,7 @@ export interface Transaction {
   transaction_hash: string;
   from: `0x${string}`;
   to: `0x${string}`;
-  status: string;
+  status: "success" | "failure";
   function: string;
   args: { [key: string]: any };
   logs: Log[];
@@ -38,7 +38,7 @@ export interface InternalTransaction {
   logs: Log[];
   block_timestamp: string;
   error?: string | null;
-  status: string;
+  status: "success" | "failure";
   block_number: string;
   transaction_index: string;
   runtime_ms: string;
