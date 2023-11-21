@@ -10,7 +10,7 @@ import { truncateMiddle } from "@/utils/formatter";
 import { formatDistanceToNowStrict } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import { isAddress } from "viem";
 
@@ -51,7 +51,8 @@ export default function Home({
   const router = useRouter();
   const [search, setSearch] = useState("");
 
-  const submitSearch = () => {
+  const submitSearch = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (isCardNameWithAt(search)) {
       router.push(`/card/${search.replace("@", "").toLowerCase()}`);
     } else if (isAddress(search)) {
@@ -70,7 +71,10 @@ export default function Home({
       <SectionContainer className="bg-[url(/card-bg.svg)] bg-no-repeat bg-cover xl:bg-[length:1536px] bg-center border-none">
         <Section className="flex-1 py-32 sm:py-40 gap-8 max-w-3xl mx-auto">
           <Heading size="h2">Facet Block Explorer</Heading>
-          <div className="flex flex-wrap bg-transparent">
+          <form
+            className="flex flex-wrap bg-transparent"
+            onSubmit={submitSearch}
+          >
             <div className="flex-1 min-w-[150px]">
               <input
                 className="w-full bg-black/20 text-md sm:text-lg md:text-2xl outline-none px-6 py-4 sm:px-10 sm:py-8 border-2 border-primary rounded-l-xl sm:rounded-l-3xl rounded-r-none"
@@ -82,11 +86,10 @@ export default function Home({
             <button
               type="submit"
               className="disabled:opacity-50 opacity-90 hover:opacity-100 p-4 sm:p-8 text-md sm:text-lg md:text-2xl bg-primary text-black border-primary rounded-r-xl sm:rounded-r-3xl rounded-l-none"
-              onClick={submitSearch}
             >
               <BiSearch />
             </button>
-          </div>
+          </form>
         </Section>
       </SectionContainer>
       <SectionContainer className="border-t">
