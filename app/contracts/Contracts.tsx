@@ -150,9 +150,9 @@ export default function Contracts({
                 row.current_type,
                 <Link
                   key={row.transaction_hash}
-                  href={`/address/${row.deployment_transaction.from}`}
+                  href={`/address/${row.deployment_transaction?.from}`}
                 >
-                  {truncateMiddle(row.deployment_transaction.from, 8, 8)}
+                  {truncateMiddle(row.deployment_transaction?.from ?? "", 8, 8)}
                 </Link>,
                 <Link
                   key={row.transaction_hash}
@@ -160,10 +160,10 @@ export default function Contracts({
                 >
                   {truncateMiddle(row.transaction_hash, 8, 8)}
                 </Link>,
-                row.deployment_transaction.block_timestamp
+                row.deployment_transaction?.block_timestamp
                   ? formatTimestamp(
                       new Date(
-                        Number(row.deployment_transaction.block_timestamp) *
+                        Number(row.deployment_transaction?.block_timestamp) *
                           1000
                       )
                     )

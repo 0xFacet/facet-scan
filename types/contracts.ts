@@ -86,5 +86,5 @@ export interface Contract {
   address: string;
   current_state: CurrentState;
   source_code: SourceCode[];
-  deployment_transaction: Transaction;
+  deployment_transaction?: Transaction;
 }

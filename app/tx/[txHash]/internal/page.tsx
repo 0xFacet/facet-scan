@@ -45,97 +45,100 @@ export default async function Page({ params }: { params: { txHash: string } }) {
 
   return (
     <div className="flex flex-col gap-8">
-      {transactions.map((transaction) => (
-        <Card key={transaction.internal_transaction_index}>
-          <List
-            items={[
-              {
-                label: (
-                  <div className="flex items-center gap-1">
-                    <Tooltip label="The order in which the internal transaction was executed.">
-                      <HiOutlineQuestionMarkCircle className="text-xl" />
-                    </Tooltip>
-                    Internal Transaction Index
-                  </div>
-                ),
-                value: transaction.internal_transaction_index,
-              },
-              {
-                label: (
-                  <div className="flex items-center gap-1">
-                    <Tooltip label="The status of the transaction.">
-                      <HiOutlineQuestionMarkCircle className="text-xl" />
-                    </Tooltip>
-                    Status
-                  </div>
-                ),
-                value: renderStatus(transaction),
-              },
-              {
-                label: (
-                  <div className="flex items-center gap-1">
-                    <Tooltip label="The sending party of the transaction.">
-                      <HiOutlineQuestionMarkCircle className="text-xl" />
-                    </Tooltip>
-                    From
-                  </div>
-                ),
-                value: (
-                  <Link href={`/address/${transaction.from}`}>
-                    {transaction.from}
-                  </Link>
-                ),
-              },
-              {
-                label: (
-                  <div className="flex items-center gap-1">
-                    <Tooltip label="The contract that was called.">
-                      <HiOutlineQuestionMarkCircle className="text-xl" />
-                    </Tooltip>
-                    To (Contract)
-                  </div>
-                ),
-                value: (
-                  <Link href={`/address/${transaction.to}`}>
-                    {transaction.to}
-                  </Link>
-                ),
-                hidden: !transaction.to,
-              },
-              {
-                label: (
-                  <div className="flex items-center gap-1">
-                    <Tooltip label="The function that was executed.">
-                      <HiOutlineQuestionMarkCircle className="text-xl" />
-                    </Tooltip>
-                    Function Name
-                  </div>
-                ),
-                value: transaction.function ?? "constructor",
-              },
-              {
-                label: (
-                  <div className="flex items-center gap-1">
-                    <Tooltip label="The arguments sent to the function that was executed.">
-                      <HiOutlineQuestionMarkCircle className="text-xl" />
-                    </Tooltip>
-                    Function Args
-                  </div>
-                ),
-                value: (
-                  <Card>
-                    <List
-                      items={Object.entries(transaction.args).map(
-                        ([label, value]) => ({ label, value })
-                      )}
-                    />
-                  </Card>
-                ),
-              },
-            ]}
-          />
-        </Card>
-      ))}
+      {transactions
+        .reverse()
+        .filter((tx) => Number(tx.internal_transaction_index) > 0)
+        .map((transaction) => (
+          <Card key={transaction.internal_transaction_index}>
+            <List
+              items={[
+                {
+                  label: (
+                    <div className="flex items-center gap-1">
+                      <Tooltip label="The order in which the internal transaction was executed.">
+                        <HiOutlineQuestionMarkCircle className="text-xl" />
+                      </Tooltip>
+                      Internal Transaction Index
+                    </div>
+                  ),
+                  value: Number(transaction.internal_transaction_index) - 1,
+                },
+                {
+                  label: (
+                    <div className="flex items-center gap-1">
+                      <Tooltip label="The status of the transaction.">
+                        <HiOutlineQuestionMarkCircle className="text-xl" />
+                      </Tooltip>
+                      Status
+                    </div>
+                  ),
+                  value: renderStatus(transaction),
+                },
+                {
+                  label: (
+                    <div className="flex items-center gap-1">
+                      <Tooltip label="The sending party of the transaction.">
+                        <HiOutlineQuestionMarkCircle className="text-xl" />
+                      </Tooltip>
+                      From
+                    </div>
+                  ),
+                  value: (
+                    <Link href={`/address/${transaction.from}`}>
+                      {transaction.from}
+                    </Link>
+                  ),
+                },
+                {
+                  label: (
+                    <div className="flex items-center gap-1">
+                      <Tooltip label="The contract that was called.">
+                        <HiOutlineQuestionMarkCircle className="text-xl" />
+                      </Tooltip>
+                      To (Contract)
+                    </div>
+                  ),
+                  value: (
+                    <Link href={`/address/${transaction.to}`}>
+                      {transaction.to}
+                    </Link>
+                  ),
+                  hidden: !transaction.to,
+                },
+                {
+                  label: (
+                    <div className="flex items-center gap-1">
+                      <Tooltip label="The function that was executed.">
+                        <HiOutlineQuestionMarkCircle className="text-xl" />
+                      </Tooltip>
+                      Function Name
+                    </div>
+                  ),
+                  value: transaction.function ?? "constructor",
+                },
+                {
+                  label: (
+                    <div className="flex items-center gap-1">
+                      <Tooltip label="The arguments sent to the function that was executed.">
+                        <HiOutlineQuestionMarkCircle className="text-xl" />
+                      </Tooltip>
+                      Function Args
+                    </div>
+                  ),
+                  value: (
+                    <Card>
+                      <List
+                        items={Object.entries(transaction.args).map(
+                          ([label, value]) => ({ label, value })
+                        )}
+                      />
+                    </Card>
+                  ),
+                },
+              ]}
+            />
+          </Card>
+        ))}
     </div>
   );
 }
