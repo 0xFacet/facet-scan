@@ -13,6 +13,8 @@ export const rainbowkitTheme: Theme = {
     accentColor: "#c3ff00",
     accentColorForeground: "#000000",
     modalBackdrop: "rgba(0,0,0,0.8)",
+    actionButtonBorder: "rgba(255,255,255,0.1)",
+    actionButtonSecondaryBackground: "transparent",
   },
   radii: {
     ...darkTheme().radii,
