@@ -16,6 +16,7 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { mainnet, goerli } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { ToastProvider } from "@/contexts/toast-context";
+import { rainbowkitTheme } from "./rainbowkit-theme";
 
 const targetNetworkName =
   (process.env.NEXT_PUBLIC_NETWORK as "mainnet" | "goerli" | undefined) ??
@@ -69,7 +70,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <RainbowKitProvider
         chains={chains}
         appInfo={demoAppInfo}
-        theme={darkTheme()}
+        theme={rainbowkitTheme}
       >
         <ToastProvider>{mounted && children}</ToastProvider>
       </RainbowKitProvider>
