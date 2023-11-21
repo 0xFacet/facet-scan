@@ -40,7 +40,7 @@ export default async function AddressLayout({
             >
               Internal Transactions
             </NavLink>
-            {!!contract.current_init_code_hash && (
+            {!!contract?.current_init_code_hash && (
               <NavLink
                 href={`/address/${params.hash}/contract`}
                 className="whitespace-nowrap"
