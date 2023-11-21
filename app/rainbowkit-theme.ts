@@ -1,4 +1,7 @@
 import { Theme, darkTheme } from "@rainbow-me/rainbowkit";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const rainbowkitTheme: Theme = {
   ...darkTheme(),
@@ -25,6 +28,6 @@ export const rainbowkitTheme: Theme = {
   },
   fonts: {
     ...darkTheme().fonts,
-    body: "Inter",
+    body: inter.style.fontFamily,
   },
 };
