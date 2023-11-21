@@ -86,7 +86,7 @@ export default function Contracts({
   const createContractTx = useSendTransaction({
     to: "0x0000000000000000000000000000000000000000",
     data: toHex(
-      `data:application/vnd.facet.tx+json;esip6=true,${JSON.stringify(
+      `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
         createContractData
       )}`
     ),
