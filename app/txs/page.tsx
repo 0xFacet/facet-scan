@@ -86,14 +86,10 @@ export default async function Page({
                     key={transaction.transaction_hash}
                     address={transaction.from}
                   />,
-                  !!transaction.to ? (
-                    <Address
-                      key={transaction.transaction_hash}
-                      address={transaction.to}
-                    />
-                  ) : (
-                    "--"
-                  ),
+                  <Address
+                    key={transaction.transaction_hash}
+                    address={transaction.effective_contract_address}
+                  />,
                   transaction.transaction_fee
                     ? Number(
                         Number(

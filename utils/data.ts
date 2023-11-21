@@ -5,9 +5,11 @@ import { Ethscription } from "@/types/ethscriptions";
 
 export const fetchTotalBlocks = async () => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URI}/blocks/total`);
-  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
-    res.json()
-  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+    }));
   return result as number;
 };
 
@@ -17,9 +19,11 @@ export const fetchBlocks = async ({ page = 1, perPage = 20 } = {}) => {
     page: `${page}`,
     per_page: `${perPage}`,
   }).toString();
-  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
-    res.json()
-  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+    }));
   return result as Block[];
 };
 
@@ -27,9 +31,11 @@ export const fetchBlock = async (blockNumber: string) => {
   const url = new URL(
     `${process.env.NEXT_PUBLIC_API_BASE_URI}/blocks/${blockNumber}`
   );
-  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
-    res.json()
-  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+    }));
   return result as Block;
 };
 
@@ -37,9 +43,11 @@ export const fetchTotalTransactions = async () => {
   const url = new URL(
     `${process.env.NEXT_PUBLIC_API_BASE_URI}/transactions/total`
   );
-  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
-    res.json()
-  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+    }));
   return result as {
     transaction_count: number;
     unique_from_address_count: number;
@@ -79,9 +87,12 @@ export const fetchTransactions = async ({
     params.to_or_from = toOrFrom;
   }
   url.search = new URLSearchParams(params).toString();
-  const { result, count } = await fetch(url.href, { cache: "no-store" }).then(
-    (res) => res.json()
-  );
+  const { result, count } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+      count: 0,
+    }));
   return { transactions: result, count } as {
     transactions: Transaction[];
     count: number;
@@ -92,9 +103,11 @@ export const fetchTransaction = async (txHash: string) => {
   const url = new URL(
     `${process.env.NEXT_PUBLIC_API_BASE_URI}/transactions/${txHash}`
   );
-  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
-    res.json()
-  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+    }));
   return result as Transaction;
 };
 
@@ -131,9 +144,12 @@ export const fetchInternalTransactions = async ({
     params.to_or_from = toOrFrom;
   }
   url.search = new URLSearchParams(params).toString();
-  const { result, count } = await fetch(url.href, { cache: "no-store" }).then(
-    (res) => res.json()
-  );
+  const { result, count } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+      count: 0,
+    }));
   return { transactions: result, count } as {
     transactions: InternalTransaction[];
     count: number;
@@ -144,9 +160,11 @@ export const fetchContractArtifacts = async () => {
   const url = new URL(
     `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/supported-contract-artifacts`
   );
-  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
-    res.json()
-  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+    }));
   return result as ContractArtifact[];
 };
 
@@ -168,9 +186,12 @@ export const fetchContracts = async ({
     params.init_code_hash = `${hash}`;
   }
   url.search = new URLSearchParams(params).toString();
-  const { result, count } = await fetch(url.href, { cache: "no-store" }).then(
-    (res) => res.json()
-  );
+  const { result, count } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+      count: 0,
+    }));
   return { contracts: result, count } as {
     contracts: Contract[];
     count: number;
@@ -181,9 +202,11 @@ export const fetchContract = async (address: string) => {
   const url = new URL(
     `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/${address}`
   );
-  const { result } = await fetch(url.href, { cache: "no-store" }).then((res) =>
-    res.json()
-  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: null,
+    }));
   return result as Contract;
 };
 

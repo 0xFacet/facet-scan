@@ -178,11 +178,12 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                 </div>
               ),
               value: (
-                <Link href={`/address/${transaction.to}`}>
-                  {transaction.to}
+                <Link
+                  href={`/address/${transaction.effective_contract_address}`}
+                >
+                  {transaction.effective_contract_address}
                 </Link>
               ),
-              hidden: !transaction.to,
             },
             {
               label: (

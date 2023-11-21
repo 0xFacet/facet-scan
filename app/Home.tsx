@@ -181,14 +181,18 @@ export default function Home({
                       {truncateMiddle(transaction.from, 8, 8)}
                     </Link>
                   </div>
-                  {!!transaction.to && (
-                    <div className="flex gap-4 justify-between">
-                      <span className="text-accent">{"To "}</span>
-                      <Link href={`/address/${transaction.to}`}>
-                        {truncateMiddle(transaction.to, 8, 8)}
-                      </Link>
-                    </div>
-                  )}
+                  <div className="flex gap-4 justify-between">
+                    <span className="text-accent">{"To "}</span>
+                    <Link
+                      href={`/address/${transaction.effective_contract_address}`}
+                    >
+                      {truncateMiddle(
+                        transaction.effective_contract_address,
+                        8,
+                        8
+                      )}
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

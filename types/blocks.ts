@@ -8,7 +8,9 @@ export interface Log {
 export interface Transaction {
   transaction_hash: string;
   from: `0x${string}`;
-  to: `0x${string}`;
+  to?: `0x${string}` | null;
+  contract_address?: `0x${string}` | null;
+  effective_contract_address: `0x${string}`;
   status: "success" | "failure";
   function: string;
   args: { [key: string]: any };
@@ -29,8 +31,9 @@ export interface InternalTransaction {
   transaction_hash: string;
   internal_transaction_index: string;
   from: `0x${string}`;
-  to: `0x${string}`;
-  effective_contract_address: string;
+  to?: `0x${string}` | null;
+  contract_address?: `0x${string}` | null;
+  effective_contract_address: `0x${string}`;
   function: string;
   args: { [key: string]: any };
   call_type: string;
