@@ -4,7 +4,7 @@ import { Address } from "@/components/Address";
 import { Pagination } from "@/components/pagination";
 import { Table } from "@/components/Table";
 import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
-import { capitalize } from "lodash";
+import { startCase } from "lodash";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { Card } from "@/components/Card";
 
@@ -41,7 +41,7 @@ export default async function Page({
                   key={transaction.transaction_hash}
                   className="flex items-center gap-1 text-gray-400 border border-gray-700 bg-gray-950 rounded-md px-2 py-1 text-xs"
                 >
-                  {capitalize(transaction.function)}
+                  {startCase(transaction.function)}
                 </div>
               ) : (
                 "--"
