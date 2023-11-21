@@ -8,7 +8,7 @@ export const fetchTotalBlocks = async () => {
   const { result } = await fetch(url.href, { cache: "no-store" })
     .then((res) => res.json())
     .catch(() => ({
-      result: null,
+      result: 0,
     }));
   return result as number;
 };
@@ -22,7 +22,7 @@ export const fetchBlocks = async ({ page = 1, perPage = 20 } = {}) => {
   const { result } = await fetch(url.href, { cache: "no-store" })
     .then((res) => res.json())
     .catch(() => ({
-      result: null,
+      result: [],
     }));
   return result as Block[];
 };
@@ -90,7 +90,7 @@ export const fetchTransactions = async ({
   const { result, count } = await fetch(url.href, { cache: "no-store" })
     .then((res) => res.json())
     .catch(() => ({
-      result: null,
+      result: [],
       count: 0,
     }));
   return { transactions: result, count } as {
@@ -147,7 +147,7 @@ export const fetchInternalTransactions = async ({
   const { result, count } = await fetch(url.href, { cache: "no-store" })
     .then((res) => res.json())
     .catch(() => ({
-      result: null,
+      result: [],
       count: 0,
     }));
   return { transactions: result, count } as {
@@ -163,7 +163,7 @@ export const fetchContractArtifacts = async () => {
   const { result } = await fetch(url.href, { cache: "no-store" })
     .then((res) => res.json())
     .catch(() => ({
-      result: null,
+      result: [],
     }));
   return result as ContractArtifact[];
 };
@@ -189,7 +189,7 @@ export const fetchContracts = async ({
   const { result, count } = await fetch(url.href, { cache: "no-store" })
     .then((res) => res.json())
     .catch(() => ({
-      result: null,
+      result: [],
       count: 0,
     }));
   return { contracts: result, count } as {
