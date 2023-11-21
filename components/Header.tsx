@@ -24,7 +24,7 @@ export const Header = () => {
               priority
             />
           </Link>
-          <div className="flex gap-4 sm:gap-8 items-center h-16">
+          <div className="flex gap-4 sm:gap-6 items-center h-16">
             <div className="gap-4 h-min-full hidden lg:flex">
               <NavLink href="/blocks">Blocks</NavLink>
               <NavLink href="/txs">Transactions</NavLink>
