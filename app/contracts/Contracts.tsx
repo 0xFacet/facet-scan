@@ -123,7 +123,7 @@ export default function Contracts({
         <Section>
           <div className="flex flex-col py-0 md:py-16 gap-4 md:gap-8">
             <Heading>Contracts</Heading>
-            <div className="text-xl">
+            <div className="text-lg text-accent">
               Contracts offers enhanced scalability and flexibility while
               reducing the constraints of on-chain gas fees and processing
               limitations.
