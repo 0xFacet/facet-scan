@@ -29,6 +29,7 @@ export function Modal({
   confirmText,
   onConfirm,
   onCancel,
+  loading,
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,7 +49,7 @@ export function Modal({
             Cancel
           </Button>
           {!!onConfirm && (
-            <Button variant="default" onClick={onConfirm}>
+            <Button variant="default" onClick={onConfirm} disabled={loading}>
               {confirmText ?? "Confirm"}
             </Button>
           )}

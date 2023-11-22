@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
 import { Modal } from "@/components/Modal";
-import { NavLink } from "@/components/NavLink";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Contract, ContractArtifact } from "@/types/contracts";
@@ -13,11 +12,11 @@ import {
   truncateMiddle,
 } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toHex } from "viem";
-import { useAccount, useSendTransaction, useWaitForTransaction } from "wagmi";
-import { kebabCase, startCase } from "lodash";
+import { useAccount } from "wagmi";
+import { sendTransaction } from "@wagmi/core";
+import { startCase } from "lodash";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -33,6 +32,7 @@ import { Pagination } from "@/components/pagination";
 import { Address } from "@/components/Address";
 import Link from "next/link";
 import { Card } from "@/components/Card";
+import { useToast } from "@/contexts/toast-context";
 
 interface Props {
   contractArtifacts: ContractArtifact[];
@@ -53,10 +53,8 @@ export default function Contracts({
   const [constructorArgs, setConstructorArgs] = useState<{
     [key: string]: any;
   }>({});
-  const searchParams = useSearchParams();
-  const router = useRouter();
   const contractTypes = contractArtifacts.map(({ name }) => name);
-  const tab = searchParams.get("tab") ?? kebabCase(contractTypes[0] ?? "");
+  const { showToast } = useToast();
 
   const creationConstructorArgs =
     (selectedContract?.abi &&
@@ -75,40 +73,31 @@ export default function Contracts({
     }
   }
 
-  const createContractData = {
-    op: "create",
-    data: {
-      args: modifiedArgs,
-      source_code: selectedContract?.source_code,
-      init_code_hash: selectedContract?.init_code_hash,
-    },
-  };
-  const createContractTx = useSendTransaction({
-    to: "0x0000000000000000000000000000000000000000",
-    data: toHex(
-      `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
-        createContractData
-      )}`
-    ),
-  });
-  const createContractWait = useWaitForTransaction({
-    hash: createContractTx.data?.hash,
-    confirmations: 1,
-    onSuccess() {
-      setShowCreateModal(false);
-      setConstructorArgs({});
-    },
-  });
-
-  const createLoading =
-    createContractTx.isLoading ||
-    createContractWait.isFetching ||
-    createContractWait.isLoading;
-
   const createContract = async () => {
     try {
       if (selectedContract && address && !isDisconnected) {
-        createContractTx.sendTransaction();
+        const createContractData = {
+          op: "create",
+          data: {
+            args: modifiedArgs,
+            source_code: selectedContract?.source_code,
+            init_code_hash: selectedContract?.init_code_hash,
+          },
+        };
+        const txn = await sendTransaction({
+          to: "0x0000000000000000000000000000000000000000",
+          data: toHex(
+            `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
+              createContractData
+            )}`
+          ),
+        });
+        showToast({
+          message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
+          type: "info",
+        });
+        setShowCreateModal(false);
+        setConstructorArgs({});
       } else if (openConnectModal) {
         openConnectModal();
       }
@@ -186,7 +175,6 @@ export default function Contracts({
           setShowCreateModal(false);
         }}
         onConfirm={selectedContract ? createContract : undefined}
-        loading={createLoading}
       >
         <div className="space-y-2 relative">
           <Label>Contract Type</Label>

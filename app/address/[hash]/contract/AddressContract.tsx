@@ -174,7 +174,7 @@ export default function WalletAddress({ hash, contract }: Props) {
           },
         };
 
-        const simulationRes = await axios.get(
+        const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`,
           {
             params: {
@@ -184,12 +184,15 @@ export default function WalletAddress({ hash, contract }: Props) {
           }
         );
 
+        const { transaction_receipt }: { transaction_receipt: Transaction } =
+          res.data.result;
+
         setSimulationResults((results) => ({
           ...results,
-          [name]: simulationRes.data.result,
+          [name]: transaction_receipt,
         }));
 
-        if (simulationRes.data.result.status != "success") {
+        if (transaction_receipt.status != "success") {
           setMethodLoading((loading) => ({ ...loading, [name]: false }));
           return;
         }
