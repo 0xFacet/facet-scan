@@ -100,9 +100,9 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                   ),
                   value: (
                     <Link
-                      href={`/address/${transaction.effective_contract_address}`}
+                      href={`/address/${transaction.to_or_contract_address}`}
                     >
-                      {transaction.effective_contract_address}
+                      {transaction.to_or_contract_address}
                     </Link>
                   ),
                 },

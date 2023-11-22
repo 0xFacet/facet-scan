@@ -88,7 +88,7 @@ export default async function Page({
                   />,
                   <Address
                     key={transaction.transaction_hash}
-                    address={transaction.effective_contract_address}
+                    address={transaction.to_or_contract_address}
                   />,
                   transaction.transaction_fee
                     ? Number(

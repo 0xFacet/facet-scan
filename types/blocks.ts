@@ -10,7 +10,7 @@ export interface Transaction {
   from: `0x${string}`;
   to?: `0x${string}` | null;
   contract_address?: `0x${string}` | null;
-  effective_contract_address: `0x${string}`;
+  to_or_contract_address: `0x${string}`;
   status: "success" | "failure";
   function: string;
   args: { [key: string]: any };
@@ -33,7 +33,7 @@ export interface InternalTransaction {
   from: `0x${string}`;
   to?: `0x${string}` | null;
   contract_address?: `0x${string}` | null;
-  effective_contract_address: `0x${string}`;
+  to_or_contract_address: `0x${string}`;
   function: string;
   args: { [key: string]: any };
   call_type: string;

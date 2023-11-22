@@ -184,13 +184,9 @@ export default function Home({
                   <div className="flex gap-4 justify-between">
                     <span className="text-accent">{"To "}</span>
                     <Link
-                      href={`/address/${transaction.effective_contract_address}`}
+                      href={`/address/${transaction.to_or_contract_address}`}
                     >
-                      {truncateMiddle(
-                        transaction.effective_contract_address,
-                        8,
-                        8
-                      )}
+                      {truncateMiddle(transaction.to_or_contract_address, 8, 8)}
                     </Link>
                   </div>
                 </div>
