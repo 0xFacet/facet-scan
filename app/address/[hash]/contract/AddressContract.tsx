@@ -289,7 +289,15 @@ export default function WalletAddress({ hash, contract }: Props) {
                           placeholder={`${arg.name} (${arg.type})`}
                           name={arg.name}
                           onChange={(e) =>
-                            handleChange(method.name, arg.name, e.target.value)
+                            handleChange(
+                              method.name,
+                              arg.name,
+                              parseTokenValue(
+                                e.target.value,
+                                contract.current_state.decimals ?? 0,
+                                arg.name
+                              )
+                            )
                           }
                           value={
                             Array.isArray(methodValues[method.name]?.[arg.name])
