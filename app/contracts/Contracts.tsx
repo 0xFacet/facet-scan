@@ -8,11 +8,12 @@ import { SectionContainer } from "@/components/SectionContainer";
 import { Contract, ContractArtifact } from "@/types/contracts";
 import {
   formatTimestamp,
+  isJsonArray,
   parseTokenValue,
   truncateMiddle,
 } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { toHex } from "viem";
 import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
@@ -59,10 +60,9 @@ export default function Contracts({
 
   const creationConstructorArgs =
     (selectedContract?.abi &&
-      (
-        selectedContract.abi.find((method) => method.type === "constructor")
-          ?.inputs ?? []
-      ).map((input) => input.name)) ||
+      (selectedContract.abi.find((method) => method.type === "constructor")
+        ?.inputs ??
+        [])) ||
     [];
 
   const modifiedArgs: { [key: string]: any } = { ...constructorArgs };
@@ -108,6 +108,20 @@ export default function Contracts({
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    let parsedValue = value;
+
+    if (isJsonArray(value)) {
+      parsedValue = JSON.parse(value);
+    }
+
+    setConstructorArgs({
+      ...constructorArgs,
+      [name]: parsedValue,
+    });
   };
 
   return (
@@ -213,19 +227,20 @@ export default function Contracts({
             </div>
             <div className="flex flex-col gap-4">
               {creationConstructorArgs.map((arg) => (
-                <div key={arg} className="space-y-2">
-                  <Label htmlFor={arg}>{startCase(arg)}</Label>
+                <div key={arg.name} className="space-y-2">
+                  <Label htmlFor={arg.name}>
+                    {arg.name} ({arg.type})
+                  </Label>
                   <Input
-                    id={arg}
-                    placeholder={startCase(arg)}
-                    name={arg}
-                    onChange={(e) => {
-                      setConstructorArgs({
-                        ...constructorArgs,
-                        [arg]: e.target.value,
-                      });
-                    }}
-                    value={constructorArgs[arg]}
+                    id={arg.name}
+                    placeholder={`${arg.name} (${arg.type})`}
+                    name={arg.name}
+                    onChange={handleChange}
+                    value={
+                      Array.isArray(constructorArgs[arg.name])
+                        ? JSON.stringify(constructorArgs[arg.name])
+                        : constructorArgs[arg.name]
+                    }
                     type="text"
                   />
                 </div>

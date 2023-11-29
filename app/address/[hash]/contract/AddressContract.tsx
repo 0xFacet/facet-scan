@@ -5,6 +5,7 @@ import { NavLink } from "@/components/NavLink";
 import { Contract, ContractABI, ContractFunction } from "@/types/contracts";
 import {
   formatTokenValue,
+  isJsonArray,
   parseTokenValue,
   truncateMiddle,
 } from "@/utils/formatter";
@@ -248,6 +249,21 @@ export default function WalletAddress({ hash, contract }: Props) {
     ) : null;
   };
 
+  const handleChange = (method: string, argName: string, value: string) => {
+    let parsedValue = value;
+    if (isJsonArray(value)) {
+      parsedValue = JSON.parse(value);
+    }
+
+    setMethodValues((prevValues) => ({
+      ...prevValues,
+      [method]: {
+        ...prevValues[method],
+        [argName]: parsedValue,
+      },
+    }));
+  };
+
   const renderMethods = (methods: ContractABI) => {
     return contract ? (
       <Accordion className="w-full" collapsible type="single">
@@ -268,24 +284,16 @@ export default function WalletAddress({ hash, contract }: Props) {
                           id={arg.name}
                           placeholder={`${arg.name} (${arg.type})`}
                           name={arg.name}
-                          onChange={(e) => {
-                            setMethodValues((values) => ({
-                              ...(values ?? {}),
-                              [method.name]: {
-                                ...(values[method.name] ?? {}),
-                                [`${arg.name}`]: parseTokenValue(
-                                  e.target.value,
-                                  contract.current_state.decimals ?? 0,
-                                  arg.name
-                                ),
-                              },
-                            }));
-                          }}
-                          value={formatTokenValue(
-                            methodValues[method.name]?.[arg.name],
-                            contract.current_state.decimals ?? 0,
-                            arg.name
-                          )}
+                          onChange={(e) =>
+                            handleChange(method.name, arg.name, e.target.value)
+                          }
+                          value={
+                            Array.isArray(methodValues[method.name]?.[arg.name])
+                              ? JSON.stringify(
+                                  methodValues[method.name][arg.name]
+                                )
+                              : methodValues[method.name]?.[arg.name] ?? ""
+                          }
                           type="text"
                         />
                       </div>
