@@ -3,7 +3,8 @@ import { Heading } from "@/components/Heading";
 import { NavLink } from "@/components/NavLink";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
-import { fetchContract } from "@/utils/data";
+import { isCardName } from "@/lib/utils";
+import { fetchCard, fetchContract } from "@/utils/data";
 
 export default async function AddressLayout({
   children,
@@ -12,15 +13,24 @@ export default async function AddressLayout({
   children: React.ReactNode;
   params: { hash: string };
 }) {
-  const contract = await fetchContract(params.hash);
+  let card;
+  if (isCardName(params.hash)) {
+    card = await fetchCard(params.hash);
+  }
+  const address = card ? card.owner : params.hash;
+  const contract = await fetchContract(address);
   return (
     <div className="flex flex-col flex-1">
       <SectionContainer>
         <Section>
           <div className="py-4">
-            <Heading size="h2">{!!contract ? "Contract" : "Address"}</Heading>
+            {card ? (
+              <Heading size="h2">{params.hash}</Heading>
+            ) : (
+              <Heading size="h2">{!!contract ? "Contract" : "Address"}</Heading>
+            )}
             <div className="w-fit mt-1 text-accent">
-              <CopyText text={params.hash} />
+              <CopyText text={address} />
             </div>
           </div>
         </Section>

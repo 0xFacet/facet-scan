@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
-import { Contract } from "@/types/contracts";
+import { Contract, ContractABI, ContractFunction } from "@/types/contracts";
 import {
   formatTokenValue,
   parseTokenValue,
@@ -62,38 +62,24 @@ export default function WalletAddress({ hash, contract }: Props) {
 
   const writeMethods = useMemo(
     () =>
-      contract
-        ? Object.keys(contract.abi)
-            .filter((name) => {
-              return (
-                Object.keys(contract.abi[name]).length &&
-                contract.abi[name]["type"] !== "constructor" &&
-                contract.abi[name].state_mutability !== "view"
-              );
-            })
-            .map((name) => ({
-              name,
-              args: contract.abi[name]["args"],
-            }))
-        : [],
+      (contract
+        ? contract.abi.filter((contractFunction) => {
+            return (
+              contractFunction.type !== "constructor" &&
+              contractFunction.stateMutability !== "view"
+            );
+          })
+        : []) as unknown as ContractFunction[],
     [contract]
   );
 
   const readMethods = useMemo(
     () =>
-      contract
-        ? Object.keys(contract.abi)
-            .filter((name) => {
-              return (
-                Object.keys(contract.abi[name]).length &&
-                contract.abi[name].state_mutability === "view"
-              );
-            })
-            .map((name) => ({
-              name,
-              args: contract.abi[name]["args"],
-            }))
-        : [],
+      (contract
+        ? contract.abi.filter((contractFunction) => {
+            return contractFunction.stateMutability === "view";
+          })
+        : []) as unknown as ContractFunction[],
     [contract]
   );
 
@@ -155,9 +141,13 @@ export default function WalletAddress({ hash, contract }: Props) {
   };
 
   const callMethod = async (name: string) => {
+    const contractFunction = contract?.abi.find(
+      (contractFunction) =>
+        contractFunction.type === "function" && contractFunction.name === name
+    );
     if (
-      contract?.abi[name].state_mutability == "view" ||
-      contract?.abi[name].state_mutability == "pure"
+      contractFunction?.stateMutability == "view" ||
+      contractFunction?.stateMutability == "pure"
     ) {
       return staticCall(name);
     }
@@ -257,84 +247,85 @@ export default function WalletAddress({ hash, contract }: Props) {
     ) : null;
   };
 
-  const renderMethods = (
-    methods: {
-      name: string;
-      args: {
-        [key: string]: string;
-      };
-    }[]
-  ) => {
+  const renderMethods = (methods: ContractABI) => {
     return contract ? (
       <Accordion className="w-full" collapsible type="single">
-        {methods.map((method) => (
-          <AccordionItem key={method.name} value={method.name}>
-            <AccordionTrigger>{method.name}</AccordionTrigger>
-            <AccordionContent className="text-sm text-gray-600 dark:text-gray-400 space-y-4">
-              {Object.keys(method.args ?? {}).map((arg) => (
-                <div key={arg} className="space-y-2">
-                  <Label htmlFor={arg}>
-                    {arg} ({method.args[arg]})
-                  </Label>
-                  <Input
-                    id={arg}
-                    placeholder={`${arg} (${method.args[arg]})`}
-                    name={arg}
-                    onChange={(e) => {
-                      setMethodValues((values) => ({
-                        ...(values ?? {}),
-                        [method.name]: {
-                          ...(values[method.name] ?? {}),
-                          [arg]: parseTokenValue(
-                            e.target.value,
+        {methods
+          .filter((method) => method.type === "function")
+          .map((method) =>
+            method.type === "function" ? (
+              <AccordionItem key={method.name} value={method.name}>
+                <AccordionTrigger>{method.name}</AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400 space-y-4">
+                  {(method.inputs ?? {}).map((arg) =>
+                    arg.name ? (
+                      <div key={arg.name} className="space-y-2">
+                        <Label htmlFor={arg.name}>
+                          {arg.name} ({arg.type})
+                        </Label>
+                        <Input
+                          id={arg.name}
+                          placeholder={`${arg.name} (${arg.type})`}
+                          name={arg.name}
+                          onChange={(e) => {
+                            setMethodValues((values) => ({
+                              ...(values ?? {}),
+                              [method.name]: {
+                                ...(values[method.name] ?? {}),
+                                [`${arg.name}`]: parseTokenValue(
+                                  e.target.value,
+                                  contract.current_state.decimals ?? 0,
+                                  arg.name
+                                ),
+                              },
+                            }));
+                          }}
+                          value={formatTokenValue(
+                            methodValues[method.name]?.[arg.name],
                             contract.current_state.decimals ?? 0,
-                            arg
-                          ),
-                        },
-                      }));
-                    }}
-                    value={formatTokenValue(
-                      methodValues[method.name]?.[arg],
-                      contract.current_state.decimals ?? 0,
-                      arg
-                    )}
-                    type="text"
-                  />
-                </div>
-              ))}
-              <Button
-                onClick={() => callMethod(method.name)}
-                disabled={methodLoading[method.name]}
-                variant="outline"
-                className="w-fit"
-              >
-                Call
-              </Button>
-              {simulationResults[method.name]?.status == "error" && (
-                <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
-                  {simulationResults[method.name].error_message}
-                </div>
-              )}
-              {staticCallResults[method.name] !== null &&
-                staticCallResults[method.name] !== undefined && (
-                  <div className="flex flex-col gap-1">
-                    <div className="text-sm font-medium leading-6">Result:</div>
-                    <div className="text-sm break-all">
-                      {typeof staticCallResults[method.name] == "object"
-                        ? JSON.stringify(staticCallResults[method.name])
-                        : formatTokenValue(
-                            staticCallResults[method.name],
-                            contract.current_state.decimals ?? 0,
-                            method.name,
-                            false,
-                            contract.current_state.symbol
+                            arg.name
                           )}
+                          type="text"
+                        />
+                      </div>
+                    ) : null
+                  )}
+                  <Button
+                    onClick={() => callMethod(method.name)}
+                    disabled={methodLoading[method.name]}
+                    variant="outline"
+                    className="w-fit"
+                  >
+                    Call
+                  </Button>
+                  {simulationResults[method.name]?.status == "error" && (
+                    <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
+                      {simulationResults[method.name].error_message}
                     </div>
-                  </div>
-                )}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+                  )}
+                  {staticCallResults[method.name] !== null &&
+                    staticCallResults[method.name] !== undefined && (
+                      <div className="flex flex-col gap-1">
+                        <div className="text-sm font-medium leading-6">
+                          Result:
+                        </div>
+                        <div className="text-sm break-all">
+                          {typeof staticCallResults[method.name] == "object"
+                            ? JSON.stringify(staticCallResults[method.name])
+                            : formatTokenValue(
+                                staticCallResults[method.name],
+                                contract.current_state.decimals ?? 0,
+                                method.name,
+                                false,
+                                contract.current_state.symbol
+                              )}
+                        </div>
+                      </div>
+                    )}
+                </AccordionContent>
+              </AccordionItem>
+            ) : null
+          )}
       </Accordion>
     ) : null;
   };

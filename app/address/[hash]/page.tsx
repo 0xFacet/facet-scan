@@ -1,4 +1,4 @@
-import { fetchTransactions } from "@/utils/data";
+import { fetchCard, fetchTransactions } from "@/utils/data";
 import Link from "next/link";
 import { Address } from "@/components/Address";
 import { formatEther } from "viem";
@@ -8,6 +8,7 @@ import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
 import { startCase } from "lodash";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { Card } from "@/components/Card";
+import { isCardName } from "@/lib/utils";
 
 export default async function Page({
   params,
@@ -16,9 +17,13 @@ export default async function Page({
   params: { hash: string };
   searchParams: { [key: string]: string | undefined };
 }) {
+  let card;
+  if (isCardName(params.hash)) {
+    card = await fetchCard(params.hash);
+  }
   const { transactions, count } = await fetchTransactions({
     page: searchParams.page ? searchParams.page : 1,
-    toOrFrom: params.hash,
+    toOrFrom: card ? card.owner.toLowerCase() : params.hash,
   });
   return (
     <>

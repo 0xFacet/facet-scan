@@ -5,6 +5,7 @@ import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Button } from "@/components/ui/button";
+import { isCardNameWithAt, isTxHash, isCardName, pluralize } from "@/lib/utils";
 import { Block, Transaction } from "@/types/blocks";
 import { truncateMiddle } from "@/utils/formatter";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -14,25 +15,6 @@ import { FormEvent, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { isAddress } from "viem";
-
-function pluralize(count: number, word: string) {
-  return `${count.toLocaleString()} ${word}${count === 1 ? "" : "s"}`;
-}
-
-function isCardNameWithAt(name: string) {
-  const regex = /^@[a-zA-Z0-9]{1,31}$/;
-  return regex.test(name);
-}
-
-function isCardName(name: string) {
-  const regex = /^[a-zA-Z0-9]{1,31}$/;
-  return regex.test(name);
-}
-
-function isTxHash(hash: string) {
-  const regex = /^0x[a-fA-F0-9]{64}$/;
-  return regex.test(hash);
-}
 
 interface Props {
   totalBlocks: number;
@@ -55,7 +37,7 @@ export default function Home({
   const submitSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isCardNameWithAt(search)) {
-      router.push(`/card/${search.replace("@", "").toLowerCase()}`);
+      router.push(`/address/${search.replace("@", "").toLowerCase()}`);
     } else if (isAddress(search)) {
       router.push(`/address/${search}`);
     } else if (isTxHash(search)) {
@@ -63,7 +45,7 @@ export default function Home({
     } else if (Number.isInteger(Number(search))) {
       router.push(`/block/${search}`);
     } else if (isCardName(search)) {
-      router.push(`/card/${search.toLowerCase()}`);
+      router.push(`/address/${search.toLowerCase()}`);
     }
   };
 

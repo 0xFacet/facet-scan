@@ -55,22 +55,35 @@ export type CurrentState = (
 };
 
 export interface ContractFunction {
-  args: {
-    [key: string]: string;
-  };
+  name: string;
+  type: "function";
+  inputs: FunctionInput[];
+  outputs: FunctionOutput[];
+  stateMutability: "pure" | "view" | "non_payable" | "payable";
+  visibility: "public" | "private" | "internal";
+  override_modifiers: string[];
   from_parent: boolean;
-  override_modifier: string;
-  parent_functions: ContractFunction[];
-  returns: string;
-  source: string;
-  state_mutability: string;
-  type: string;
-  visibility: string;
 }
 
-export type ContractAbi = {
-  [key: string]: ContractFunction;
-};
+export interface FunctionInput {
+  name?: string;
+  type: string;
+}
+
+export interface FunctionOutput {
+  type: string;
+}
+
+export interface ContractConstructor {
+  type: "constructor";
+  inputs: FunctionInput[];
+  stateMutability: "non_payable" | "payable";
+  visibility: null;
+  override_modifiers: string[];
+  from_parent: boolean;
+}
+
+export type ContractABI = Array<ContractFunction | ContractConstructor>;
 
 export type SourceCode = {
   code: string;
@@ -81,7 +94,7 @@ export interface Contract {
   transaction_hash: string;
   current_type: string;
   current_init_code_hash: string;
-  abi: ContractAbi;
+  abi: ContractABI;
   call_receipts: InternalTransaction[];
   address: string;
   current_state: CurrentState;
