@@ -54,8 +54,8 @@ export interface ContractFunction {
   outputs: FunctionOutput[];
   stateMutability: "pure" | "view" | "non_payable" | "payable";
   visibility: "public" | "private" | "internal";
-  override_modifiers: string[];
-  from_parent: boolean;
+  overrideModifiers: string[];
+  fromParent: boolean;
 }
 
 export interface FunctionInput {
@@ -73,8 +73,8 @@ export interface ContractConstructor {
   inputs: FunctionInput[];
   stateMutability: "non_payable" | "payable";
   visibility: null;
-  override_modifiers: string[];
-  from_parent: boolean;
+  overrideModifiers: string[];
+  fromParent: boolean;
 }
 
 export type ContractABI = Array<ContractFunction | ContractConstructor>;

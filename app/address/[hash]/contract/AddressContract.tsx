@@ -31,6 +31,7 @@ import {
 import { useToast } from "@/contexts/toast-context";
 import { Transaction } from "@/types/blocks";
 import { Card } from "@/components/Card";
+import { facetAddress } from "@/app/constants";
 
 interface Props {
   hash: string;
@@ -188,7 +189,7 @@ export default function WalletAddress({ hash, contract }: Props) {
         }
 
         const txn = await sendTransaction({
-          to: "0x00000000000000000000000000000000000face7",
+          to: facetAddress,
           data: toHex(
             `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
               txnData
