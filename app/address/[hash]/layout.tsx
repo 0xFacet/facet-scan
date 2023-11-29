@@ -4,7 +4,7 @@ import { NavLink } from "@/components/NavLink";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { isCardName } from "@/lib/utils";
-import { fetchCard, fetchContract } from "@/utils/data";
+import { fetchContract, getCardOwner } from "@/utils/data";
 
 export default async function AddressLayout({
   children,
@@ -15,7 +15,7 @@ export default async function AddressLayout({
 }) {
   let cardOwner;
   if (isCardName(params.hash)) {
-    cardOwner = await fetchCard(params.hash);
+    cardOwner = await getCardOwner(params.hash);
   }
   const address = cardOwner ?? params.hash;
   const contract = await fetchContract(address);

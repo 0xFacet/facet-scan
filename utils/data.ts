@@ -1,7 +1,6 @@
 import { Block, Transaction, InternalTransaction } from "@/types/blocks";
-import { Card } from "@/types/cards";
 import { Contract, ContractArtifact } from "@/types/contracts";
-import { Ethscription } from "@/types/ethscriptions";
+import { FacetCallPayload, FacetCreatePayload } from "@/types/payloads";
 
 export const fetchTotalBlocks = async () => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URI}/blocks/total`);
@@ -97,6 +96,26 @@ export const fetchTransactions = async ({
     transactions: Transaction[];
     count: number;
   };
+};
+
+export const simulateTransaction = async (
+  from: string,
+  payload: FacetCallPayload | FacetCreatePayload
+) => {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`
+  );
+  const params = {
+    from,
+    tx_payload: JSON.stringify(payload),
+  };
+  url.search = new URLSearchParams(params).toString();
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({
+      result: { transaction_receipt: null },
+    }));
+  return result as { transaction_receipt: Transaction | null };
 };
 
 export const fetchTransaction = async (txHash: string) => {
@@ -210,17 +229,31 @@ export const fetchContract = async (address: string) => {
   return result as Contract;
 };
 
-export const fetchCard = async (name: string) => {
+export const sendStaticCall = async (
+  to: string,
+  func: string,
+  args?: any[] | { [key: string]: any }
+) => {
   const url = new URL(
-    `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/0x55ab0390a89fed8992e3affbf61d102490735e24/static-call/resolveName`
+    `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/${to}/static-call/${func}`
   );
-  url.search = new URLSearchParams({
-    args: JSON.stringify([name]),
-  }).toString();
+  const params: { [key: string]: string } = {};
+  if (args) {
+    params.args = JSON.stringify(args);
+  }
+  url.search = new URLSearchParams(params).toString();
   const { result } = await fetch(url.href, { cache: "no-store" })
     .then((res) => res.json())
     .catch(() => ({
       result: null,
     }));
-  return result as string | null;
+  return result;
 };
+
+export const getCardOwner = async (name: string) =>
+  sendStaticCall(
+    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ??
+      "0x55ab0390a89fed8992e3affbf61d102490735e24",
+    "resolveName",
+    [name]
+  );

@@ -14,7 +14,7 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { isAddress, toHex } from "viem";
-import { useAccount, useBlockNumber } from "wagmi";
+import { useAccount } from "wagmi";
 import { startCase } from "lodash";
 import { sendTransaction } from "@wagmi/core";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -33,6 +33,11 @@ import { useToast } from "@/contexts/toast-context";
 import { Transaction } from "@/types/blocks";
 import { Card } from "@/components/Card";
 import { facetAddress } from "@/app/constants";
+import { sendStaticCall } from "@/utils/data";
+import {
+  sendFacetCall,
+  waitForTransactionResult,
+} from "@/utils/facet-transactions";
 
 interface Props {
   hash: string;
@@ -40,7 +45,6 @@ interface Props {
 }
 
 export default function WalletAddress({ hash, contract }: Props) {
-  const { data: latestBlockNumber } = useBlockNumber({ watch: true });
   const { openConnectModal } = useConnectModal();
   const { address, isDisconnected } = useAccount();
   const [methodValues, setMethodValues] = useState<{
@@ -55,9 +59,6 @@ export default function WalletAddress({ hash, contract }: Props) {
   const [staticCallResults, setStaticCallResults] = useState<{
     [key: string]: any;
   }>({});
-  const [pendingCallTxnHash, setPendingCallTxnHash] = useState<string | null>(
-    null
-  );
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") ?? "details";
   const { showToast } = useToast();
@@ -89,60 +90,12 @@ export default function WalletAddress({ hash, contract }: Props) {
     [contract]
   );
 
-  useEffect(() => {
-    if (pendingCallTxnHash && latestBlockNumber) {
-      try {
-        const fetchData = async () => {
-          const callReceiptRes = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_BASE_URI}/transactions/${pendingCallTxnHash}`
-          );
-          const receipt = callReceiptRes.data.result as Transaction;
-
-          if (receipt) {
-            setPendingCallTxnHash(null);
-            if (receipt.status === "success") {
-              showToast({
-                message: `Transaction succeeded (${truncateMiddle(
-                  receipt.transaction_hash,
-                  8,
-                  8
-                )})`,
-                type: "success",
-              });
-            } else {
-              showToast({
-                message: `Transaction failed (${truncateMiddle(
-                  receipt.transaction_hash,
-                  8,
-                  8
-                )})`,
-                type: "error",
-              });
-            }
-            setMethodLoading({});
-          }
-        };
-
-        fetchData();
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }, [latestBlockNumber, pendingCallTxnHash, showToast]);
-
   const staticCall = async (name: string) => {
     setStaticCallResults((results) => ({ ...results, [name]: null }));
-    const callRes = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/${hash}/static-call/${name}`,
-      {
-        params: {
-          args: JSON.stringify(methodValues[name]),
-        },
-      }
-    );
+    const result = await sendStaticCall(hash, name, methodValues[name]);
     setStaticCallResults((results) => ({
       ...results,
-      [name]: callRes.data.result,
+      [name]: result,
     }));
   };
 
@@ -160,58 +113,40 @@ export default function WalletAddress({ hash, contract }: Props) {
     setMethodLoading((loading) => ({ ...loading, [name]: true }));
     setSimulationResults((results) => ({ ...results, [name]: null }));
     try {
-      if (address && !isDisconnected) {
-        const txnData = {
-          op: "call",
-          data: {
-            to: hash,
-            function: name,
-            args: methodValues[name],
-          },
-        };
-
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/simulate`,
-          {
-            params: {
-              from: address,
-              tx_payload: JSON.stringify(txnData),
-            },
-          }
-        );
-
-        const { transaction_receipt }: { transaction_receipt: Transaction } =
-          res.data.result;
-
-        setSimulationResults((results) => ({
-          ...results,
-          [name]: transaction_receipt,
-        }));
-
-        if (transaction_receipt.status != "success") {
-          setMethodLoading((loading) => ({ ...loading, [name]: false }));
-          return;
+      const txn = await sendFacetCall(hash, name, methodValues[name]);
+      showToast({
+        message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
+        type: "info",
+      });
+      const receipt = await waitForTransactionResult(txn.hash);
+      if (receipt) {
+        if (receipt.status === "success") {
+          showToast({
+            message: `Transaction succeeded (${truncateMiddle(
+              receipt.transaction_hash,
+              8,
+              8
+            )})`,
+            type: "success",
+          });
+        } else {
+          showToast({
+            message: `Transaction failed (${truncateMiddle(
+              receipt.transaction_hash,
+              8,
+              8
+            )})`,
+            type: "error",
+          });
         }
-
-        const txn = await sendTransaction({
-          to: facetAddress,
-          data: toHex(
-            `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
-              txnData
-            )}`
-          ),
-        });
-        setPendingCallTxnHash(txn.hash);
-        showToast({
-          message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
-          type: "info",
-        });
-      } else if (openConnectModal) {
-        openConnectModal();
       }
     } catch (e) {
-      console.log(e);
+      showToast({
+        message: `${e}`,
+        type: "error",
+      });
     }
+    setMethodLoading((loading) => ({ ...loading, [name]: false }));
   };
 
   const renderStateDetails = () => {

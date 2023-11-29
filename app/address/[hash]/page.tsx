@@ -1,4 +1,4 @@
-import { fetchCard, fetchTransactions } from "@/utils/data";
+import { fetchTransactions, getCardOwner } from "@/utils/data";
 import Link from "next/link";
 import { Address } from "@/components/Address";
 import { formatEther } from "viem";
@@ -19,7 +19,7 @@ export default async function Page({
 }) {
   let cardOwner;
   if (isCardName(params.hash)) {
-    cardOwner = await fetchCard(params.hash);
+    cardOwner = await getCardOwner(params.hash);
   }
   const { transactions, count } = await fetchTransactions({
     page: searchParams.page ? searchParams.page : 1,

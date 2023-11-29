@@ -1,4 +1,4 @@
-import { fetchCard, fetchInternalTransactions } from "@/utils/data";
+import { fetchInternalTransactions, getCardOwner } from "@/utils/data";
 import Link from "next/link";
 import { Address } from "@/components/Address";
 import { Pagination } from "@/components/pagination";
@@ -18,7 +18,7 @@ export default async function Page({
 }) {
   let cardOwner;
   if (isCardName(params.hash)) {
-    cardOwner = await fetchCard(params.hash);
+    cardOwner = await getCardOwner(params.hash);
   }
   const { transactions, count } = await fetchInternalTransactions({
     page: searchParams.page ? searchParams.page : 1,

@@ -12,12 +12,7 @@ import {
   parseTokenValue,
   truncateMiddle,
 } from "@/utils/formatter";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { ChangeEvent, useEffect, useState } from "react";
-import { toHex } from "viem";
-import { useAccount } from "wagmi";
-import { sendTransaction } from "@wagmi/core";
-import { startCase } from "lodash";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -34,7 +29,10 @@ import { Address } from "@/components/Address";
 import Link from "next/link";
 import { Card } from "@/components/Card";
 import { useToast } from "@/contexts/toast-context";
-import { facetAddress } from "../constants";
+import {
+  sendFacetCreate,
+  waitForTransactionResult,
+} from "@/utils/facet-transactions";
 
 interface Props {
   contractArtifacts: ContractArtifact[];
@@ -47,8 +45,6 @@ export default function Contracts({
   contracts,
   totalContracts,
 }: Props) {
-  const { openConnectModal } = useConnectModal();
-  const { address, isDisconnected } = useAccount();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedContract, setSelectedContract] =
     useState<ContractArtifact | null>(null);
@@ -85,33 +81,44 @@ export default function Contracts({
 
   const createContract = async () => {
     try {
-      if (selectedContract && address && !isDisconnected) {
-        const createContractData = {
-          op: "create",
-          data: {
-            args: modifiedArgs,
-            source_code: selectedContract?.source_code,
-            init_code_hash: selectedContract?.init_code_hash,
-          },
-        };
-        const txn = await sendTransaction({
-          to: facetAddress,
-          data: toHex(
-            `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
-              createContractData
-            )}`
-          ),
-        });
-        showToast({
-          message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
-          type: "info",
-        });
-        setShowCreateModal(false);
-      } else if (openConnectModal) {
-        openConnectModal();
+      if (!selectedContract) throw "No contract selected";
+      const txn = await sendFacetCreate(
+        selectedContract.source_code,
+        selectedContract.init_code_hash,
+        modifiedArgs
+      );
+      showToast({
+        message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
+        type: "info",
+      });
+      const receipt = await waitForTransactionResult(txn.hash);
+      if (receipt) {
+        if (receipt.status === "success") {
+          showToast({
+            message: `Transaction succeeded (${truncateMiddle(
+              receipt.transaction_hash,
+              8,
+              8
+            )})`,
+            type: "success",
+          });
+        } else {
+          showToast({
+            message: `Transaction failed (${truncateMiddle(
+              receipt.transaction_hash,
+              8,
+              8
+            )})`,
+            type: "error",
+          });
+        }
       }
+      setShowCreateModal(false);
     } catch (e) {
-      console.log(e);
+      showToast({
+        message: `${e}`,
+        type: "error",
+      });
     }
   };
 
@@ -241,11 +248,11 @@ export default function Contracts({
                     placeholder={`${arg.name} (${arg.type})`}
                     name={arg.name}
                     onChange={handleChange}
-                    value={
-                      Array.isArray(constructorArgs[arg.name])
+                    value={`${
+                      (Array.isArray(constructorArgs[arg.name])
                         ? JSON.stringify(constructorArgs[arg.name])
-                        : constructorArgs[arg.name]
-                    }
+                        : constructorArgs[arg.name]) ?? ""
+                    }`}
                     type="text"
                   />
                 </div>
