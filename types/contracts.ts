@@ -1,12 +1,5 @@
 import { InternalTransaction, Transaction } from "./blocks";
 
-export interface ContractArtifact {
-  name: string;
-  source_code: string;
-  init_code_hash: string;
-  abi: { [key: string]: { [key: string]: any } };
-}
-
 export interface CurrentStateSimpleToken {
   contract_type: "SimpleToken";
   name: string;
@@ -66,11 +59,12 @@ export interface ContractFunction {
 }
 
 export interface FunctionInput {
-  name?: string;
+  name: string;
   type: string;
 }
 
 export interface FunctionOutput {
+  name?: string;
   type: string;
 }
 
@@ -84,6 +78,13 @@ export interface ContractConstructor {
 }
 
 export type ContractABI = Array<ContractFunction | ContractConstructor>;
+
+export interface ContractArtifact {
+  name: string;
+  source_code: string;
+  init_code_hash: string;
+  abi: ContractABI;
+}
 
 export type SourceCode = {
   code: string;

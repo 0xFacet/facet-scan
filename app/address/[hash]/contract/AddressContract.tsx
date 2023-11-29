@@ -188,7 +188,7 @@ export default function WalletAddress({ hash, contract }: Props) {
         }
 
         const txn = await sendTransaction({
-          to: "0x0000000000000000000000000000000000000000",
+          to: "0x00000000000000000000000000000000000face7",
           data: toHex(
             `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
               txnData

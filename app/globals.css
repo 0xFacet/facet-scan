@@ -21,21 +21,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
+:not(html, body) {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.1) #000000;
 }
 
-*::-webkit-scrollbar {
+:not(html, body)::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
 
-*::-webkit-scrollbar-track {
+:not(html, body)::-webkit-scrollbar-track {
   background: #000000;
 }
 
-*::-webkit-scrollbar-thumb {
+:not(html, body)::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   border: 3px solid #000000;

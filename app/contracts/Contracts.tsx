@@ -56,9 +56,14 @@ export default function Contracts({
   const contractTypes = contractArtifacts.map(({ name }) => name);
   const { showToast } = useToast();
 
+  console.log(selectedContract);
+
   const creationConstructorArgs =
     (selectedContract?.abi &&
-      Object.keys(selectedContract.abi["constructor"]["args"])) ||
+      Object.keys(
+        selectedContract.abi.find?.((method) => method.type === "constructor")
+          ?.inputs ?? {}
+      )) ||
     [];
 
   const modifiedArgs: { [key: string]: any } = { ...constructorArgs };
@@ -85,7 +90,7 @@ export default function Contracts({
           },
         };
         const txn = await sendTransaction({
-          to: "0x0000000000000000000000000000000000000000",
+          to: "0x00000000000000000000000000000000000face7",
           data: toHex(
             `data:application/vnd.facet.tx+json;rule=esip6,${JSON.stringify(
               createContractData
