@@ -17,13 +17,13 @@ export default async function Page({
   params: { hash: string };
   searchParams: { [key: string]: string | undefined };
 }) {
-  let card;
+  let cardOwner;
   if (isCardName(params.hash)) {
-    card = await fetchCard(params.hash);
+    cardOwner = await fetchCard(params.hash);
   }
   const { transactions, count } = await fetchTransactions({
     page: searchParams.page ? searchParams.page : 1,
-    toOrFrom: card ? card.owner.toLowerCase() : params.hash,
+    toOrFrom: cardOwner ?? params.hash,
   });
   return (
     <>

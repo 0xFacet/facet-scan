@@ -13,18 +13,18 @@ export default async function AddressLayout({
   children: React.ReactNode;
   params: { hash: string };
 }) {
-  let card;
+  let cardOwner;
   if (isCardName(params.hash)) {
-    card = await fetchCard(params.hash);
+    cardOwner = await fetchCard(params.hash);
   }
-  const address = card ? card.owner : params.hash;
+  const address = cardOwner ?? params.hash;
   const contract = await fetchContract(address);
   return (
     <div className="flex flex-col flex-1">
       <SectionContainer>
         <Section>
           <div className="py-4">
-            {card ? (
+            {cardOwner ? (
               <Heading size="h2">{params.hash}</Heading>
             ) : (
               <Heading size="h2">{!!contract ? "Contract" : "Address"}</Heading>
