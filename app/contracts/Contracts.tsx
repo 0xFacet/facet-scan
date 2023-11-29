@@ -13,7 +13,7 @@ import {
   truncateMiddle,
 } from "@/utils/formatter";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { toHex } from "viem";
 import { useAccount } from "wagmi";
 import { sendTransaction } from "@wagmi/core";
@@ -77,6 +77,12 @@ export default function Contracts({
     }
   }
 
+  useEffect(() => {
+    if (!showCreateModal) {
+      setConstructorArgs({});
+    }
+  }, [showCreateModal]);
+
   const createContract = async () => {
     try {
       if (selectedContract && address && !isDisconnected) {
@@ -101,7 +107,6 @@ export default function Contracts({
           type: "info",
         });
         setShowCreateModal(false);
-        setConstructorArgs({});
       } else if (openConnectModal) {
         openConnectModal();
       }

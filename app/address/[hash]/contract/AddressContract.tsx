@@ -50,7 +50,7 @@ export default function WalletAddress({ hash, contract }: Props) {
     [key: string]: boolean;
   }>({});
   const [simulationResults, setSimulationResults] = useState<{
-    [key: string]: any;
+    [key: string]: Transaction | null;
   }>({});
   const [staticCallResults, setStaticCallResults] = useState<{
     [key: string]: any;
@@ -311,9 +311,9 @@ export default function WalletAddress({ hash, contract }: Props) {
                   >
                     Call
                   </Button>
-                  {simulationResults[method.name]?.status == "error" && (
+                  {!!simulationResults[method.name]?.error?.message && (
                     <div className="font-mono text-sm pl-3 border-l-4 border-red-300">
-                      {simulationResults[method.name].error_message}
+                      {simulationResults[method.name]?.error?.message}
                     </div>
                   )}
                   {staticCallResults[method.name] !== null &&

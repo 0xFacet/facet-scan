@@ -28,10 +28,10 @@ export default async function Page({ params }: { params: { txHash: string } }) {
               <BiXCircle className="text-lg" />
               {capitalize(transaction.status)}
             </div>
-            {!!transaction.error_message && (
+            {!!transaction?.error?.message && (
               <div className="w-full">
                 <div className="truncate whitespace-break-spaces">
-                  {transaction.error_message}
+                  {transaction?.error?.message}
                 </div>
               </div>
             )}

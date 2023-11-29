@@ -5,6 +5,10 @@ export interface Log {
   contractAddress: string;
 }
 
+export interface ErrorMessage {
+  message: string;
+}
+
 export interface Transaction {
   transaction_hash: string;
   from: `0x${string}`;
@@ -16,7 +20,7 @@ export interface Transaction {
   args: { [key: string]: any };
   logs: Log[];
   block_timestamp: string;
-  error_message?: string | null;
+  error?: ErrorMessage | null;
   block_number: number;
   transaction_index: number;
   block_blockhash: string;
