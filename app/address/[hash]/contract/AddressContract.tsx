@@ -62,25 +62,29 @@ export default function WalletAddress({ hash, contract }: Props) {
   const tab = searchParams.get("tab") ?? "details";
   const { showToast } = useToast();
 
-  const writeMethods = useMemo(
+  const readMethods = useMemo(
     () =>
       (contract
-        ? contract.abi.filter((contractFunction) => {
-            return (
-              contractFunction.type !== "constructor" &&
-              contractFunction.stateMutability !== "view"
-            );
-          })
+        ? contract.abi.filter(
+            (item) =>
+              item.type === "function" &&
+              item.visibility === "public" &&
+              (item.stateMutability === "view" ||
+                item.stateMutability === "pure")
+          )
         : []) as unknown as ContractFunction[],
     [contract]
   );
 
-  const readMethods = useMemo(
+  const writeMethods = useMemo(
     () =>
       (contract
-        ? contract.abi.filter((contractFunction) => {
-            return contractFunction.stateMutability === "view";
-          })
+        ? contract.abi.filter(
+            (item) =>
+              item.type === "function" &&
+              item.visibility === "public" &&
+              item.stateMutability === "non_payable"
+          )
         : []) as unknown as ContractFunction[],
     [contract]
   );
