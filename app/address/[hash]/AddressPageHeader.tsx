@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { useAccount, useBlockNumber } from "wagmi";
@@ -13,8 +13,10 @@ import { useToast } from "@/contexts/toast-context";
 import { truncateMiddle } from "@/utils/formatter";
 
 export default function AddressPageHeader({
-  pageAddress
-}: { pageAddress:string }) {
+  pageAddress,
+}: {
+  pageAddress: string;
+}) {
   const [methodLoading, setMethodLoading] = useState<{
     [key: string]: boolean;
   }>({});
@@ -27,19 +29,22 @@ export default function AddressPageHeader({
   const { data: latestBlockNumber } = useBlockNumber({ watch: true });
 
   const [userHasSunriseSticker, setUserHasSunriseSticker] = useState(false);
-  const [userCanClaimSunriseSticker, setUserCanClaimSunriseSticker] = useState(false);
+  const [userCanClaimSunriseSticker, setUserCanClaimSunriseSticker] =
+    useState(false);
   const [userStickerDeadline, setUserStickerDeadline] = useState(0);
-  const [userStickerSignature, setUserStickerSignature] = useState('');
+  const [userStickerSignature, setUserStickerSignature] = useState("");
   const [userSampleTokenId, setUserSampleTokenId] = useState(0);
-  
-  const isCurrentUsersPage = address && (pageAddress!.toLowerCase() == address.toLowerCase());
-  
-  const claimCheckURL = `${process.env.NEXT_PUBLIC_FACET_SWAP_BASE_URL!}/stickers`
-  
+
+  const isCurrentUsersPage =
+    address && pageAddress!.toLowerCase() == address.toLowerCase();
+
+  const claimCheckURL = `${process.env
+    .NEXT_PUBLIC_FACET_SWAP_BASE_URL!}/stickers`;
+
   async function callMethodBasic(toAddress: string, name: string, args: any) {
     setMethodLoading((loading) => ({ ...loading, [name]: true }));
     setSimulationResults((results) => ({ ...results, [name]: null }));
-  
+
     try {
       const txn = await sendFacetCall(toAddress, name, args);
       showToast({
@@ -80,35 +85,32 @@ export default function AddressPageHeader({
     }
     setMethodLoading((loading) => ({ ...loading, [name]: false }));
   }
-  
+
   useEffect(() => {
     if (isDisconnected) {
       setUserCanClaimSunriseSticker(false);
     } else {
       const getSticker = async () => {
         try {
-          const stickerRes = await axios.get(
-            claimCheckURL,
-            {
-              params: {
-                claimer: address,
-              },
-            }
-          );
-          
-          setUserStickerDeadline(stickerRes.data.message.deadline)
-          setUserStickerSignature(stickerRes.data.signature)
-          setUserSampleTokenId(stickerRes.data.sampleId)
-          setUserCanClaimSunriseSticker(true)
+          const stickerRes = await axios.get(claimCheckURL, {
+            params: {
+              claimer: address,
+            },
+          });
+
+          setUserStickerDeadline(stickerRes.data.message.deadline);
+          setUserStickerSignature(stickerRes.data.signature);
+          setUserSampleTokenId(stickerRes.data.sampleId);
+          setUserCanClaimSunriseSticker(true);
         } catch (e) {
-          console.log(e)
+          console.log(e);
           setUserCanClaimSunriseSticker(false);
         }
-      }
-      getSticker()
+      };
+      getSticker();
     }
   }, [address, latestBlockNumber, isDisconnected]);
-  
+
   useEffect(() => {
     if (isDisconnected) {
       setUserHasSunriseSticker(false);
@@ -122,10 +124,10 @@ export default function AddressPageHeader({
             },
           }
         );
-        
-        setUserHasSunriseSticker(stickerRes.data.result)
-      }
-      getSticker()
+
+        setUserHasSunriseSticker(stickerRes.data.result);
+      };
+      getSticker();
     }
   }, [address, latestBlockNumber, isDisconnected]);
 
@@ -134,30 +136,46 @@ export default function AddressPageHeader({
     deadline: userStickerDeadline,
     signature: userStickerSignature,
     tokenId: userSampleTokenId,
-    position: [10, 10] 
-  }
-  
-  return <div>
-    {userHasSunriseSticker && <div>
-      This address has claimed their Sunrise Sticker!
-    </div>}
-    
-    {!userHasSunriseSticker && userCanClaimSunriseSticker && isCurrentUsersPage && <div>
-      <div>You don't have the sticker but you can claim it now!</div>
-      <Button
-      disabled={methodLoading.claimSticker || !userStickerSignature?.length}
-      onClick={() => callMethodBasic(
-        process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS!,
-        'claimSticker',
-        stickerParams
+    position: [10, 10],
+  };
+
+  return (
+    <div>
+      {userHasSunriseSticker && (
+        <div>This address has claimed their Sunrise Sticker!</div>
       )}
-      >
-        Claim now!
-      </Button>
-    </div>}
-    
-    {!userHasSunriseSticker && !userCanClaimSunriseSticker && isCurrentUsersPage && <div>
-      You don't have the Sunrise Sticker and unfortunately you can't claim it.
-    </div>}
-  </div>
+
+      {!userHasSunriseSticker &&
+        userCanClaimSunriseSticker &&
+        isCurrentUsersPage && (
+          <div>
+            <div>{"You don't have the sticker but you can claim it now!"}</div>
+            <Button
+              disabled={
+                methodLoading.claimSticker || !userStickerSignature?.length
+              }
+              onClick={() =>
+                callMethodBasic(
+                  process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS!,
+                  "claimSticker",
+                  stickerParams
+                )
+              }
+            >
+              Claim now!
+            </Button>
+          </div>
+        )}
+
+      {!userHasSunriseSticker &&
+        !userCanClaimSunriseSticker &&
+        isCurrentUsersPage && (
+          <div>
+            {
+              "You don't have the Sunrise Sticker and unfortunately you can't claim it."
+            }
+          </div>
+        )}
+    </div>
+  );
 }
