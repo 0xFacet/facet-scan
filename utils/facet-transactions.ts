@@ -40,7 +40,7 @@ export const sendFacetCall = async (
 };
 
 export const sendFacetCreate = async (
-  sourceCode: string,
+  sourceCode: string | null,
   initCodeHash: string,
   args: any[] | { [key: string]: any }
 ) => {
@@ -51,11 +51,11 @@ export const sendFacetCreate = async (
   const payload: FacetCreatePayload = {
     op: "create",
     data: {
-      source_code: sourceCode,
       init_code_hash: initCodeHash,
       args,
     },
   };
+  if (sourceCode) payload.data.source_code = sourceCode;
   return sendFacetTransaction(address, payload);
 };
 

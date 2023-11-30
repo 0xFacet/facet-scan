@@ -107,10 +107,13 @@ export const simulateTransaction = async (
   );
   const params = {
     from,
-    tx_payload: JSON.stringify(payload),
   };
   url.search = new URLSearchParams(params).toString();
-  const { result } = await fetch(url.href, { cache: "no-store" })
+  const { result } = await fetch(url.href, {
+    method: "post",
+    body: JSON.stringify(payload),
+    cache: "no-store",
+  })
     .then((res) => res.json())
     .catch(() => ({
       result: { transaction_receipt: null },

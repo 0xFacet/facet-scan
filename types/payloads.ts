@@ -10,7 +10,7 @@ export interface FacetCallPayload {
 export interface FacetCreatePayload {
   op: "create";
   data: {
-    source_code: string;
+    source_code?: string;
     init_code_hash: string;
     args: any[] | { [key: string]: string };
   };
