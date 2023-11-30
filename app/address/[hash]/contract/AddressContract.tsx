@@ -9,14 +9,10 @@ import {
   parseTokenValue,
   truncateMiddle,
 } from "@/utils/formatter";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
-import axios from "axios";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { isAddress, toHex } from "viem";
-import { useAccount } from "wagmi";
+import { useMemo, useState } from "react";
+import { isAddress } from "viem";
 import { startCase } from "lodash";
-import { sendTransaction } from "@wagmi/core";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { stackoverflowDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { Address } from "@/components/Address";
@@ -32,7 +28,6 @@ import {
 import { useToast } from "@/contexts/toast-context";
 import { Transaction } from "@/types/blocks";
 import { Card } from "@/components/Card";
-import { facetAddress } from "@/app/constants";
 import { sendStaticCall } from "@/utils/data";
 import {
   sendFacetCall,
@@ -45,8 +40,6 @@ interface Props {
 }
 
 export default function WalletAddress({ hash, contract }: Props) {
-  const { openConnectModal } = useConnectModal();
-  const { address, isDisconnected } = useAccount();
   const [methodValues, setMethodValues] = useState<{
     [key: string]: { [key: string]: string };
   }>({});
@@ -141,10 +134,14 @@ export default function WalletAddress({ hash, contract }: Props) {
         }
       }
     } catch (e) {
-      showToast({
-        message: `${e}`,
-        type: "error",
-      });
+      if (
+        !`${e}`.includes("TransactionExecutionError: User rejected the request")
+      ) {
+        showToast({
+          message: `${e}`,
+          type: "error",
+        });
+      }
     }
     setMethodLoading((loading) => ({ ...loading, [name]: false }));
   };

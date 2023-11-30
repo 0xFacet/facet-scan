@@ -115,10 +115,14 @@ export default function Contracts({
       }
       setShowCreateModal(false);
     } catch (e) {
-      showToast({
-        message: `${e}`,
-        type: "error",
-      });
+      if (
+        !`${e}`.includes("TransactionExecutionError: User rejected the request")
+      ) {
+        showToast({
+          message: `${e}`,
+          type: "error",
+        });
+      }
     }
   };
 
