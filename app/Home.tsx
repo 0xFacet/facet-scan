@@ -5,7 +5,13 @@ import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Button } from "@/components/ui/button";
-import { isCardNameWithAt, isTxHash, isCardName, pluralize } from "@/lib/utils";
+import {
+  isCardNameWithAt,
+  isTxHash,
+  isCardName,
+  pluralize,
+  isBlockNumber,
+} from "@/lib/utils";
 import { Block, Transaction } from "@/types/blocks";
 import { truncateMiddle } from "@/utils/formatter";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -42,7 +48,7 @@ export default function Home({
       router.push(`/address/${search}`);
     } else if (isTxHash(search)) {
       router.push(`/tx/${search}`);
-    } else if (Number.isInteger(Number(search))) {
+    } else if (isBlockNumber(search)) {
       router.push(`/block/${search}`);
     } else if (isCardName(search)) {
       router.push(`/address/${search.toLowerCase()}`);

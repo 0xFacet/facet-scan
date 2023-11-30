@@ -23,3 +23,8 @@ export function isTxHash(hash: string) {
   const regex = /^0x[a-fA-F0-9]{64}$/;
   return regex.test(hash);
 }
+
+export function isBlockNumber(blockNumber: any) {
+  const regex = /^[0-9]$/;
+  return regex.test(blockNumber);
+}
