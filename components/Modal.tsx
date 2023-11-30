@@ -46,7 +46,7 @@ export function Modal({
         </DialogDescription>
         <div className="flex justify-end mt-4 gap-2">
           <Button onClick={onCancel} variant="ghost">
-            Cancel
+            Close
           </Button>
           {!!onConfirm && (
             <Button variant="default" onClick={onConfirm} disabled={loading}>
