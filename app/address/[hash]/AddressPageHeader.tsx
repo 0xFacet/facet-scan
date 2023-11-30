@@ -101,7 +101,7 @@ export default function AddressPageHeader({
           setUserStickerDeadline(stickerRes.data.message.deadline);
           setUserStickerSignature(stickerRes.data.signature);
           setUserSampleTokenId(stickerRes.data.sampleId);
-          setUserCanClaimSunriseSticker(true);
+          // setUserCanClaimSunriseSticker(true);
         } catch (e) {
           console.log(e);
           setUserCanClaimSunriseSticker(false);
