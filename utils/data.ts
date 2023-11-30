@@ -48,8 +48,8 @@ export const fetchTotalTransactions = async () => {
       result: null,
     }));
   return result as {
-    transaction_count: number;
-    unique_from_address_count: number;
+    transaction_count: string;
+    unique_from_address_count: string;
   };
 };
 

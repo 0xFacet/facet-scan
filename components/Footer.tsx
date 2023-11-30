@@ -13,11 +13,11 @@ export const Footer = () => {
           <Link href="https://github.com/0xfacet" target="_blank">
             GitHub
           </Link>
-          <Link
-            href="https://docs.ethscriptions.com/v/ethscriptions-vm"
-            target="_blank"
-          >
+          <Link href="https://docs.facet.org" target="_blank">
             Docs
+          </Link>
+          <Link href="https://facet.org/terms.html" target="_blank">
+            Terms
           </Link>
         </div>
         <div>
