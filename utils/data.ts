@@ -256,7 +256,7 @@ export const sendStaticCall = async (
 export const getCardOwner = async (name: string) =>
   sendStaticCall(
     process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ??
-      "0x55ab0390a89fed8992e3affbf61d102490735e24",
+      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
     "resolveName",
     [name]
   );

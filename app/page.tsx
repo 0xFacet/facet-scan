@@ -15,7 +15,7 @@ export default async function Page() {
 
   return (
     <Home
-      totalBlocks={totalBlocks}
+      totalBlocks={Number(totalBlocks)}
       blocks={blocks}
       totalTransactions={Number(transaction_count)}
       totalWallets={Number(unique_from_address_count)}
