@@ -2,16 +2,11 @@ import { fetchTotalBlocks, fetchBlocks } from "@/utils/data";
 import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Pagination } from "@/components/pagination";
-import { formatDistanceToNowStrict } from "date-fns";
 import { Heading } from "@/components/Heading";
 import Link from "next/link";
 import { Table } from "@/components/Table";
 import { formatTimestamp } from "@/utils/formatter";
 import { Card } from "@/components/Card";
-
-function pluralize(count: number, word: string) {
-  return `${count.toLocaleString()} ${word}${count === 1 ? "" : "s"}`;
-}
 
 export default async function Page({
   searchParams,
@@ -58,7 +53,7 @@ export default async function Page({
               ]}
             />
           </Card>
-          <Pagination count={Math.ceil(totalBlocks / 20)} />
+          <Pagination count={Math.ceil(Number(totalBlocks) / 20)} />
         </Section>
       </SectionContainer>
     </div>

@@ -9,7 +9,7 @@ export const fetchTotalBlocks = async () => {
     .catch(() => ({
       result: 0,
     }));
-  return result as number;
+  return result as string;
 };
 
 export const fetchBlocks = async ({ page = 1, perPage = 20 } = {}) => {
