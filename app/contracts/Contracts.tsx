@@ -226,11 +226,13 @@ export default function Contracts({
             <SelectContent className="absolute z-[1000] py-1 mt-1 bg-black rounded-md shadow-lg max-h-60 overflow-auto">
               <SelectGroup>
                 <SelectItem value="-">Select a Contract Type</SelectItem>
-                {contractTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
+                {contractTypes
+                  .filter((type) => type !== "NameRegistry")
+                  .map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
               </SelectGroup>
             </SelectContent>
           </Select>
