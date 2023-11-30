@@ -5,6 +5,7 @@ import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { isCardName } from "@/lib/utils";
 import { fetchContract, getCardOwner } from "@/utils/data";
+import AddressPageHeader from "./AddressPageHeader";
 
 export default async function AddressLayout({
   children,
@@ -33,6 +34,7 @@ export default async function AddressLayout({
               <CopyText text={address} />
             </div>
           </div>
+          <AddressPageHeader pageAddress={address} />
         </Section>
       </SectionContainer>
       <SectionContainer>
