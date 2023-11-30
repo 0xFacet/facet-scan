@@ -120,7 +120,7 @@ export default function AddressPageHeader({
           `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/${process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS}/static-call/userToStickerIdsAwardedMap`,
           {
             params: {
-              args: JSON.stringify([address, 1]),
+              args: JSON.stringify([pageAddress, 1]),
             },
           }
         );
