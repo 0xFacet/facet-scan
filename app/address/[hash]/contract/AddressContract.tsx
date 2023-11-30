@@ -236,7 +236,11 @@ export default function WalletAddress({ hash, contract }: Props) {
                               ? JSON.stringify(
                                   methodValues[method.name][arg.name]
                                 )
-                              : methodValues[method.name]?.[arg.name] ?? ""
+                              : formatTokenValue(
+                                  methodValues[method.name]?.[arg.name],
+                                  contract.current_state.decimals ?? 0,
+                                  arg.name
+                                ) ?? ""
                           }
                           type="text"
                         />
