@@ -1,4 +1,9 @@
-import { fetchInternalTransactions, getCardOwner } from "@/utils/data";
+import {
+  fetchInternalTransactions,
+  getCardDetails,
+  lookupName,
+  lookupPrimaryName,
+} from "@/utils/data";
 import Link from "next/link";
 import { Address } from "@/components/Address";
 import { Pagination } from "@/components/pagination";
@@ -8,6 +13,7 @@ import { startCase } from "lodash";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { Card } from "@/components/Card";
 import { isCardName } from "@/lib/utils";
+import { isAddress } from "viem";
 
 export default async function Page({
   params,
@@ -17,8 +23,22 @@ export default async function Page({
   searchParams: { [key: string]: string | undefined };
 }) {
   let cardOwner;
-  if (isCardName(params.hash)) {
-    cardOwner = await getCardOwner(params.hash);
+  let cardId;
+  let cardDetails;
+  let cardName;
+  if (isAddress(params.hash)) {
+    const { primaryName } = await lookupPrimaryName(params.hash);
+    cardName = primaryName;
+  } else if (isCardName(params.hash)) {
+    cardName = params.hash;
+  }
+  if (cardName) {
+    const card = await lookupName(cardName);
+    cardOwner = card.address;
+    cardId = card.id;
+    if (cardOwner) {
+      cardDetails = await getCardDetails(cardId);
+    }
   }
   const { transactions, count } = await fetchInternalTransactions({
     page: searchParams.page ? searchParams.page : 1,

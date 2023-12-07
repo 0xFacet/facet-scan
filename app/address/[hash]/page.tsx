@@ -1,7 +1,12 @@
-import { fetchTransactions, getCardOwner } from "@/utils/data";
+import {
+  fetchTransactions,
+  getCardDetails,
+  lookupName,
+  lookupPrimaryName,
+} from "@/utils/data";
 import Link from "next/link";
 import { Address } from "@/components/Address";
-import { formatEther } from "viem";
+import { formatEther, isAddress } from "viem";
 import { Pagination } from "@/components/pagination";
 import { Table } from "@/components/Table";
 import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
@@ -18,8 +23,22 @@ export default async function Page({
   searchParams: { [key: string]: string | undefined };
 }) {
   let cardOwner;
-  if (isCardName(params.hash)) {
-    cardOwner = await getCardOwner(params.hash);
+  let cardId;
+  let cardDetails;
+  let cardName;
+  if (isAddress(params.hash)) {
+    const { primaryName } = await lookupPrimaryName(params.hash);
+    cardName = primaryName;
+  } else if (isCardName(params.hash)) {
+    cardName = params.hash;
+  }
+  if (cardName) {
+    const card = await lookupName(cardName);
+    cardOwner = card.address;
+    cardId = card.id;
+    if (cardOwner) {
+      cardDetails = await getCardDetails(cardId);
+    }
   }
   const { transactions, count } = await fetchTransactions({
     page: searchParams.page ? searchParams.page : 1,

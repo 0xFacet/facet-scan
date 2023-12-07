@@ -4,7 +4,7 @@ import { useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { IoCheckmarkCircleOutline, IoCopyOutline } from "react-icons/io5";
 
-export const CopyText = ({ text }: { text: string }) => {
+export const CopyText = ({ text, title }: { text: string; title?: string }) => {
   const [addressCopied, setAddressCopied] = useState(false);
   return (
     <CopyToClipboard
@@ -18,7 +18,7 @@ export const CopyText = ({ text }: { text: string }) => {
     >
       <div className="flex items-center gap-2 cursor-pointer text-secondary hover:text-primary">
         {addressCopied ? <IoCheckmarkCircleOutline /> : <IoCopyOutline />}
-        <div>{text}</div>
+        <div>{title ?? text}</div>
       </div>
     </CopyToClipboard>
   );

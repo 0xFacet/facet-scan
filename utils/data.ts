@@ -253,10 +253,50 @@ export const sendStaticCall = async (
   return result;
 };
 
-export const getCardOwner = async (name: string) =>
-  sendStaticCall(
-    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ??
+export const lookupPrimaryName = async (address: string) => {
+  const primaryName = await sendStaticCall(
+    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
       "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
-    "resolveName",
+    "lookupAddress",
+    { user: address }
+  );
+  return { primaryName };
+};
+
+export const ownerOf = async (id: number) => {
+  return sendStaticCall(
+    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
+      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
+    "ownerOf",
+    { id }
+  );
+};
+
+export const lookupName = async (name: string) => {
+  const id = await sendStaticCall(
+    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
+      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
+    "nameToTokenId",
     [name]
   );
+  const address = await ownerOf(Number(id));
+  return { id, address };
+};
+
+export const getCardStickers = async (tokenId: number) => {
+  return sendStaticCall(
+    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
+      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
+    "getCardStickers",
+    { tokenId }
+  );
+};
+
+export const getCardDetails = async (tokenId: number) => {
+  return sendStaticCall(
+    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
+      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
+    "getCardDetails",
+    { tokenId }
+  );
+};
