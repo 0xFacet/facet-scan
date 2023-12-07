@@ -75,7 +75,7 @@ export default async function AddressLayout({
                 {!!cardDetails.links.length && (
                   <div className="flex flex-wrap justify-center gap-4">
                     {cardDetails.links.map((link: string) => (
-                      <Link href={link} target="_blank">
+                      <Link key={link} href={link} target="_blank">
                         <Button variant="outline">
                           <div className="flex items-center gap-2">
                             {link.split("://")[1] ?? link}
