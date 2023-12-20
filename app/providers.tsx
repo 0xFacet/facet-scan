@@ -44,7 +44,7 @@ const demoAppInfo = {
 const connectors = connectorsForWallets([
   {
     groupName: "Popular",
-    wallets: [...wallets[0].wallets, okxWallet({ projectId, chains })],
+    wallets: [okxWallet({ projectId, chains }), ...wallets[0].wallets],
   },
   {
     groupName: "Other",
