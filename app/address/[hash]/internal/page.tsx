@@ -1,5 +1,6 @@
 import {
   fetchInternalTransactions,
+  getAddressToName,
   getCardDetails,
   lookupName,
   lookupPrimaryName,
@@ -9,7 +10,7 @@ import { Address } from "@/components/Address";
 import { Pagination } from "@/components/pagination";
 import { Table } from "@/components/Table";
 import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
-import { startCase } from "lodash";
+import { flatten, startCase } from "lodash";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { Card } from "@/components/Card";
 import { isCardName } from "@/lib/utils";
@@ -44,6 +45,9 @@ export default async function Page({
     page: searchParams.page ? searchParams.page : 1,
     toOrFrom: cardOwner ?? params.hash,
   });
+  const addressToName = await getAddressToName(
+    flatten(transactions.map((txn) => [txn.from, txn.to_or_contract_address]))
+  );
   return (
     <>
       <Card>
@@ -85,10 +89,12 @@ export default async function Page({
               <Address
                 key={transaction.transaction_hash}
                 address={transaction.from}
+                name={addressToName[transaction.from]}
               />,
               <Address
                 key={transaction.transaction_hash}
                 address={transaction.to_or_contract_address}
+                name={addressToName[transaction.to_or_contract_address]}
               />,
             ]),
           ]}

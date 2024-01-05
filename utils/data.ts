@@ -1,6 +1,14 @@
 import { Block, Transaction, InternalTransaction } from "@/types/blocks";
 import { Contract, ContractArtifact } from "@/types/contracts";
+import { Pair } from "@/types/pairs";
 import { FacetCallPayload, FacetCreatePayload } from "@/types/payloads";
+import { uniq } from "lodash";
+
+const fethContractAddress = "0x1673540243e793b0e77c038d4a88448eff524dce";
+const routerContractAddress = "0xf29e6e319ac4ce8c100cfc02b1702eb3d275029e";
+const cardsContractAddress =
+  process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
+  "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d";
 
 export const fetchTotalBlocks = async () => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URI}/blocks/total`);
@@ -253,10 +261,44 @@ export const sendStaticCall = async (
   return result;
 };
 
+export const getPairsForRouter = async (userAddress: `0x${string}`) => {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_BASE_URI}/contracts/pairs_for_router`
+  );
+  const params: { [key: string]: string } = {
+    user_address: userAddress,
+    router: "0xf29e6e319ac4ce8c100cfc02b1702eb3d275029e",
+  };
+  url.search = new URLSearchParams(params).toString();
+  const result = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({}));
+  return result as { [key: string]: Pair };
+};
+
+export const getFethBalance = async (userAddress: `0x${string}`) => {
+  return sendStaticCall(fethContractAddress, "balanceOf", [userAddress]);
+};
+
+export const getTokenPrices = async (tokenAddresses: `0x${string}`[]) => {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_BASE_URI}/tokens/token_prices`
+  );
+  const params: { [key: string]: string } = {
+    token_addresses: tokenAddresses.join(","),
+    eth_contract_address: fethContractAddress,
+    router_address: routerContractAddress,
+  };
+  url.search = new URLSearchParams(params).toString();
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({ result: {} }));
+  return result as { token_address: string; last_swap_price: string }[];
+};
+
 export const lookupPrimaryName = async (address: string) => {
   const primaryName = await sendStaticCall(
-    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
-      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
+    cardsContractAddress,
     "lookupAddress",
     { user: address }
   );
@@ -264,39 +306,41 @@ export const lookupPrimaryName = async (address: string) => {
 };
 
 export const ownerOf = async (id: number) => {
-  return sendStaticCall(
-    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
-      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
-    "ownerOf",
-    { id }
-  );
+  return sendStaticCall(cardsContractAddress, "ownerOf", { id });
 };
 
 export const lookupName = async (name: string) => {
-  const id = await sendStaticCall(
-    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
-      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
-    "nameToTokenId",
-    [name]
-  );
+  const id = await sendStaticCall(cardsContractAddress, "nameToTokenId", [
+    name,
+  ]);
   const address = await ownerOf(Number(id));
   return { id, address };
 };
 
 export const getCardStickers = async (tokenId: number) => {
-  return sendStaticCall(
-    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
-      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
-    "getCardStickers",
-    { tokenId }
-  );
+  return sendStaticCall(cardsContractAddress, "getCardStickers", { tokenId });
 };
 
 export const getCardDetails = async (tokenId: number) => {
-  return sendStaticCall(
-    process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
-      "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d",
-    "getCardDetails",
-    { tokenId }
-  );
+  return sendStaticCall(cardsContractAddress, "getCardDetails", { tokenId });
 };
+
+export const getAddressToName = async (addresses: `0x${string}`[]) =>
+  (
+    await Promise.all(
+      uniq(addresses).map(async (address) => {
+        const name = await sendStaticCall(
+          cardsContractAddress,
+          "lookupAddress",
+          { user: address.toLowerCase() }
+        );
+        return { address, name } as {
+          address: `0x${string}`;
+          name: string | null;
+        };
+      })
+    )
+  ).reduce(
+    (previous, current) => ({ ...previous, [current.address]: current.name }),
+    {} as { [key: `0x${string}`]: string }
+  );

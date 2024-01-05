@@ -147,9 +147,12 @@ export default function WalletAddress({ hash, contract }: Props) {
   };
 
   const renderStateDetails = () => {
+    const contractState = contract?.current_state
+      ? Object.keys(contract.current_state)
+      : [];
     return contract ? (
       <List
-        items={...Object.keys(contract.current_state)
+        items={contractState
           .filter(
             (key) =>
               typeof contract.current_state[key] === "string" ||

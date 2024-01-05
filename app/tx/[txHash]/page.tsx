@@ -1,7 +1,11 @@
 import { Card } from "@/components/Card";
 import { List } from "@/components/List";
 import { Tooltip } from "@/components/Tooltip";
-import { fetchTransaction } from "@/utils/data";
+import {
+  fetchTransaction,
+  getAddressToName,
+  lookupPrimaryName,
+} from "@/utils/data";
 import { formatDistanceToNowStrict } from "date-fns";
 import { capitalize } from "lodash";
 import Link from "next/link";
@@ -11,6 +15,10 @@ import { formatEther, formatGwei } from "viem";
 
 export default async function Page({ params }: { params: { txHash: string } }) {
   const transaction = await fetchTransaction(params.txHash);
+  const addressToName = await getAddressToName([
+    transaction.from,
+    transaction.to_or_contract_address,
+  ]);
 
   const renderStatus = () => {
     switch (transaction.status) {
@@ -164,7 +172,9 @@ export default async function Page({ params }: { params: { txHash: string } }) {
               ),
               value: (
                 <Link href={`/address/${transaction.from}`}>
-                  {transaction.from}
+                  {addressToName[transaction.from]
+                    ? `${addressToName[transaction.from]} (${transaction.from})`
+                    : transaction.from}
                 </Link>
               ),
             },
@@ -179,7 +189,11 @@ export default async function Page({ params }: { params: { txHash: string } }) {
               ),
               value: (
                 <Link href={`/address/${transaction.to_or_contract_address}`}>
-                  {transaction.to_or_contract_address}
+                  {addressToName[transaction.to_or_contract_address]
+                    ? `${addressToName[transaction.to_or_contract_address]} (${
+                        transaction.to_or_contract_address
+                      })`
+                    : transaction.to_or_contract_address}
                 </Link>
               ),
             },
