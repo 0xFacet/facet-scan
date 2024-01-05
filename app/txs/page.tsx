@@ -5,9 +5,9 @@ import { Section } from "@/components/Section";
 import { SectionContainer } from "@/components/SectionContainer";
 import { Table } from "@/components/Table";
 import { Pagination } from "@/components/pagination";
-import { fetchTransactions } from "@/utils/data";
+import { fetchTransactions, getAddressToName } from "@/utils/data";
 import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
-import { startCase } from "lodash";
+import { flatten, startCase } from "lodash";
 import Link from "next/link";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { formatEther } from "viem";
@@ -21,6 +21,9 @@ export default async function Page({
     page: searchParams.page ? searchParams.page : 1,
     block: searchParams.block,
   });
+  const addressToName = await getAddressToName(
+    flatten(transactions.map((txn) => [txn.from, txn.to_or_contract_address]))
+  );
 
   return (
     <div className="flex flex-col flex-1">
@@ -85,10 +88,12 @@ export default async function Page({
                   <Address
                     key={transaction.transaction_hash}
                     address={transaction.from}
+                    name={addressToName[transaction.from]}
                   />,
                   <Address
                     key={transaction.transaction_hash}
                     address={transaction.to_or_contract_address}
+                    name={addressToName[transaction.to_or_contract_address]}
                   />,
                   transaction.transaction_fee
                     ? Number(

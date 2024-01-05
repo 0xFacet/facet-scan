@@ -38,12 +38,16 @@ interface Props {
   contractArtifacts: ContractArtifact[];
   contracts: Contract[];
   totalContracts: number;
+  addressToName: {
+    [key: `0x${string}`]: string;
+  };
 }
 
 export default function Contracts({
   contractArtifacts,
   contracts,
   totalContracts,
+  addressToName,
 }: Props) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedContract, setSelectedContract] =
@@ -169,14 +173,15 @@ export default function Contracts({
                 "Age",
               ]}
               rows={contracts.map((row) => [
-                <Address address={row.address} key={row.address} />,
+                <Address key={row.address} address={row.address} />,
                 row.current_type,
-                <Link
-                  key={row.transaction_hash}
-                  href={`/address/${row.deployment_transaction?.from}`}
-                >
-                  {truncateMiddle(row.deployment_transaction?.from ?? "", 8, 8)}
-                </Link>,
+                row.deployment_transaction?.from ? (
+                  <Address
+                    key={row.address}
+                    address={row.deployment_transaction.from}
+                    name={addressToName[row.deployment_transaction.from]}
+                  />
+                ) : null,
                 <Link
                   key={row.transaction_hash}
                   href={`/tx/${row.transaction_hash}`}

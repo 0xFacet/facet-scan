@@ -1,3 +1,33 @@
+import { isValidElement } from "react";
+
+const renderValue = (value: any) => {
+  if (isValidElement(value)) return value;
+
+  switch (typeof value) {
+    case "boolean":
+      return <span>{value.toString()}</span>;
+    case "object":
+      if (Array.isArray(value)) {
+        return (
+          <List
+            items={value.reduce(
+              (previousValue, currentValue, currentIndex) => [
+                ...previousValue,
+                { label: currentIndex, value: currentValue },
+              ],
+              []
+            )}
+          />
+        );
+      }
+      return (
+        <pre style={{ padding: "10px" }}>{JSON.stringify(value, null, 2)}</pre>
+      );
+    default:
+      return <span>{value}</span>;
+  }
+};
+
 export const List = ({
   items,
 }: {
@@ -16,10 +46,10 @@ export const List = ({
               {item.label}
             </dt>
             <dd
-              className="flex mt-1 leading-6 sm:col-span-2 sm:mt-0 truncate items-center"
+              className="flex mt-1 leading-6 sm:col-span-2 sm:mt-0 items-center"
               title={typeof item.value === "string" ? item.value : undefined}
             >
-              {item.value}
+              <div className="overflow-auto">{renderValue(item.value)}</div>
             </dd>
           </div>
         ))}
