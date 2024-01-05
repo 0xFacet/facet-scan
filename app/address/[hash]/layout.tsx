@@ -228,6 +228,14 @@ export default async function AddressLayout({
             >
               Internal Transactions
             </NavLink>
+            {!!contract?.current_init_code_hash && (
+              <NavLink
+                href={`/address/${params.hash}/contract`}
+                className="whitespace-nowrap"
+              >
+                Contract
+              </NavLink>
+            )}
             {totalValue > 0 && (
               <NavLink
                 href={`/address/${params.hash}/tokens`}
@@ -236,12 +244,12 @@ export default async function AddressLayout({
                 Tokens
               </NavLink>
             )}
-            {!!contract?.current_init_code_hash && (
+            {!!contract?.current_state?.balanceOf && (
               <NavLink
-                href={`/address/${params.hash}/contract`}
+                href={`/address/${params.hash}/holders`}
                 className="whitespace-nowrap"
               >
-                Contract
+                Holders
               </NavLink>
             )}
           </div>
