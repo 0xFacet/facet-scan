@@ -1,5 +1,6 @@
 "use client";
 
+import { Address } from "@/components/Address";
 import { Card } from "@/components/Card";
 import { Heading } from "@/components/Heading";
 import { Section } from "@/components/Section";
@@ -28,6 +29,9 @@ interface Props {
   totalTransactions: number;
   transactions: Transaction[];
   totalWallets: number;
+  addressToName: {
+    [key: `0x${string}`]: string;
+  };
 }
 
 export default function Home({
@@ -36,6 +40,7 @@ export default function Home({
   totalTransactions,
   transactions,
   totalWallets,
+  addressToName,
 }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -165,17 +170,17 @@ export default function Home({
                 <div>
                   <div className="flex gap-4 justify-between">
                     <span className="text-accent">{"From "}</span>
-                    <Link href={`/address/${transaction.from}`}>
-                      {truncateMiddle(transaction.from, 8, 8)}
-                    </Link>
+                    <Address
+                      address={transaction.from}
+                      name={addressToName[transaction.from]}
+                    />
                   </div>
                   <div className="flex gap-4 justify-between">
-                    <span className="text-accent">{"To "}</span>
-                    <Link
-                      href={`/address/${transaction.to_or_contract_address}`}
-                    >
-                      {truncateMiddle(transaction.to_or_contract_address, 8, 8)}
-                    </Link>
+                    <span className="text-accent mr-6">{"To "}</span>
+                    <Address
+                      address={transaction.to_or_contract_address}
+                      name={addressToName[transaction.to_or_contract_address]}
+                    />
                   </div>
                 </div>
               </div>

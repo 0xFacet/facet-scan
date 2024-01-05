@@ -23,7 +23,7 @@ export const CustomConnectButton = () => {
                     variant="outline"
                     onClick={openConnectModal}
                   >
-                    <IoWalletOutline className="h-6 w-6" />
+                    <IoWalletOutline className="h-5 w-5" />
                     <span className="sr-only">Connect wallet</span>
                   </Button>
                 );

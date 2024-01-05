@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Analytics } from '@vercel/analytics/react';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
           <div className="min-h-[100vh] flex flex-col">
             <Header />
             {children}
+            <Analytics />
             <Footer />
           </div>
         </Providers>
