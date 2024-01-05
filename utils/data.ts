@@ -4,11 +4,9 @@ import { Pair } from "@/types/pairs";
 import { FacetCallPayload, FacetCreatePayload } from "@/types/payloads";
 import { uniq } from "lodash";
 
-const fethContractAddress = "0x1673540243e793b0e77c038d4a88448eff524dce";
-const routerContractAddress = "0xf29e6e319ac4ce8c100cfc02b1702eb3d275029e";
-const cardsContractAddress =
-  process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS ||
-  "0xde11257ac24e96b8e39df45dbd4d3cf32237d63d";
+const fethContractAddress = process.env.NEXT_PUBLIC_BRIDGED_ETHER_ADDRESS!;
+const routerContractAddress = process.env.NEXT_PUBLIC_ROUTER_ADDRESS!;
+const cardsContractAddress = process.env.NEXT_PUBLIC_CARDS_CONTRACT_ADDRESS!;
 
 export const fetchTotalBlocks = async () => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URI}/blocks/total`);
