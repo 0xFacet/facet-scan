@@ -296,6 +296,16 @@ export const getTokenPrices = async (tokenAddresses: `0x${string}`[]) => {
   return result as { token_address: string; last_swap_price: string }[];
 };
 
+export const getTokenHolders = async (tokenAddress: `0x${string}`) => {
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_BASE_URI}/tokens/${tokenAddress}/holders`
+  );
+  const { result } = await fetch(url.href, { cache: "no-store" })
+    .then((res) => res.json())
+    .catch(() => ({ result: {} }));
+  return result as { [key: string]: string };
+};
+
 export const lookupPrimaryName = async (address: string) => {
   const primaryName = await sendStaticCall(
     cardsContractAddress,
