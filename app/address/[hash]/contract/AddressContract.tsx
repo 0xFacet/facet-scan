@@ -62,7 +62,7 @@ export default function WalletAddress({ hash, contract }: Props) {
         ? contract.abi.filter(
             (item) =>
               item.type === "function" &&
-              item.visibility === "public" &&
+              (item.visibility === "public" || item.visibility === "external") &&
               (item.stateMutability === "view" ||
                 item.stateMutability === "pure")
           )
@@ -76,7 +76,7 @@ export default function WalletAddress({ hash, contract }: Props) {
         ? contract.abi.filter(
             (item) =>
               item.type === "function" &&
-              item.visibility === "public" &&
+              (item.visibility === "public" || item.visibility === "external") &&
               item.stateMutability === "non_payable"
           )
         : []) as unknown as ContractFunction[],

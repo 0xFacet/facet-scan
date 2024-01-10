@@ -10,7 +10,7 @@ export interface ContractFunction {
   inputs: FunctionInput[];
   outputs: FunctionOutput[];
   stateMutability: "pure" | "view" | "non_payable";
-  visibility: "public" | "private" | "internal";
+  visibility: "public" | "private" | "internal" | "external";
   overrideModifiers: string[];
   fromParent: boolean;
 }
