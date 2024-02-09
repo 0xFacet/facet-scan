@@ -44,7 +44,7 @@ export interface InternalTransaction {
   return_value?: string | null;
   logs: Log[];
   block_timestamp: string;
-  error?: string | null;
+  error?: ErrorMessage | null;
   status: "success" | "failure";
   block_number: string;
   transaction_index: string;
