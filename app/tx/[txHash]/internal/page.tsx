@@ -32,7 +32,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
             {!!transaction.error && (
               <div className="w-full">
                 <div className="truncate whitespace-break-spaces">
-                  {transaction.error}
+                  {transaction.error.message}
                 </div>
               </div>
             )}
