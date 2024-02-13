@@ -12,7 +12,7 @@ export default async function Page() {
   const totalBlocks = await fetchTotalBlocks();
   const blocks = await fetchBlocks({ perPage: 10 });
   const { transaction_count, unique_from_address_count } =
-    await fetchTotalTransactions();
+    (await fetchTotalTransactions()) || {};
   const { transactions } = await fetchTransactions({ perPage: 10 });
   const addressToName = await getAddressToName(
     flatten(transactions.map((txn) => [txn.from, txn.to_or_contract_address]))
