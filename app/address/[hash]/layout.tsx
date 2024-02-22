@@ -108,6 +108,10 @@ export default async function AddressLayout({
     formatEther(BigInt(Math.round(ethPrice)) * totalEth)
   );
 
+  const hasBalanceOf =
+    !!contract?.current_state?.balanceOf ||
+    !!contract?.current_state?._balanceOf;
+
   return (
     <div className="flex flex-col flex-1">
       <SectionContainer>
@@ -244,7 +248,7 @@ export default async function AddressLayout({
                 Tokens
               </NavLink>
             )}
-            {!!contract?.current_state?.balanceOf && (
+            {hasBalanceOf && (
               <NavLink
                 href={`/address/${params.hash}/holders`}
                 className="whitespace-nowrap"
