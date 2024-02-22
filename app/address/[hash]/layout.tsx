@@ -101,7 +101,7 @@ export default async function AddressLayout({
           )
         )
       ),
-    BigInt(fethBalance)
+    BigInt(fethBalance ?? 0)
   );
   const ethPrice = await getUsdPerEth();
   const totalValue = Number(

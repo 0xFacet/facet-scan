@@ -1,14 +1,14 @@
 import {
+  fetchContract,
   getAddressToName,
   getTokenHolders,
   lookupName,
-  sendStaticCall,
 } from "@/utils/data";
 import { Address } from "@/components/Address";
 import { Table } from "@/components/Table";
 import { Card } from "@/components/Card";
 import { isCardName } from "@/lib/utils";
-import { formatEther } from "viem";
+import { formatUnits } from "viem";
 import { Pagination } from "@/components/pagination";
 
 const ITEMS_PER_PAGE = 30;
@@ -27,7 +27,9 @@ export default async function Page({
   }
   const address = cardOwner ?? params.hash;
   const tokenHolders = await getTokenHolders(address);
-  const totalSupply = await sendStaticCall(address, "totalSupply");
+  const contract = await fetchContract(address);
+  const totalSupply = contract.current_state.totalSupply || 0;
+  const decimals = contract.current_state.decimals || 0;
   const sortedTokenHolders = Object.keys(tokenHolders).sort(
     (a, b) => Number(tokenHolders[b]) - Number(tokenHolders[a])
   ) as `0x${string}`[];
@@ -59,7 +61,7 @@ export default async function Page({
                   100
                 ).toLocaleString()}%`,
                 Number(
-                  formatEther(BigInt(tokenHolders[holder]))
+                  formatUnits(BigInt(tokenHolders[holder]), decimals)
                 ).toLocaleString(),
               ]),
           ]}
