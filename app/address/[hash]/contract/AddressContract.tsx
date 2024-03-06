@@ -41,7 +41,7 @@ interface Props {
 
 export default function WalletAddress({ hash, contract }: Props) {
   const [methodValues, setMethodValues] = useState<{
-    [key: string]: { [key: string]: string };
+    [key: string]: { [key: string]: any };
   }>({});
   const [methodLoading, setMethodLoading] = useState<{
     [key: string]: boolean;
@@ -62,7 +62,8 @@ export default function WalletAddress({ hash, contract }: Props) {
         ? contract.abi.filter(
             (item) =>
               item.type === "function" &&
-              (item.visibility === "public" || item.visibility === "external") &&
+              (item.visibility === "public" ||
+                item.visibility === "external") &&
               (item.stateMutability === "view" ||
                 item.stateMutability === "pure")
           )
@@ -76,7 +77,8 @@ export default function WalletAddress({ hash, contract }: Props) {
         ? contract.abi.filter(
             (item) =>
               item.type === "function" &&
-              (item.visibility === "public" || item.visibility === "external") &&
+              (item.visibility === "public" ||
+                item.visibility === "external") &&
               item.stateMutability === "non_payable"
           )
         : []) as unknown as ContractFunction[],
@@ -188,19 +190,36 @@ export default function WalletAddress({ hash, contract }: Props) {
     ) : null;
   };
 
-  const handleChange = (method: string, argName: string, value: string) => {
+  const handleChange = (
+    method: string,
+    argName: string,
+    value: string,
+    tupleKey?: string
+  ) => {
     let parsedValue = value;
     if (isJsonArray(value)) {
       parsedValue = JSON.parse(value);
     }
 
-    setMethodValues((prevValues) => ({
-      ...prevValues,
-      [method]: {
-        ...prevValues[method],
-        [argName]: parsedValue,
-      },
-    }));
+    setMethodValues((prevValues) => {
+      const updatedMethodValues = { ...prevValues[method] };
+
+      if (tupleKey) {
+        const tupleValues =
+          typeof updatedMethodValues[argName] === "object"
+            ? { ...updatedMethodValues[argName] }
+            : {};
+        tupleValues[tupleKey] = parsedValue;
+        updatedMethodValues[argName] = tupleValues;
+      } else {
+        updatedMethodValues[argName] = parsedValue;
+      }
+
+      return {
+        ...prevValues,
+        [method]: updatedMethodValues,
+      };
+    });
   };
 
   const renderMethods = (methods: ContractABI) => {
@@ -219,34 +238,84 @@ export default function WalletAddress({ hash, contract }: Props) {
                         <Label htmlFor={arg.name}>
                           {arg.name} ({arg.type})
                         </Label>
-                        <Input
-                          id={arg.name}
-                          placeholder={`${arg.name} (${arg.type})`}
-                          name={arg.name}
-                          onChange={(e) =>
-                            handleChange(
-                              method.name,
-                              arg.name,
-                              parseTokenValue(
-                                e.target.value,
-                                contract.current_state.decimals ?? 0,
-                                arg.name
-                              )
-                            )
-                          }
-                          value={
-                            Array.isArray(methodValues[method.name]?.[arg.name])
-                              ? JSON.stringify(
-                                  methodValues[method.name][arg.name]
-                                )
-                              : formatTokenValue(
-                                  methodValues[method.name]?.[arg.name],
+                        {arg.components?.length ? (
+                          <div className="pl-4 space-y-2">
+                            {arg.components.map((argComponent) => (
+                              <div
+                                key={argComponent.name}
+                                className="space-y-2"
+                              >
+                                <Label htmlFor={argComponent.name}>
+                                  {argComponent.name} ({argComponent.type})
+                                </Label>
+                                <Input
+                                  id={argComponent.name}
+                                  placeholder={`${argComponent.name} (${argComponent.type})`}
+                                  name={argComponent.name}
+                                  onChange={(e) =>
+                                    handleChange(
+                                      method.name,
+                                      arg.name,
+                                      e.target.value,
+                                      argComponent.name
+                                    )
+                                  }
+                                  value={
+                                    Array.isArray(
+                                      methodValues[method.name]?.[arg.name]?.[
+                                        argComponent.name
+                                      ]
+                                    )
+                                      ? JSON.stringify(
+                                          methodValues[method.name][arg.name][
+                                            argComponent.name
+                                          ]
+                                        )
+                                      : formatTokenValue(
+                                          methodValues[method.name]?.[
+                                            arg.name
+                                          ]?.[argComponent.name],
+                                          contract.current_state.decimals ?? 0,
+                                          argComponent.name
+                                        ) ?? ""
+                                  }
+                                  type="text"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <Input
+                            id={arg.name}
+                            placeholder={`${arg.name} (${arg.type})`}
+                            name={arg.name}
+                            onChange={(e) =>
+                              handleChange(
+                                method.name,
+                                arg.name,
+                                parseTokenValue(
+                                  e.target.value,
                                   contract.current_state.decimals ?? 0,
                                   arg.name
-                                ) ?? ""
-                          }
-                          type="text"
-                        />
+                                )
+                              )
+                            }
+                            value={
+                              Array.isArray(
+                                methodValues[method.name]?.[arg.name]
+                              )
+                                ? JSON.stringify(
+                                    methodValues[method.name][arg.name]
+                                  )
+                                : formatTokenValue(
+                                    methodValues[method.name]?.[arg.name],
+                                    contract.current_state.decimals ?? 0,
+                                    arg.name
+                                  ) ?? ""
+                            }
+                            type="text"
+                          />
+                        )}
                       </div>
                     ) : null
                   )}
