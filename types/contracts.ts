@@ -18,6 +18,8 @@ export interface ContractFunction {
 export interface FunctionInput {
   name: string;
   type: string;
+  internalType: string;
+  components?: { name: string; type: string; internalType: string }[];
 }
 
 export interface FunctionOutput {
