@@ -112,10 +112,11 @@ export const parseTokenValue = (
 };
 
 export const isJsonArray = (input: any) => {
+  let isArray = false;
   try {
     const json = JSON.parse(input);
-    return Array.isArray(json);
+    isArray = Array.isArray(json);
   } finally {
-    return false;
+    return isArray;
   }
 };
