@@ -11,6 +11,7 @@ export interface PairToken {
   address: `0x${string}`;
   name: string;
   symbol: string;
+  decimals: string;
 }
 
 export interface LPReserves {

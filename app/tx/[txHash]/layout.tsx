@@ -1,8 +1,10 @@
-import { Heading } from "@/components/Heading";
-import { NavLink } from "@/components/NavLink";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
-import { fetchTransaction } from "@/utils/data";
+import { fetchTransaction } from "@/utils/facet/transactions";
+import {
+  SectionContainer,
+  Section,
+  Heading,
+  NavLink,
+} from "@0xfacet/component-library";
 
 export default async function TransactionLayout({
   children,
@@ -12,8 +14,9 @@ export default async function TransactionLayout({
   params: { txHash: string };
 }) {
   const transaction = await fetchTransaction(params.txHash);
+  if (!transaction) return;
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col divide-y divide-line">
       <SectionContainer>
         <Section>
           <Heading size="h2" className="py-4">

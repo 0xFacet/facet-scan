@@ -1,20 +1,17 @@
-import {
-  fetchTransactions,
-  getAddressToName,
-  getCardDetails,
-  lookupName,
-  lookupPrimaryName,
-} from "@/utils/data";
 import Link from "next/link";
-import { Address } from "@/components/Address";
-import { Pagination } from "@/components/pagination";
-import { Table } from "@/components/Table";
+import { Address } from "@/components/address";
 import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
 import { flatten, startCase } from "lodash";
 import { IoAlertCircleOutline } from "react-icons/io5";
-import { Card } from "@/components/Card";
 import { isCardName } from "@/lib/utils";
 import { formatEther, isAddress } from "viem";
+import {
+  lookupPrimaryName,
+  getAddressToName,
+  getCardOwner,
+} from "@/utils/facet/cards";
+import { fetchTransactions } from "@/utils/facet/transactions";
+import { Card, Table, Pagination } from "@0xfacet/component-library";
 
 export default async function Page({
   params,
@@ -24,8 +21,6 @@ export default async function Page({
   searchParams: { [key: string]: string | undefined };
 }) {
   let cardOwner;
-  let cardId;
-  let cardDetails;
   let cardName;
   if (isAddress(params.hash)) {
     const { primaryName } = await lookupPrimaryName(params.hash);
@@ -34,12 +29,7 @@ export default async function Page({
     cardName = params.hash;
   }
   if (cardName) {
-    const card = await lookupName(cardName);
-    cardOwner = card.address;
-    cardId = card.id;
-    if (cardOwner) {
-      cardDetails = await getCardDetails(cardId);
-    }
+    cardOwner = await getCardOwner(cardName);
   }
   const { transactions, count } = await fetchTransactions({
     page: searchParams.page ? searchParams.page : 1,
@@ -50,7 +40,7 @@ export default async function Page({
   );
   return (
     <>
-      <Card>
+      <Card childrenClassName="px-4">
         <Table
           headers={[
             "Transaction Hash",
@@ -91,7 +81,9 @@ export default async function Page({
               </Link>,
               transaction.block_timestamp
                 ? formatTimestamp(
-                    new Date(Number(transaction.block_timestamp) * 1000)
+                    new Date(
+                      Number(transaction.block_timestamp) * 1000
+                    ).toISOString()
                   )
                 : "--",
               <Address

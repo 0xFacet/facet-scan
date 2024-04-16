@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { NavLink } from "@/components/NavLink";
 import { Contract, ContractABI, ContractFunction } from "@/types/contracts";
 import {
   formatTokenValue,
@@ -15,24 +13,20 @@ import { isAddress } from "viem";
 import { startCase } from "lodash";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { stackoverflowDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { Address } from "@/components/Address";
-import { List } from "@/components/List";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { useToast } from "@/contexts/toast-context";
+import { Transaction } from "@/types/blocks";
+import { sendStaticCall } from "@/utils/facet/contracts";
+import { sendFacetCall, waitForTransactionResult } from "@/utils/facet/helpers";
+import { List, Button, Card, NavLink } from "@0xfacet/component-library";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { useToast } from "@/contexts/toast-context";
-import { Transaction } from "@/types/blocks";
-import { Card } from "@/components/Card";
-import { sendStaticCall } from "@/utils/data";
-import {
-  sendFacetCall,
-  waitForTransactionResult,
-} from "@/utils/facet-transactions";
+  Input,
+  Label,
+} from "@0xfacet/component-library/ui";
+import { Address } from "@/components/address";
 
 interface Props {
   hash: string;
@@ -110,10 +104,10 @@ export default function WalletAddress({ hash, contract }: Props) {
     try {
       const txn = await sendFacetCall(hash, name, methodValues[name]);
       showToast({
-        message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
+        message: `Transaction pending (${truncateMiddle(txn, 8, 8)})`,
         type: "info",
       });
-      const receipt = await waitForTransactionResult(txn.hash);
+      const receipt = await waitForTransactionResult(txn);
       if (receipt) {
         if (receipt.status === "success") {
           showToast({
@@ -178,7 +172,6 @@ export default function WalletAddress({ hash, contract }: Props) {
                       {formatTokenValue(
                         contract.current_state[key],
                         contract.current_state["decimals"] ?? 0,
-                        key,
                         true,
                         contract.current_state.symbol
                       )}
@@ -275,8 +268,7 @@ export default function WalletAddress({ hash, contract }: Props) {
                                           methodValues[method.name]?.[
                                             arg.name
                                           ]?.[argComponent.name],
-                                          contract.current_state.decimals ?? 0,
-                                          argComponent.name
+                                          contract.current_state.decimals ?? 0
                                         ) ?? ""
                                   }
                                   type="text"
@@ -295,8 +287,7 @@ export default function WalletAddress({ hash, contract }: Props) {
                                 arg.name,
                                 parseTokenValue(
                                   e.target.value,
-                                  contract.current_state.decimals ?? 0,
-                                  arg.name
+                                  contract.current_state.decimals ?? 0
                                 )
                               )
                             }
@@ -309,8 +300,7 @@ export default function WalletAddress({ hash, contract }: Props) {
                                   )
                                 : formatTokenValue(
                                     methodValues[method.name]?.[arg.name],
-                                    contract.current_state.decimals ?? 0,
-                                    arg.name
+                                    contract.current_state.decimals ?? 0
                                   ) ?? ""
                             }
                             type="text"
@@ -344,7 +334,6 @@ export default function WalletAddress({ hash, contract }: Props) {
                             : formatTokenValue(
                                 staticCallResults[method.name],
                                 contract.current_state.decimals ?? 0,
-                                method.name,
                                 false,
                                 contract.current_state.symbol
                               )}
@@ -402,7 +391,7 @@ export default function WalletAddress({ hash, contract }: Props) {
   };
 
   return (
-    <Card>
+    <Card childrenClassName="px-4">
       <div className="flex gap-4">
         <NavLink
           href="?tab=details"

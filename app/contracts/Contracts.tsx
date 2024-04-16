@@ -1,10 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/Heading";
-import { Modal } from "@/components/Modal";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
 import { Contract, ContractArtifact } from "@/types/contracts";
 import {
   formatTimestamp,
@@ -13,26 +8,33 @@ import {
   truncateMiddle,
 } from "@/utils/formatter";
 import { ChangeEvent, useEffect, useState } from "react";
-import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { useToast } from "@/contexts/toast-context";
 import {
+  sendFacetCreate,
+  waitForTransactionResult,
+} from "@/utils/facet/helpers";
+import {
+  SectionContainer,
+  Section,
+  Heading,
+  Button,
+  Card,
+  Table,
+  Pagination,
+  Modal,
+} from "@0xfacet/component-library";
+import {
+  Input,
+  Label,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Table } from "@/components/Table";
-import { Pagination } from "@/components/pagination";
-import { Address } from "@/components/Address";
-import Link from "next/link";
-import { Card } from "@/components/Card";
-import { useToast } from "@/contexts/toast-context";
-import {
-  sendFacetCreate,
-  waitForTransactionResult,
-} from "@/utils/facet-transactions";
+} from "@0xfacet/component-library/ui";
+import { Address } from "@/components/address";
 
 interface Props {
   contractArtifacts: ContractArtifact[];
@@ -71,8 +73,7 @@ export default function Contracts({
     for (let key in modifiedArgs) {
       modifiedArgs[key] = parseTokenValue(
         `${modifiedArgs[key]}`,
-        modifiedArgs.decimals,
-        key
+        modifiedArgs.decimals
       );
     }
   }
@@ -87,15 +88,15 @@ export default function Contracts({
     try {
       if (!selectedContract) throw "No contract selected";
       const txn = await sendFacetCreate(
-        selectedContract.source_code,
+        modifiedArgs,
         selectedContract.init_code_hash,
-        modifiedArgs
+        selectedContract.source_code
       );
       showToast({
-        message: `Transaction pending (${truncateMiddle(txn.hash, 8, 8)})`,
+        message: `Transaction pending (${truncateMiddle(txn, 8, 8)})`,
         type: "info",
       });
-      const receipt = await waitForTransactionResult(txn.hash);
+      const receipt = await waitForTransactionResult(txn);
       if (receipt) {
         if (receipt.status === "success") {
           showToast({
@@ -145,7 +146,7 @@ export default function Contracts({
   };
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col divide-y divide-line">
       <SectionContainer className="bg-[url(/card-bg.svg)] bg-no-repeat bg-cover xl:bg-[length:1536px] bg-center border-none">
         <Section>
           <div className="flex flex-col py-0 md:py-16 gap-4 md:gap-8">
@@ -161,9 +162,9 @@ export default function Contracts({
           </div>
         </Section>
       </SectionContainer>
-      <SectionContainer className="flex-1 border-t">
+      <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <Card>
+          <Card childrenClassName="px-4">
             <Table
               headers={[
                 "Contract Address",
@@ -193,7 +194,7 @@ export default function Contracts({
                       new Date(
                         Number(row.deployment_transaction?.block_timestamp) *
                           1000
-                      )
+                      ).toISOString()
                     )
                   : "--",
               ])}

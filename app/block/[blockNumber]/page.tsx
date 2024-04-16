@@ -1,13 +1,15 @@
-import { fetchBlock } from "@/utils/data";
-import { List } from "@/components/List";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Button } from "@/components/ui/button";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import Link from "next/link";
-import { Heading } from "@/components/Heading";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
-import { Card } from "@/components/Card";
+import { fetchBlock } from "@/utils/facet/blocks";
+import {
+  SectionContainer,
+  Section,
+  Heading,
+  Card,
+  List,
+  Button,
+} from "@0xfacet/component-library";
 
 function pluralize(count: number, word: string) {
   return `${count.toLocaleString()} ${word}${count === 1 ? "" : "s"}`;
@@ -19,9 +21,10 @@ export default async function Page({
   params: { blockNumber: string };
 }) {
   const block = await fetchBlock(params.blockNumber);
+  if (!block) return;
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col divide-y divide-line">
       <SectionContainer>
         <Section>
           <Heading size="h2" className="py-4">
@@ -31,7 +34,7 @@ export default async function Page({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <Card>
+          <Card childrenClassName="px-4">
             <List
               items={[
                 {

@@ -1,15 +1,10 @@
-import {
-  fetchContract,
-  getAddressToName,
-  getTokenHolders,
-  lookupName,
-} from "@/utils/data";
-import { Address } from "@/components/Address";
-import { Table } from "@/components/Table";
-import { Card } from "@/components/Card";
+import { Address } from "@/components/address";
 import { isCardName } from "@/lib/utils";
+import { getAddressToName, getCardOwner } from "@/utils/facet/cards";
+import { fetchContract } from "@/utils/facet/contracts";
+import { getTokenHolders } from "@/utils/facet/tokens";
+import { Card, Table, Pagination } from "@0xfacet/component-library";
 import { formatUnits } from "viem";
-import { Pagination } from "@/components/pagination";
 
 const ITEMS_PER_PAGE = 30;
 
@@ -22,12 +17,14 @@ export default async function Page({
 }) {
   let cardOwner;
   if (isCardName(params.hash)) {
-    const card = await lookupName(params.hash);
-    cardOwner = card.address;
+    cardOwner = await getCardOwner(params.hash);
   }
   const address = cardOwner ?? params.hash;
   const tokenHolders = await getTokenHolders(address);
   const contract = await fetchContract(address);
+
+  if (!contract) return;
+
   const totalSupply = contract.current_state.totalSupply || 0;
   const decimals = contract.current_state.decimals || 0;
   const sortedTokenHolders = Object.keys(tokenHolders).sort(
@@ -43,7 +40,7 @@ export default async function Page({
 
   return (
     <>
-      <Card>
+      <Card childrenClassName="px-4">
         <Table
           headers={["Rank", "Address", "Percentage", "Balance"]}
           rows={[

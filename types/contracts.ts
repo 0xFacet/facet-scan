@@ -18,8 +18,7 @@ export interface ContractFunction {
 export interface FunctionInput {
   name: string;
   type: string;
-  internalType: string;
-  components?: { name: string; type: string; internalType: string }[];
+  components?: FunctionInput[];
 }
 
 export interface FunctionOutput {
@@ -56,7 +55,7 @@ export interface Contract {
   current_init_code_hash: string;
   abi: ContractABI;
   call_receipts: InternalTransaction[];
-  address: string;
+  address: `0x${string}`;
   current_state: CurrentState;
   source_code: SourceCode[];
   deployment_transaction?: Transaction;

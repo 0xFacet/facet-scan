@@ -1,8 +1,5 @@
 "use client";
 
-import { PlaceholderToast } from "@/components/PlaceholderToast";
-import { ToastContainer } from "@/components/ToastContainers";
-import Toast from "@/components/ui/toast";
 import React, {
   createContext,
   useContext,
@@ -12,6 +9,11 @@ import React, {
   useRef,
   useCallback,
 } from "react";
+import {
+  PlaceholderToast,
+  ToastContainer,
+  Toast,
+} from "@0xfacet/component-library";
 
 type ToastContextType = {
   showToast: (toast: Omit<ToastData, "id" | "timeoutId">) => void;

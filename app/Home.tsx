@@ -1,20 +1,22 @@
 "use client";
 
-import { Address } from "@/components/Address";
-import { Card } from "@/components/Card";
-import { Heading } from "@/components/Heading";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
-import { Button } from "@/components/ui/button";
+import { Address } from "@/components/address";
 import {
+  isBlockNumber,
+  isCardName,
   isCardNameWithAt,
   isTxHash,
-  isCardName,
   pluralize,
-  isBlockNumber,
 } from "@/lib/utils";
 import { Block, Transaction } from "@/types/blocks";
 import { truncateMiddle } from "@/utils/formatter";
+import {
+  SectionContainer,
+  Section,
+  Heading,
+  Card,
+  Button,
+} from "@0xfacet/component-library";
 import { formatDistanceToNowStrict } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -61,9 +63,9 @@ export default function Home({
   };
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col divide-y divide-line">
       <SectionContainer className="bg-[url(/card-bg.svg)] bg-no-repeat bg-cover xl:bg-[length:1536px] bg-center border-none">
-        <Section className="flex-1 py-32 sm:py-40 gap-8 max-w-3xl mx-auto">
+        <Section className="flex-1 py-32 sm:py-40 gap-8 mx-auto">
           <Heading size="h2">Facet Block Explorer</Heading>
           <form
             className="flex flex-wrap bg-transparent"
@@ -86,8 +88,8 @@ export default function Home({
           </form>
         </Section>
       </SectionContainer>
-      <SectionContainer className="border-t">
-        <Section className="flex-1 py-8 gap-8 max-w-3xl mx-auto">
+      <SectionContainer>
+        <Section className="flex-1 py-8 gap-8 mx-auto">
           <div className="flex flex-1 flex-col sm:flex-row flex-wrap">
             <div className="flex flex-col flex-1 items-center justify-center text-center gap-2 p-8">
               <Heading size="h2">
@@ -108,7 +110,7 @@ export default function Home({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1 flex-col sm:flex-row gap-4 sm:gap-8">
-          <Card>
+          <Card childrenClassName="px-4">
             <div className="py-4 text-accent">Latest Blocks</div>
             {blocks.map((block) => (
               <div
@@ -140,7 +142,7 @@ export default function Home({
               </Button>
             </div>
           </Card>
-          <Card>
+          <Card childrenClassName="px-4">
             <div className="py-4 text-accent">Latest Transactions</div>
             {transactions.map((transaction) => (
               <div

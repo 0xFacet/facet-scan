@@ -1,8 +1,6 @@
-import { Card } from "@/components/Card";
-import { List } from "@/components/List";
-import { Tooltip } from "@/components/Tooltip";
 import { InternalTransaction } from "@/types/blocks";
-import { fetchInternalTransactions } from "@/utils/data";
+import { fetchInternalTransactions } from "@/utils/facet/transactions";
+import { Card, List, Tooltip } from "@0xfacet/component-library";
 import { capitalize } from "lodash";
 import Link from "next/link";
 import { BiXCircle, BiCheckCircle } from "react-icons/bi";
@@ -49,7 +47,10 @@ export default async function Page({ params }: { params: { txHash: string } }) {
         .reverse()
         .filter((tx) => Number(tx.internal_transaction_index) > 0)
         .map((transaction) => (
-          <Card key={transaction.internal_transaction_index}>
+          <Card
+            childrenClassName="px-4"
+            key={transaction.internal_transaction_index}
+          >
             <List
               items={[
                 {
@@ -127,7 +128,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                     </div>
                   ),
                   value: (
-                    <Card>
+                    <Card childrenClassName="px-4">
                       <List
                         items={Object.entries(transaction.args).map(
                           ([label, value]) => ({ label, value })

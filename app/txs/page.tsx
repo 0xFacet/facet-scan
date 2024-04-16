@@ -1,12 +1,15 @@
-import { Address } from "@/components/Address";
-import { Card } from "@/components/Card";
-import { Heading } from "@/components/Heading";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
-import { Table } from "@/components/Table";
-import { Pagination } from "@/components/pagination";
-import { fetchTransactions, getAddressToName } from "@/utils/data";
+import { Address } from "@/components/address";
+import { getAddressToName } from "@/utils/facet/cards";
+import { fetchTransactions } from "@/utils/facet/transactions";
 import { truncateMiddle, formatTimestamp } from "@/utils/formatter";
+import {
+  SectionContainer,
+  Section,
+  Heading,
+  Card,
+  Table,
+  Pagination,
+} from "@0xfacet/component-library";
 import { flatten, startCase } from "lodash";
 import Link from "next/link";
 import { IoAlertCircleOutline } from "react-icons/io5";
@@ -26,7 +29,7 @@ export default async function Page({
   );
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col divide-y divide-line">
       <SectionContainer>
         <Section>
           <div className="py-4">
@@ -41,7 +44,7 @@ export default async function Page({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <Card>
+          <Card childrenClassName="px-4">
             <Table
               headers={[
                 "Transaction Hash",
@@ -82,7 +85,9 @@ export default async function Page({
                   </Link>,
                   transaction.block_timestamp
                     ? formatTimestamp(
-                        new Date(Number(transaction.block_timestamp) * 1000)
+                        new Date(
+                          Number(transaction.block_timestamp) * 1000
+                        ).toISOString()
                       )
                     : "--",
                   <Address

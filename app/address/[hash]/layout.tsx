@@ -1,35 +1,36 @@
-import { CopyText } from "@/components/CopyText";
-import { Heading } from "@/components/Heading";
-import { NavLink } from "@/components/NavLink";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
 import { isCardName } from "@/lib/utils";
-import {
-  fetchContract,
-  getCardDetails,
-  getFethBalance,
-  getPairsForRouter,
-  getTokenPrices,
-  lookupName,
-  lookupPrimaryName,
-} from "@/utils/data";
 import { formatEther, isAddress } from "viem";
-import { Button } from "@/components/ui/button";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { truncateMiddle } from "@/utils/formatter";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import {
   IoEllipsisHorizontal,
   IoShareOutline,
   IoWalletOutline,
 } from "react-icons/io5";
+import {
+  lookupPrimaryName,
+  lookupName,
+  getCardDetails,
+  getCardOwner,
+} from "@/utils/facet/cards";
+import { fetchContract, getPools } from "@/utils/facet/contracts";
+import { getTokenPrices, getFethBalance } from "@/utils/facet/tokens";
+import {
+  SectionContainer,
+  Section,
+  Heading,
+  Button,
+  CopyText,
+  NavLink,
+} from "@0xfacet/component-library";
 import { getUsdPerEth } from "@/utils/usd";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@0xfacet/component-library/ui";
 
 export default async function AddressLayout({
   children,
@@ -50,7 +51,7 @@ export default async function AddressLayout({
   }
   if (cardName) {
     const card = await lookupName(cardName);
-    cardOwner = card.address;
+    cardOwner = await getCardOwner(cardName);
     cardId = card.id;
     if (cardOwner) {
       cardDetails = await getCardDetails(cardId);
@@ -58,7 +59,7 @@ export default async function AddressLayout({
   }
   const address = cardOwner ?? params.hash;
   const contract = await fetchContract(address);
-  const pairs = await getPairsForRouter(address);
+  const pairs = await getPools(address);
   const fethContractAddress = "0x1673540243e793b0e77c038d4a88448eff524dce";
   const tokenBalances = Object.values(pairs)
     .filter((pair) => {
@@ -113,7 +114,7 @@ export default async function AddressLayout({
     !!contract?.current_state?._balanceOf;
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col divide-y divide-line">
       <SectionContainer>
         <Section>
           <div className="py-4">
