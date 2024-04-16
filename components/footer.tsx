@@ -8,9 +8,9 @@ export const Footer = () => {
     <SectionContainer className="border-t border-line">
       <Section className="flex-1 items-center gap-4 text-accent text-sm">
         <div className="flex flex-row gap-4 flex-wrap justify-center">
-          <Link href="/">Swap</Link>
-          <Link href="/pools">Pools</Link>
-          <Link href="/wrap">Wrap</Link>
+          <Link href="/blocks">Blocks</Link>
+          <Link href="/txs">Transactions</Link>
+          <Link href="/contracts">Contracts</Link>
           <Link href="https://github.com/0xfacet" target="_blank">
             GitHub
           </Link>
