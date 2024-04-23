@@ -1,11 +1,7 @@
 "use client";
 
 import { Contract, ContractABI, ContractFunction } from "@/types/contracts";
-import {
-  isJsonArray,
-  parseTokenValue,
-  truncateMiddle,
-} from "@/utils/formatter";
+import { isJsonArray, truncateMiddle } from "@/utils/formatter";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { isAddress } from "viem";
@@ -276,10 +272,7 @@ export default function WalletAddress({ hash, contract }: Props) {
                               handleChange(
                                 method.name,
                                 arg.name,
-                                parseTokenValue(
-                                  e.target.value,
-                                  contract.current_state.decimals ?? 0
-                                )
+                                e.target.value
                               )
                             }
                             value={
