@@ -2,7 +2,6 @@
 
 import { Contract, ContractABI, ContractFunction } from "@/types/contracts";
 import {
-  formatTokenValue,
   isJsonArray,
   parseTokenValue,
   truncateMiddle,
@@ -169,12 +168,7 @@ export default function WalletAddress({ hash, contract }: Props) {
                       key={key}
                       className="max-w-full text-ellipsis overflow-hidden"
                     >
-                      {formatTokenValue(
-                        contract.current_state[key],
-                        contract.current_state["decimals"] ?? 0,
-                        true,
-                        contract.current_state.symbol
-                      )}
+                      {contract.current_state[key]}
                     </div>
                   ),
                 }
@@ -264,12 +258,9 @@ export default function WalletAddress({ hash, contract }: Props) {
                                             argComponent.name
                                           ]
                                         )
-                                      : formatTokenValue(
-                                          methodValues[method.name]?.[
-                                            arg.name
-                                          ]?.[argComponent.name],
-                                          contract.current_state.decimals ?? 0
-                                        ) ?? ""
+                                      : methodValues[method.name]?.[arg.name]?.[
+                                          argComponent.name
+                                        ]
                                   }
                                   type="text"
                                 />
@@ -298,10 +289,7 @@ export default function WalletAddress({ hash, contract }: Props) {
                                 ? JSON.stringify(
                                     methodValues[method.name][arg.name]
                                   )
-                                : formatTokenValue(
-                                    methodValues[method.name]?.[arg.name],
-                                    contract.current_state.decimals ?? 0
-                                  ) ?? ""
+                                : methodValues[method.name]?.[arg.name]
                             }
                             type="text"
                           />
@@ -331,12 +319,7 @@ export default function WalletAddress({ hash, contract }: Props) {
                         <div className="text-sm break-all">
                           {typeof staticCallResults[method.name] == "object"
                             ? JSON.stringify(staticCallResults[method.name])
-                            : formatTokenValue(
-                                staticCallResults[method.name],
-                                contract.current_state.decimals ?? 0,
-                                false,
-                                contract.current_state.symbol
-                              )}
+                            : staticCallResults[method.name]}
                         </div>
                       </div>
                     )}

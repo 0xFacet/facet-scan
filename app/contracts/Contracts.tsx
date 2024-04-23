@@ -4,7 +4,6 @@ import { Contract, ContractArtifact } from "@/types/contracts";
 import {
   formatTimestamp,
   isJsonArray,
-  parseTokenValue,
   truncateMiddle,
 } from "@/utils/formatter";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -67,17 +66,6 @@ export default function Contracts({
         [])) ||
     [];
 
-  const modifiedArgs: { [key: string]: any } = { ...constructorArgs };
-
-  if (modifiedArgs.decimals) {
-    for (let key in modifiedArgs) {
-      modifiedArgs[key] = parseTokenValue(
-        `${modifiedArgs[key]}`,
-        modifiedArgs.decimals
-      );
-    }
-  }
-
   useEffect(() => {
     if (!showCreateModal) {
       setConstructorArgs({});
@@ -88,7 +76,7 @@ export default function Contracts({
     try {
       if (!selectedContract) throw "No contract selected";
       const txn = await sendFacetCreate(
-        modifiedArgs,
+        constructorArgs,
         selectedContract.init_code_hash,
         selectedContract.source_code
       );
