@@ -1,22 +1,14 @@
-import {
-  getCardDetails,
-  getFethBalance,
-  getPairsForRouter,
-  getTokenPrices,
-  lookupName,
-  lookupPrimaryName,
-} from "@/utils/data";
-import { Address } from "@/components/Address";
-import { Table } from "@/components/Table";
-import { Card } from "@/components/Card";
 import { isCardName } from "@/lib/utils";
 import { formatEther, isAddress } from "viem";
 import { getUsdPerEth } from "@/utils/usd";
+import { lookupPrimaryName, getCardOwner } from "@/utils/facet/cards";
+import { getTokenPrices, getFethBalance } from "@/utils/facet/tokens";
+import { Card, Table } from "@0xfacet/component-library";
+import { getPools } from "@/utils/facet/contracts";
+import { Address } from "@/components/address";
 
 export default async function Page({ params }: { params: { hash: string } }) {
   let cardOwner;
-  let cardId;
-  let cardDetails;
   let cardName;
   if (isAddress(params.hash)) {
     const { primaryName } = await lookupPrimaryName(params.hash);
@@ -25,15 +17,10 @@ export default async function Page({ params }: { params: { hash: string } }) {
     cardName = params.hash;
   }
   if (cardName) {
-    const card = await lookupName(cardName);
-    cardOwner = card.address;
-    cardId = card.id;
-    if (cardOwner) {
-      cardDetails = await getCardDetails(cardId);
-    }
+    cardOwner = await getCardOwner(cardName);
   }
   const address = cardOwner ?? params.hash;
-  const pairs = await getPairsForRouter(address);
+  const pairs = await getPools(address);
   const fethContractAddress = "0x1673540243e793b0e77c038d4a88448eff524dce";
   const tokenBalances = Object.values(pairs)
     .filter((pair) => {
@@ -83,7 +70,7 @@ export default async function Page({ params }: { params: { hash: string } }) {
   const ethPrice = await getUsdPerEth();
   return (
     <>
-      <Card>
+      <Card childrenClassName="px-4">
         <Table
           headers={[
             "Token",

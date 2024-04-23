@@ -1,10 +1,9 @@
+import { getAddressToName } from "@/utils/facet/cards";
 import {
   fetchContractArtifacts,
   fetchContracts,
-  getAddressToName,
-} from "@/utils/data";
+} from "@/utils/facet/contracts";
 import Contracts from "./Contracts";
-import { flatten } from "lodash";
 
 export default async function Page({
   searchParams,

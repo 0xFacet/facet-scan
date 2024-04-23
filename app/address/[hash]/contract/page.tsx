@@ -1,17 +1,11 @@
-import {
-  fetchContract,
-  getCardDetails,
-  lookupName,
-  lookupPrimaryName,
-} from "@/utils/data";
 import AddressContract from "./AddressContract";
 import { isCardName } from "@/lib/utils";
+import { lookupPrimaryName, getCardOwner } from "@/utils/facet/cards";
+import { fetchContract } from "@/utils/facet/contracts";
 import { isAddress } from "viem";
 
 export default async function Page({ params }: { params: { hash: string } }) {
   let cardOwner;
-  let cardId;
-  let cardDetails;
   let cardName;
   if (isAddress(params.hash)) {
     const { primaryName } = await lookupPrimaryName(params.hash);
@@ -20,14 +14,12 @@ export default async function Page({ params }: { params: { hash: string } }) {
     cardName = params.hash;
   }
   if (cardName) {
-    const card = await lookupName(cardName);
-    cardOwner = card.address;
-    cardId = card.id;
-    if (cardOwner) {
-      cardDetails = await getCardDetails(cardId);
-    }
+    cardOwner = await getCardOwner(cardName);
   }
   const address = cardOwner ?? params.hash;
   const contract = await fetchContract(address);
+
+  if (!contract) return;
+
   return <AddressContract hash={params.hash} contract={contract} />;
 }

@@ -1,10 +1,11 @@
+"use client";
+
 import Link from "next/link";
-import { Section } from "./Section";
-import { SectionContainer } from "./SectionContainer";
+import { SectionContainer, Section } from "@0xfacet/component-library";
 
 export const Footer = () => {
   return (
-    <SectionContainer className="border-none">
+    <SectionContainer className="border-t border-line">
       <Section className="flex-1 items-center gap-4 text-accent text-sm">
         <div className="flex flex-row gap-4 flex-wrap justify-center">
           <Link href="/blocks">Blocks</Link>

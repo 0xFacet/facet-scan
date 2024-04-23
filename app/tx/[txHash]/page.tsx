@@ -1,11 +1,6 @@
-import { Card } from "@/components/Card";
-import { List } from "@/components/List";
-import { Tooltip } from "@/components/Tooltip";
-import {
-  fetchTransaction,
-  getAddressToName,
-  lookupPrimaryName,
-} from "@/utils/data";
+import { getAddressToName } from "@/utils/facet/cards";
+import { fetchTransaction } from "@/utils/facet/transactions";
+import { Card, List, Tooltip } from "@0xfacet/component-library";
 import { formatDistanceToNowStrict } from "date-fns";
 import { capitalize } from "lodash";
 import Link from "next/link";
@@ -15,6 +10,9 @@ import { formatEther, formatGwei } from "viem";
 
 export default async function Page({ params }: { params: { txHash: string } }) {
   const transaction = await fetchTransaction(params.txHash);
+
+  if (!transaction) return;
+
   const addressToName = await getAddressToName([
     transaction.from,
     transaction.to_or_contract_address,
@@ -52,7 +50,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <Card>
+      <Card childrenClassName="px-4">
         <List
           items={[
             {
@@ -158,7 +156,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
           ]}
         />
       </Card>
-      <Card>
+      <Card childrenClassName="px-4">
         <List
           items={[
             {
@@ -218,7 +216,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
                 </div>
               ),
               value: (
-                <Card>
+                <Card childrenClassName="px-4">
                   <List
                     items={Object.entries(transaction.args).map(
                       ([label, value]) => ({ label, value })

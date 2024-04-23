@@ -1,55 +1,44 @@
-import { Collection, CollectionItem } from "./collections";
-
-export interface Transfer {
-  block_number: number;
-  from: `0x${string}`;
-  overall_order_number: string;
-  overall_order_number_as_int: number;
-  timestamp: string;
-  to: `0x${string}`;
+export interface EthscriptionTransfer {
+  id: number;
+  ethscription_transaction_hash: string;
   transaction_hash: string;
-  transaction_index: number;
+  from_address: string;
+  to_address: string;
+  block_number: number;
+  block_timestamp: number;
+  block_blockhash: string;
+  event_log_index: null | number;
   transfer_index: number;
-  sale_price: string;
+  transaction_index: number;
+  enforced_previous_owner: null | string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Ethscription {
-  block_confirmations: number;
-  content_uri: string;
-  creation_timestamp: string;
+  id: number;
+  transaction_hash: `0x${string}`;
+  block_number: number;
+  transaction_index: number;
+  block_timestamp: number;
+  block_blockhash: string;
+  event_log_index: null | number;
+  ethscription_number: number;
   creator: string;
+  initial_owner: string;
   current_owner: string;
+  previous_owner: string;
+  content_uri: string;
+  content_sha: string;
+  esip6: boolean;
   mimetype: string;
-  image_removed_by_request_of_rights_holder?: boolean | null;
-  ethscription_number?: null | number;
-  finalization_status: FinalizationStatus;
-  min_block_confirmations: number;
-  overall_order_number_as_int: number;
-  transaction_hash: string;
-  valid_data_uri: boolean;
-  valid_transfers?: Transfer[];
-  valid_listings?: Listing[];
-  collection_items?: CollectionItem[];
-  collections?: Collection[];
-}
-
-export enum FinalizationStatus {
-  Pending = "pending",
-  PartiallyConfirmed = "partially_confirmed",
-  Safe = "safe",
-  Finalized = "finalized",
-}
-
-export interface Listing {
-  listing_id: string;
-  seller: string;
-  start_time: number;
-  end_time: number;
-  domain_name: string;
-  verifying_contract: string;
-  chain_id: number;
-  version: string;
-  signature: string;
-  ethscription_id: string;
-  price: string;
+  media_type: string;
+  mime_subtype: string;
+  gas_price: string;
+  gas_used: number;
+  transaction_fee: string;
+  value: string;
+  created_at: string;
+  updated_at: string;
+  latest_transfer?: EthscriptionTransfer;
 }

@@ -1,15 +1,16 @@
-import { Address } from "@/components/Address";
-import { Card } from "@/components/Card";
-import { List } from "@/components/List";
-import { fetchTransaction } from "@/utils/data";
+import { Address } from "@/components/address";
+import { fetchTransaction } from "@/utils/facet/transactions";
+import { Card, List } from "@0xfacet/component-library";
 
 export default async function Page({ params }: { params: { txHash: string } }) {
   const transaction = await fetchTransaction(params.txHash);
 
+  if (!transaction) return;
+
   return (
     <div className="flex flex-col gap-8">
       {transaction.logs.map((log, i) => (
-        <Card key={i}>
+        <Card key={i} childrenClassName="px-4">
           <List
             items={[
               {
@@ -23,7 +24,7 @@ export default async function Page({ params }: { params: { txHash: string } }) {
               {
                 label: "Data",
                 value: (
-                  <Card>
+                  <Card childrenClassName="px-4">
                     <List
                       items={Object.entries(log.data).map(([label, value]) => ({
                         label,

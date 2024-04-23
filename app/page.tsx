@@ -1,10 +1,9 @@
+import { fetchTotalBlocks, fetchBlocks } from "@/utils/facet/blocks";
+import { getAddressToName } from "@/utils/facet/cards";
 import {
-  fetchBlocks,
-  fetchTransactions,
-  fetchTotalBlocks,
   fetchTotalTransactions,
-  getAddressToName,
-} from "@/utils/data";
+  fetchTransactions,
+} from "@/utils/facet/transactions";
 import Home from "./Home";
 import { flatten } from "lodash";
 

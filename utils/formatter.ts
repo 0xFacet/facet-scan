@@ -1,21 +1,73 @@
-import { formatDistanceToNowStrict, parseISO } from "date-fns";
-import { camelCase } from "lodash";
+import BigNumber from "bignumber.js";
+import {
+  formatDistanceToNowStrict,
+  intervalToDuration,
+  parseISO,
+} from "date-fns";
 import { formatEther as formatEth, formatUnits, parseUnits } from "viem";
 
-export const formatTimestamp = (date: Date) => {
-  if (!date) return null;
-
-  const timeAgo = formatDistanceToNowStrict(date, {
-    roundingMethod: "floor",
-  });
-
-  return `${timeAgo} ago`;
+export const maxDecimals = function (
+  value: BigNumber | number | undefined,
+  decimalPlaces = 4
+) {
+  let result = (value ?? 0).toFixed(decimalPlaces);
+  result = result.replace(/\.?0+$/, "");
+  return result;
 };
 
-export const formatEther = (wei: string | number, toLocaleString = true) => {
+export const dynamicRound = (value: number) => {
+  if (value === 0) return 0;
+
+  let count = 1;
+  let scaledValue = Math.abs(value);
+
+  while (scaledValue < 2) {
+    scaledValue *= 10;
+    count++;
+  }
+
+  let decimalPlaces = Math.max(2, count);
+
+  return parseFloat(value.toFixed(decimalPlaces));
+};
+
+export const formatTimestamp = (dateStr: string) => {
+  if (!dateStr) return null;
+
+  const targetDate = parseISO(dateStr);
+  const now = new Date();
+
+  if (targetDate.getTime() > now.getTime()) {
+    const duration = intervalToDuration({ start: now, end: targetDate });
+
+    let output = "";
+    if (duration.days) {
+      output = `${duration.days}d ${duration.hours}h`;
+    } else if (duration.hours) {
+      output = `${duration.hours}h ${duration.minutes}m`;
+    } else if (duration.minutes) {
+      output = `${duration.minutes}m ${duration.seconds}s`;
+    } else {
+      output = `${duration.seconds}s`;
+    }
+
+    return `in ${output}`;
+  } else {
+    const formattedDistance = formatDistanceToNowStrict(targetDate, {
+      roundingMethod: "floor",
+    });
+
+    return `${formattedDistance} ago`;
+  }
+};
+
+export const formatEther = (
+  wei: string | number | bigint,
+  toLocaleString = true
+) => {
   try {
     if (toLocaleString) {
-      return Number(formatEth(BigInt(wei)).toString()).toLocaleString();
+      return formatLocaleString(Number(formatEth(BigInt(wei)).toString()));
     }
     return formatEth(BigInt(wei)).toString();
   } catch (e) {
@@ -23,6 +75,11 @@ export const formatEther = (wei: string | number, toLocaleString = true) => {
   }
   return "0";
 };
+
+export const formatLocaleString = (value: number) =>
+  dynamicRound(value).toLocaleString(undefined, {
+    maximumFractionDigits: 20,
+  });
 
 export const truncateMiddle = (
   str: string,
@@ -39,31 +96,12 @@ export const truncateMiddle = (
 };
 
 export const formatTokenValue = (
-  value: string | number,
-  decimals: number,
-  key?: string,
+  value: string | bigint,
+  decimals = 0,
   toLocaleString?: boolean,
   unit?: string
 ) => {
-  if (!value) return "";
-  const isToken =
-    !key ||
-    [
-      "totalSupply",
-      "maxSupply",
-      "perMintLimit",
-      "maxPerAddress",
-      "amount",
-      "value",
-      "balance",
-      "calculateOutputAmount",
-      "tokenAAmount",
-      "tokenBAmount",
-      "inputAmount",
-      "outputAmount",
-      "allowance",
-    ].includes(camelCase(key));
-  if (!isToken) return value;
+  if (!value) return "0";
   let formattedValue = "";
   try {
     if (toLocaleString) {
@@ -83,32 +121,19 @@ export const formatTokenValue = (
   return "0";
 };
 
-export const parseTokenValue = (
-  value: string,
-  decimals: number,
-  key?: string,
-  toLocaleString?: boolean
-) => {
-  const isToken =
-    !key ||
-    ["totalSupply", "maxSupply", "perMintLimit", "amount", "value"].includes(
-      camelCase(key)
-    );
-  if (!isToken) return value;
-  let formattedValue = "";
+export const parseTokenValue = (value: string, decimals: number) => {
   try {
-    if (toLocaleString) {
-      formattedValue = Number(
-        parseUnits(value, decimals).toString()
-      ).toLocaleString();
-    } else {
-      formattedValue = parseUnits(value, decimals).toString();
-    }
-    return formattedValue;
+    return parseUnits(value, decimals).toString();
   } catch (e) {
     console.error(e);
   }
   return "0";
+};
+
+export const cleanErrorMessage = (error: string) => {
+  const errorMessageRegex = /error:\s(.+?)\s\(\w+:\d+\)/;
+  const match = error.match(errorMessageRegex);
+  return match ? match[1] : error;
 };
 
 export const isJsonArray = (input: any) => {
@@ -116,6 +141,8 @@ export const isJsonArray = (input: any) => {
   try {
     const json = JSON.parse(input);
     isArray = Array.isArray(json);
+  } catch (e) {
+    //
   } finally {
     return isArray;
   }

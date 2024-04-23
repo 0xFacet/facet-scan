@@ -1,12 +1,14 @@
-import { fetchTotalBlocks, fetchBlocks } from "@/utils/data";
-import { Section } from "@/components/Section";
-import { SectionContainer } from "@/components/SectionContainer";
-import { Pagination } from "@/components/pagination";
-import { Heading } from "@/components/Heading";
 import Link from "next/link";
-import { Table } from "@/components/Table";
 import { formatTimestamp } from "@/utils/formatter";
-import { Card } from "@/components/Card";
+import { fetchTotalBlocks, fetchBlocks } from "@/utils/facet/blocks";
+import {
+  SectionContainer,
+  Section,
+  Heading,
+  Card,
+  Table,
+  Pagination,
+} from "@0xfacet/component-library";
 
 export default async function Page({
   searchParams,
@@ -19,7 +21,7 @@ export default async function Page({
   });
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-1 flex-col divide-y divide-line">
       <SectionContainer>
         <Section>
           <Heading size="h2" className="py-4">
@@ -29,7 +31,7 @@ export default async function Page({
       </SectionContainer>
       <SectionContainer className="flex-1">
         <Section className="flex-1">
-          <Card>
+          <Card childrenClassName="px-4">
             <Table
               headers={["Block", "Age", "Transactions"]}
               rows={[
@@ -41,7 +43,9 @@ export default async function Page({
                     {block.block_number}
                   </Link>,
                   block.timestamp
-                    ? formatTimestamp(new Date(Number(block.timestamp) * 1000))
+                    ? formatTimestamp(
+                        new Date(Number(block.timestamp) * 1000).toISOString()
+                      )
                     : "--",
                   <Link
                     key={block.block_number}
