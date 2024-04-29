@@ -1,5 +1,5 @@
 import { get } from "../api-client";
-import { sendStaticCall } from "./contracts";
+import { sendStaticCall, storageGet } from "./contracts";
 
 const fethContractAddress = process.env.NEXT_PUBLIC_BRIDGED_ETHER_ADDRESS!;
 const routerContractAddress = process.env.NEXT_PUBLIC_ROUTER_ADDRESS!;
@@ -43,7 +43,7 @@ export const getTokenSwaps = async (
 };
 
 export const getFethBalance = async (userAddress: `0x${string}`) => {
-  return sendStaticCall(fethContractAddress, "balanceOf", [userAddress]);
+  return storageGet(fethContractAddress, "balanceOf", [userAddress]);
 };
 
 export const getTokenPrices = async (tokenAddresses: `0x${string}`[]) => {
