@@ -3,7 +3,10 @@ import { mainnet } from "viem/chains";
 
 const publicClient = createPublicClient({
   chain: mainnet,
-  transport: http(),
+  transport:
+    process.env.NEXT_PUBLIC_NETWORK === "mainnet"
+      ? http("https://ethereum-rpc.publicnode.com")
+      : http("https://ethereum-sepolia-rpc.publicnode.com"),
 });
 
 export const getUsdPerEth = async () => {
