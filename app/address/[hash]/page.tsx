@@ -35,9 +35,10 @@ export default async function Page({
     page: searchParams.page ? searchParams.page : 1,
     toOrFrom: cardOwner ?? params.hash,
   });
-  const addressToName = await getAddressToName(
-    flatten(transactions.map((txn) => [txn.from, txn.to_or_contract_address]))
-  );
+  // const addressToName = await getAddressToName(
+  //   flatten(transactions.map((txn) => [txn.from, txn.to_or_contract_address]))
+  // );
+  const addressToName = {} as any;
   return (
     <>
       <Card childrenClassName="px-4">
