@@ -10,6 +10,10 @@ const publicClient = createPublicClient({
 });
 
 export const getUsdPerEth = async () => {
+  if (process.env.NEXT_PUBLIC_NETWORK != 'mainnet') {
+    return 0;
+  }
+  
   const usdContractRead = (await publicClient.readContract({
     address: "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f",
     abi: reservesABI,
