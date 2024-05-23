@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@0xfacet/component-library@^1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@0xfacet/component-library/-/component-library-1.0.10.tgz#2192cd44ca12132a1eb18ce8f6712ae1f8102068"
-  integrity sha512-7xBb5dJxhQQoNhqtkcy9ezJw2pHLxnRT2l+YJBefrQ4h1t9/g9lypTLRtOLfjDt+YhHG1P/rhRgxa54BdVWedQ==
+"@0xfacet/component-library@^1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@0xfacet/component-library/-/component-library-1.0.11.tgz#157187a5f6dceff479fd1a542ee2609859eddb79"
+  integrity sha512-fMa0MkuolK/JhMRNszXbSpr5RD5fXQXSslJW7mJ4Ml8yr44hzN3chAN6v3ZKAS35IaZN01YIY/ZnqD5CLaYP+Q==
   dependencies:
     "@radix-ui/react-accordion" "^1.1.2"
     "@radix-ui/react-checkbox" "^1.0.4"
