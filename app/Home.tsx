@@ -64,7 +64,7 @@ export default function Home({
 
   return (
     <div className="flex flex-1 flex-col divide-y divide-line">
-      <SectionContainer className="bg-[url(/card-bg.svg)] bg-no-repeat bg-cover xl:bg-[length:1536px] bg-center border-none">
+      <SectionContainer className="bg-[url(/halftone_1.svg)] bg-black bg-no-repeat bg-[length:1536px] xl:bg-cover bg-center border-none">
         <Section className="flex-1 py-32 sm:py-40 gap-8 mx-auto">
           <Heading size="h2">Facet Block Explorer</Heading>
           <form
@@ -73,7 +73,7 @@ export default function Home({
           >
             <div className="flex-1 min-w-[150px]">
               <input
-                className="w-full bg-black/20 text-md sm:text-lg md:text-2xl outline-none px-6 py-4 sm:px-10 sm:py-8 border-2 border-primary rounded-l-xl sm:rounded-l-3xl rounded-r-none"
+                className="w-full bg-black text-md sm:text-lg md:text-2xl outline-none px-6 py-4 sm:px-10 sm:py-8 border-4 border-primary rounded-l-xl sm:rounded-l-3xl rounded-r-none"
                 placeholder="Search by card, address, transaction, or block"
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
@@ -81,7 +81,7 @@ export default function Home({
             </div>
             <button
               type="submit"
-              className="disabled:opacity-50 opacity-90 hover:opacity-100 p-4 sm:p-8 text-md sm:text-lg md:text-2xl bg-primary text-black border-primary rounded-r-xl sm:rounded-r-3xl rounded-l-none"
+              className="p-4 sm:p-8 text-md sm:text-lg md:text-2xl bg-primary rounded-r-xl sm:rounded-r-3xl rounded-l-none"
             >
               <BiSearch />
             </button>

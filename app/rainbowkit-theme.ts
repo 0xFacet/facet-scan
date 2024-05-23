@@ -10,13 +10,11 @@ export const rainbowkitTheme: Theme = {
   },
   colors: {
     ...darkTheme().colors,
-    modalBackground:
-      "radial-gradient(100% 100% at 100% 100%, #1a1d0e 0%, #000000 100%)",
+    modalBackground: "black",
     modalBorder: "rgba(255,255,255,0.1)",
-    accentColor: "#c3ff00",
-    accentColorForeground: "#000000",
+    accentColor: "#3F19D9",
+    accentColorForeground: "white",
     modalBackdrop: "rgba(0,0,0,0.8)",
-    actionButtonBorder: "rgba(255,255,255,0.1)",
     actionButtonSecondaryBackground: "transparent",
   },
   radii: {
