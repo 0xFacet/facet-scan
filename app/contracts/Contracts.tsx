@@ -135,15 +135,10 @@ export default function Contracts({
 
   return (
     <div className="flex flex-1 flex-col divide-y divide-line">
-      <SectionContainer className="bg-[url(/card-bg.svg)] bg-no-repeat bg-cover xl:bg-[length:1536px] bg-center border-none">
+      <SectionContainer className="bg-[url(/halftone_1.svg)] bg-no-repeat bg-[length:1536px] xl:bg-cover bg-center border-none">
         <Section>
           <div className="flex flex-col py-0 md:py-16 gap-4 md:gap-8">
             <Heading>Contracts</Heading>
-            <div className="text-lg text-accent">
-              Contracts offers enhanced scalability and flexibility while
-              reducing the constraints of on-chain gas fees and processing
-              limitations.
-            </div>
             <Button onClick={() => setShowCreateModal(true)} className="w-fit">
               Create Contract
             </Button>
