@@ -14,10 +14,6 @@ interface Props {
 }
 
 export const Address = ({ address, size = 16, name, linkTarget, fallbackText }: Props) => {
-  if (fallbackText && address == null) {
-    return <>{fallbackText}</>;
-  }
-  
   const [primaryName, setPrimaryName] = useState<string>(name ?? "");
 
   useEffect(() => {
@@ -30,6 +26,10 @@ export const Address = ({ address, size = 16, name, linkTarget, fallbackText }: 
       setPrimaryName(name);
     }
   }, [address, name]);
+  
+  if (fallbackText && address == null) {
+    return <>{fallbackText}</>;
+  }
 
   const href = linkTarget ? linkTarget : `/address/${primaryName || address}`;
 
