@@ -99,6 +99,7 @@ export default async function Page({
                     key={transaction.transaction_hash}
                     address={transaction.to_or_contract_address}
                     name={addressToName[transaction.to_or_contract_address]}
+                    fallbackText="--"
                   />,
                   transaction.transaction_fee
                     ? Number(

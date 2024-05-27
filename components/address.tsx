@@ -10,9 +10,14 @@ interface Props {
   linkTarget?: string;
   size?: number;
   name?: string;
+  fallbackText?: string;
 }
 
-export const Address = ({ address, size = 16, name, linkTarget }: Props) => {
+export const Address = ({ address, size = 16, name, linkTarget, fallbackText }: Props) => {
+  if (fallbackText && address == null) {
+    return <>{fallbackText}</>;
+  }
+  
   const [primaryName, setPrimaryName] = useState<string>(name ?? "");
 
   useEffect(() => {
