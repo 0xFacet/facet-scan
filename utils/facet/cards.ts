@@ -26,16 +26,20 @@ export const getCardDetails = async (tokenId: number) => {
 export const getCardOwner = async (name: string) =>
   sendStaticCall(cardsContractAddress, "resolveName", [name]);
 
-export const getAddressToName = async (addresses: `0x${string}`[]) =>
+export const getAddressToName = async (
+  addresses: (`0x${string}` | null | undefined)[]
+) =>
   (
     await Promise.all(
-      uniq(addresses).map(async (address) => {
-        const { primaryName } = await lookupPrimaryName(address);
-        return { address, name: primaryName } as {
-          address: `0x${string}`;
-          name: string | null;
-        };
-      })
+      (uniq(addresses).filter((address) => !!address) as `0x${string}`[]).map(
+        async (address) => {
+          const { primaryName } = await lookupPrimaryName(address);
+          return { address, name: primaryName } as {
+            address: `0x${string}`;
+            name: string | null;
+          };
+        }
+      )
     )
   ).reduce(
     (previous, current) => ({ ...previous, [current.address]: current.name }),
