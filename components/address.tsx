@@ -6,30 +6,27 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 interface Props {
-  address: string;
+  address?: string | null;
   linkTarget?: string;
   size?: number;
-  name?: string;
-  fallbackText?: string;
+  name?: string | null;
 }
 
-export const Address = ({ address, size = 16, name, linkTarget, fallbackText }: Props) => {
+export const Address = ({ address, size = 16, name, linkTarget }: Props) => {
   const [primaryName, setPrimaryName] = useState<string>(name ?? "");
 
   useEffect(() => {
-    if (!name) {
+    if (!name && address) {
       (async () => {
         const res = await lookupPrimaryName(address);
         setPrimaryName(res.primaryName);
       })();
-    } else {
+    } else if (name && address) {
       setPrimaryName(name);
     }
   }, [address, name]);
-  
-  if (fallbackText && address == null) {
-    return <>{fallbackText}</>;
-  }
+
+  if (!address) return "--";
 
   const href = linkTarget ? linkTarget : `/address/${primaryName || address}`;
 

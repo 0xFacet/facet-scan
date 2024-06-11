@@ -181,7 +181,11 @@ export default function Home({
                     <span className="text-accent mr-6">{"To "}</span>
                     <Address
                       address={transaction.to_or_contract_address}
-                      name={addressToName[transaction.to_or_contract_address]}
+                      name={
+                        transaction.to_or_contract_address
+                          ? addressToName[transaction.to_or_contract_address]
+                          : null
+                      }
                     />
                   </div>
                 </div>

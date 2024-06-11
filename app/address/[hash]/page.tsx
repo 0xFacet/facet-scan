@@ -94,7 +94,11 @@ export default async function Page({
               <Address
                 key={transaction.transaction_hash}
                 address={transaction.to_or_contract_address}
-                name={addressToName[transaction.to_or_contract_address]}
+                name={
+                  transaction.to_or_contract_address
+                    ? addressToName[transaction.to_or_contract_address]
+                    : null
+                }
               />,
               transaction.transaction_fee
                 ? Number(

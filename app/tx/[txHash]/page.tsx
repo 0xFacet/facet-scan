@@ -187,7 +187,8 @@ export default async function Page({ params }: { params: { txHash: string } }) {
               ),
               value: (
                 <Link href={`/address/${transaction.to_or_contract_address}`}>
-                  {addressToName[transaction.to_or_contract_address]
+                  {transaction.to_or_contract_address &&
+                  addressToName[transaction.to_or_contract_address]
                     ? `${addressToName[transaction.to_or_contract_address]} (${
                         transaction.to_or_contract_address
                       })`
